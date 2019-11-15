@@ -1,0 +1,17 @@
+#NEXUS
+
+Begin taxa;
+	Dimensions ntax=3;
+		Taxlabels
+			bonobo 
+			chimp 
+			gorilla
+			;
+End;
+Begin trees;
+	Translate
+		   1 bonobo,
+		   2 chimp,
+		   3 gorilla
+;
+tree STATE_0 = ((1:0.8372919835715303,2:0.8372919835715303):0.40173560078707615,3:1.2390275843586065):0.0;

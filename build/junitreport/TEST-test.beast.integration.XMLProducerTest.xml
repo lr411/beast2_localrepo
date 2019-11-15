@@ -1,0 +1,971 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuite errors="0" failures="0" hostname="Leonardos-MacBook-Pro.local" name="test.beast.integration.XMLProducerTest" skipped="0" tests="2" time="3.242" timestamp="2019-06-11T12:13:38">
+  <properties>
+    <property name="java.vendor" value="Oracle Corporation" />
+    <property name="sun.java.launcher" value="SUN_STANDARD" />
+    <property name="BEAUti_name" value="BEAUti" />
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers" />
+    <property name="dist" value="/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/build/dist" />
+    <property name="lib" value="/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/lib" />
+    <property name="os.name" value="Mac OS X" />
+    <property name="sun.boot.class.path" value="/Library/Java/JavaVirtualMachines/jdk1.8.0_192.jdk/Contents/Home/jre/lib/resources.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_192.jdk/Contents/Home/jre/lib/rt.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_192.jdk/Contents/Home/jre/lib/sunrsasign.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_192.jdk/Contents/Home/jre/lib/jsse.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_192.jdk/Contents/Home/jre/lib/jce.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_192.jdk/Contents/Home/jre/lib/charsets.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_192.jdk/Contents/Home/jre/lib/jfr.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_192.jdk/Contents/Home/jre/classes" />
+    <property name="report" value="build/junitreport" />
+    <property name="common_dir" value="release/common" />
+    <property name="java.vm.specification.vendor" value="Oracle Corporation" />
+    <property name="ant.home" value="/usr/local/Cellar/ant/1.10.6/libexec" />
+    <property name="java.runtime.version" value="1.8.0_192-b12" />
+    <property name="main_class_BEAST" value="beast.app.beastapp.BeastMain" />
+    <property name="Mac_package_dir" value="release/Mac/BEAST" />
+    <property name="user.name" value="lr411" />
+    <property name="AppleSigner" value="Developer ID Application: Remco Bouckaert (LHFJWE5U63)" />
+    <property name="LogAnalyser_name" value="LogAnalyser" />
+    <property name="user.language" value="en" />
+    <property name="build" value="/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/build" />
+    <property name="sun.boot.library.path" value="/Library/Java/JavaVirtualMachines/jdk1.8.0_192.jdk/Contents/Home/jre/lib" />
+    <property name="ant.project.default-target" value="build_jar_all_BEAST" />
+    <property name="tools_dir" value="release/common/tools" />
+    <property name="ant.project.name" value="BUILD_BEAST_2" />
+    <property name="java.version" value="1.8.0_192" />
+    <property name="version" value="2.5.1" />
+    <property name="user.timezone" value="" />
+    <property name="sun.arch.data.model" value="64" />
+    <property name="Linux_dir" value="release/Linux" />
+    <property name="http.nonProxyHosts" value="local|*.local|169.254/16|*.169.254/16" />
+    <property name="java.endorsed.dirs" value="/Library/Java/JavaVirtualMachines/jdk1.8.0_192.jdk/Contents/Home/jre/lib/endorsed" />
+    <property name="doc" value="/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/doc" />
+    <property name="version_number" value="2.5.1" />
+    <property name="sun.cpu.isalist" value="" />
+    <property name="sun.jnu.encoding" value="UTF-8" />
+    <property name="file.encoding.pkg" value="sun.io" />
+    <property name="file.separator" value="/" />
+    <property name="java.specification.name" value="Java Platform API Specification" />
+    <property name="java.class.version" value="52.0" />
+    <property name="src" value="/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/src" />
+    <property name="Mac_bundle_dir" value="release/Mac/BEAST/BEAST" />
+    <property name="user.country" value="GB" />
+    <property name="java.home" value="/Library/Java/JavaVirtualMachines/jdk1.8.0_192.jdk/Contents/Home/jre" />
+    <property name="java.vm.info" value="mixed mode" />
+    <property name="Mac_dir" value="release/Mac" />
+    <property name="ant.file" value="/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/build.xml" />
+    <property name="os.version" value="10.14" />
+    <property name="release_dir" value="release" />
+    <property name="path.separator" value=":" />
+    <property name="java.vm.version" value="25.192-b12" />
+    <property name="ant.library.dir" value="/usr/local/Cellar/ant/1.10.6/libexec/lib" />
+    <property name="java.awt.printerjob" value="sun.lwawt.macosx.CPrinterJob" />
+    <property name="sun.io.unicode.encoding" value="UnicodeBig" />
+    <property name="beast1_dir" value="release/common/beast1" />
+    <property name="awt.toolkit" value="sun.lwawt.macosx.LWCToolkit" />
+    <property name="socksNonProxyHosts" value="local|*.local|169.254/16|*.169.254/16" />
+    <property name="ftp.nonProxyHosts" value="local|*.local|169.254/16|*.169.254/16" />
+    <property name="BEAST_name" value="BEAST" />
+    <property name="TreeAnnotator_name" value="TreeAnnotator" />
+    <property name="user.home" value="/Users/lr411" />
+    <property name="java.specification.vendor" value="Oracle Corporation" />
+    <property name="test" value="/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/test" />
+    <property name="ant.file.BUILD_BEAST_2" value="/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/build.xml" />
+    <property name="java.library.path" value="/Users/lr411/Library/Java/Extensions:/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java:." />
+    <property name="java.vendor.url" value="http://java.oracle.com/" />
+    <property name="java.vm.vendor" value="Oracle Corporation" />
+    <property name="gopherProxySet" value="false" />
+    <property name="copyright" value="Beast 2 development team 2011-2018" />
+    <property name="java.runtime.name" value="Java(TM) SE Runtime Environment" />
+    <property name="ant.version" value="Apache Ant(TM) version 1.10.6 compiled on May 2 2019" />
+    <property name="sun.java.command" value="org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner test.beast.integration.XMLProducerTest skipNonTests=false filtertrace=true haltOnError=false haltOnFailure=false formatter=org.apache.tools.ant.taskdefs.optional.junit.SummaryJUnitResultFormatter showoutput=false outputtoformatters=true logfailedtests=true threadid=0 logtestlistenerevents=false formatter=org.apache.tools.ant.taskdefs.optional.junit.XMLJUnitResultFormatter,/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/build/junitreport/TEST-test.beast.integration.XMLProducerTest.xml crashfile=/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/junitvmwatcher5666786698287584301.properties propsfile=/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/junit6925453242014584200.properties" />
+    <property name="java.class.path" value="/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/lib/beagle.jar:/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/lib/jam.jar:/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/lib/colt.jar:/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/lib/fest.jar:/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/lib/junit-4.8.2.jar:/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/lib/antlr-runtime-4.7.jar:/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/build:/usr/local/Cellar/ant/1.10.6/libexec/lib/ant-launcher.jar:/usr/local/Cellar/ant/1.10.6/libexec/lib/ant.jar:/usr/local/Cellar/ant/1.10.6/libexec/lib/ant-junit.jar:/usr/local/Cellar/ant/1.10.6/libexec/lib/ant-junit4.jar" />
+    <property name="sdk_dir" value="release/BEAST_SDK" />
+    <property name="junitfailed" value="true" />
+    <property name="ant.file.type.BUILD_BEAST_2" value="file" />
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification" />
+    <property name="ant.file.type" value="file" />
+    <property name="java.vm.specification.version" value="1.8" />
+    <property name="sun.os.patch.level" value="unknown" />
+    <property name="sun.cpu.endian" value="little" />
+    <property name="Linux_package_dir" value="release/Linux/beast" />
+    <property name="java.io.tmpdir" value="/var/folders/gf/rwhntprj2sqd6lkt8254md2m0000gn/T/" />
+    <property name="beast_name" value="beast" />
+    <property name="java.vendor.url.bug" value="http://bugreport.sun.com/bugreport/" />
+    <property name="java.awt.graphicsenv" value="sun.awt.CGraphicsEnvironment" />
+    <property name="os.arch" value="x86_64" />
+    <property name="java.ext.dirs" value="/Users/lr411/Library/Java/Extensions:/Library/Java/JavaVirtualMachines/jdk1.8.0_192.jdk/Contents/Home/jre/lib/ext:/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java" />
+    <property name="user.dir" value="/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2" />
+    <property name="line.separator" value="&#xa;" />
+    <property name="java.vm.name" value="Java HotSpot(TM) 64-Bit Server VM" />
+    <property name="basedir" value="/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2" />
+    <property name="ant.java.version" value="1.8" />
+    <property name="ant.core.lib" value="/usr/local/Cellar/ant/1.10.6/libexec/lib/ant.jar" />
+    <property name="Windows_dir" value="release/Windows" />
+    <property name="LogCombiner_name" value="LogCombiner" />
+    <property name="file.encoding" value="UTF-8" />
+    <property name="java.specification.version" value="1.8" />
+    <property name="ant.project.invoked-targets" value="build_jar_all_BEAST" />
+    <property name="AppLauncher_name" value="AppLauncher" />
+    <property name="Windows_package_dir" value="release/Windows/BEAST" />
+  </properties>
+  <testcase classname="test.beast.integration.XMLProducerTest" name="test_ThatNexusExamplesProduces" time="3.173" />
+  <testcase classname="test.beast.integration.XMLProducerTest" name="testObjectWithoutID" time="0.015" />
+  <system-out><![CDATA[Test Nexus Examples in /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/examples/nexus
+Processing Primates.nex
+Tarsius_syrichta: 898 4
+Lemur_catta: 898 4
+Homo_sapiens: 898 4
+Pan: 898 4
+Gorilla: 898 4
+Pongo: 898 4
+Hylobates: 898 4
+Macaca_fuscata: 898 4
+M_mulatta: 898 4
+M_fascicularis: 898 4
+M_sylvanus: 898 4
+Saimiri_sciureus: 898 4
+Alignment(null)
+  12 taxa
+  898 sites
+  413 patterns
+
+Filter 1-449
+12 taxa
+449 sites
+227 patterns
+Filter 450-898
+12 taxa
+449 sites
+231 patterns
+Primates
+Done Primates.nex
+Processing Shankarappa.Patient9.nex
+Alignment(null)
+  117 taxa
+  663 sites
+  341 patterns
+
+p9c003-01 = 003 (131.0)
+p9c003-04 = 003 (131.0)
+p9c003-09 = 003 (131.0)
+p9c003-11 = 003 (131.0)
+p9c003-364 = 003 (131.0)
+p9c003-367 = 003 (131.0)
+p9c003-368 = 003 (131.0)
+p9c003-369 = 003 (131.0)
+p9c003-371 = 003 (131.0)
+p9c009-03 = 009 (125.0)
+p9c009-07 = 009 (125.0)
+p9c009-14 = 009 (125.0)
+p9c009-384 = 009 (125.0)
+p9c009-390 = 009 (125.0)
+p9c009-392 = 009 (125.0)
+p9c009-393 = 009 (125.0)
+p9c017-01 = 017 (117.0)
+p9c017-02 = 017 (117.0)
+p9c017-04 = 017 (117.0)
+p9c017-05 = 017 (117.0)
+p9c017-06 = 017 (117.0)
+p9c017-13 = 017 (117.0)
+p9c017-16 = 017 (117.0)
+p9c017-407 = 017 (117.0)
+p9c017-409 = 017 (117.0)
+p9c039-02 = 039 (95.0)
+p9c039-03 = 039 (95.0)
+p9c039-04 = 039 (95.0)
+p9c039-05 = 039 (95.0)
+p9c039-07 = 039 (95.0)
+p9c039-09 = 039 (95.0)
+p9c039-10 = 039 (95.0)
+p9c039-18 = 039 (95.0)
+p9c039-299 = 039 (95.0)
+p9c039-300 = 039 (95.0)
+p9c063-01 = 063 (71.0)
+p9c063-02 = 063 (71.0)
+p9c063-04 = 063 (71.0)
+p9c063-05 = 063 (71.0)
+p9c063-06 = 063 (71.0)
+p9c063-07 = 063 (71.0)
+p9c063-09 = 063 (71.0)
+p9c063-10 = 063 (71.0)
+p9c063-11 = 063 (71.0)
+p9c063-12 = 063 (71.0)
+p9c063-13 = 063 (71.0)
+p9c063-16 = 063 (71.0)
+p9c086-02 = 086 (48.0)
+p9c086-03 = 086 (48.0)
+p9c086-05 = 086 (48.0)
+p9c086-08 = 086 (48.0)
+p9c086-10 = 086 (48.0)
+p9c086-11 = 086 (48.0)
+p9c086-12 = 086 (48.0)
+p9c086-17 = 086 (48.0)
+p9c086-19 = 086 (48.0)
+p9c086-20 = 086 (48.0)
+p9c104-02 = 104 (30.0)
+p9c104-05 = 104 (30.0)
+p9c104-09 = 104 (30.0)
+p9c104-10 = 104 (30.0)
+p9c104-12 = 104 (30.0)
+p9c104-14 = 104 (30.0)
+p9c111-02 = 111 (23.0)
+p9c111-05 = 111 (23.0)
+p9c111-07 = 111 (23.0)
+p9c111-08 = 111 (23.0)
+p9c111-10 = 111 (23.0)
+p9c111-11 = 111 (23.0)
+p9c111-16 = 111 (23.0)
+p9c111-18 = 111 (23.0)
+p9c117-02 = 117 (17.0)
+p9c117-03 = 117 (17.0)
+p9c117-06 = 117 (17.0)
+p9c117-07 = 117 (17.0)
+p9c117-09 = 117 (17.0)
+p9c117-11 = 117 (17.0)
+p9c117-12 = 117 (17.0)
+p9c117-13 = 117 (17.0)
+p9c122-03 = 122 (12.0)
+p9c122-06 = 122 (12.0)
+p9c122-07 = 122 (12.0)
+p9c122-09 = 122 (12.0)
+p9c122-10 = 122 (12.0)
+p9c122-11 = 122 (12.0)
+p9c122-12 = 122 (12.0)
+p9c122-15 = 122 (12.0)
+p9c122-16 = 122 (12.0)
+p9c122-17 = 122 (12.0)
+p9c129-02 = 129 (5.0)
+p9c129-03 = 129 (5.0)
+p9c129-08 = 129 (5.0)
+p9c129-09 = 129 (5.0)
+p9c129-10 = 129 (5.0)
+p9c129-12 = 129 (5.0)
+p9c129-15 = 129 (5.0)
+p9c129-16 = 129 (5.0)
+p9c129-17 = 129 (5.0)
+p9c129-18 = 129 (5.0)
+p9c134-01 = 134 (0.0)
+p9c134-02 = 134 (0.0)
+p9c134-03 = 134 (0.0)
+p9c134-05 = 134 (0.0)
+p9c134-07 = 134 (0.0)
+p9c134-08 = 134 (0.0)
+p9c134-09 = 134 (0.0)
+p9c134-11 = 134 (0.0)
+p9c134-19 = 134 (0.0)
+p9c134-20 = 134 (0.0)
+p9c104-03 = 104 (30.0)
+p9c104-08 = 104 (30.0)
+p9c104-11 = 104 (30.0)
+p9c111-04 = 111 (23.0)
+p9c111-20 = 111 (23.0)
+p9c117-15 = 117 (17.0)
+p9c117-16 = 117 (17.0)
+p9c129-04 = 129 (5.0)
+Shankarappa
+Done Shankarappa.Patient9.nex
+Processing primate-mtDNA-interleaved.nex
+Lemur_catta: 898 4
+Homo_sapiens: 898 4
+Pan: 898 4
+Gorilla: 898 4
+Pongo: 898 4
+Hylobates: 898 4
+Macaca_fuscata: 898 4
+M._mulatta: 898 4
+M._fascicularis: 898 4
+M._sylvanus: 898 4
+Saimiri_sciureus: 898 4
+Tarsius_syrichta: 898 4
+Alignment(null)
+  12 taxa
+  898 sites
+  413 patterns
+
+Filter 2-457,660-896
+12 taxa
+693 sites
+361 patterns
+Filter 1,458-659,897-898
+12 taxa
+205 sites
+79 patterns
+Filter 2-457\3,660-896\3
+12 taxa
+231 sites
+120 patterns
+Filter 3-457\3,661-896\3
+12 taxa
+231 sites
+82 patterns
+Filter 4-457\3,662-.\3
+12 taxa
+231 sites
+204 patterns
+primate-mtDNA-interleaved
+Done primate-mtDNA-interleaved.nex
+Processing ML_analysis.nex
+A: 200 4
+B: 200 4
+C: 200 4
+D: 200 4
+E: 200 4
+F: 200 4
+G: 200 4
+H: 200 4
+Alignment(null)
+  8 taxa
+  200 sites
+  152 patterns
+
+ML_analysis
+Done ML_analysis.nex
+Processing Flu.nex
+TREESPARROW_HENAN_1_2004: 1698 4
+HUMAN_VIETNAM_CL105_2005: 1698 4
+TREESPARROW_HENAN_4_2004: 1698 4
+CHICKEN_HEBEI_326_2005: 1698 4
+CHICKEN_HONGKONG_915_1997: 1698 4
+VIETNAM_3062_2004: 1698 4
+GOOSE_HONGKONG_W355_1997: 1698 4
+DUCK_HONGKONG_Y283_1997: 1698 4
+DUCK_VIETNAM_376_2005: 1698 4
+MALLARD_VIETNAM_16_2003: 1698 4
+CHICKEN_THAILAND_KANCHANABURI_CK_160_2005: 1698 4
+DUCK_GUANGZHOU_20_2005: 1698 4
+CK_HK_WF157_2003: 1698 4
+SWINE_ANHUI_2004: 1698 4
+DUCK_VIETNAM_272_2005: 1698 4
+HONGKONG_1997_1998: 1698 4
+GOOSE_SHANTOU_2216_2005: 1698 4
+TREESPARROW_HENAN_3_2004: 1698 4
+PEREGRINEFALCON_HK_D0028_2004: 1698 4
+TREESPARROW_HENAN_2_2004: 1698 4
+HONGKONG_538_1997: 1698 4
+Alignment(null)
+  21 taxa
+  1698 sites
+  217 patterns
+
+Flu
+Done Flu.nex
+Processing 47.nex
+Orthogeomys_heterodus: 819 4
+Thomomys_bottae_awahnee_a: 819 4
+Thomomys_bottae_awahnee_b: 819 4
+Thomomys_bottae_xerophilus: 819 4
+Thomomys_bottae_cactophilus: 819 4
+Thomomys_bottae_albatus: 819 4
+Thomomys_bottae_ruidosae: 819 4
+Thomomys_bottae_bottae: 819 4
+Thomomys_bottae_alpinus: 819 4
+Thomomys_bottae_riparius: 819 4
+Thomomys_bottae_mewa: 819 4
+Thomomys_bottae_saxatilis: 819 4
+Thomomys_bottae_laticeps: 819 4
+Thomomys_talpoides_ocius: 819 4
+Thomomys_idahoensis_pygmaeus_a: 819 4
+Thomomys_idahoensis_pygmaeus_b: 819 4
+Thomomys_mazama_mazama: 819 4
+Thomomys_mazama_nasicus: 819 4
+Thomomys_monticola_a: 819 4
+Thomomys_monticola_b: 819 4
+Thomomys_talpoides_yakimensis: 819 4
+Thomomys_talpoides_bridgeri: 819 4
+Thomomys_townsendii_townsendii: 819 4
+Thomomys_townsendii_relictus: 819 4
+Thomomys_umbrinus_chihuahuae: 819 4
+Thomomys_umbrinus_atroavarius: 819 4
+Alignment(null)
+  26 taxa
+  819 sites
+  153 patterns
+
+47
+Done 47.nex
+Processing 53.nex
+Orthogeomys_heterodus: 621 4
+Thomomys_bottae_awahnee_a: 621 4
+Thomomys_bottae_awahnee_b: 621 4
+Thomomys_bottae_xerophilus: 621 4
+Thomomys_bottae_cactophilus: 621 4
+Thomomys_bottae_albatus: 621 4
+Thomomys_bottae_ruidosae: 621 4
+Thomomys_bottae_bottae: 621 4
+Thomomys_bottae_alpinus: 621 4
+Thomomys_bottae_riparius: 621 4
+Thomomys_bottae_mewa: 621 4
+Thomomys_bottae_saxatilis: 621 4
+Thomomys_bottae_laticeps: 621 4
+Thomomys_talpoides_ocius: 621 4
+Thomomys_idahoensis_pygmaeus_a: 621 4
+Thomomys_idahoensis_pygmaeus_b: 621 4
+Thomomys_mazama_mazama: 621 4
+Thomomys_mazama_nasicus: 621 4
+Thomomys_monticola_a: 621 4
+Thomomys_monticola_b: 621 4
+Thomomys_talpoides_yakimensis: 621 4
+Thomomys_talpoides_bridgeri: 621 4
+Thomomys_townsendii_townsendii: 621 4
+Thomomys_townsendii_relictus: 621 4
+Thomomys_umbrinus_chihuahuae: 621 4
+Thomomys_umbrinus_atroavarius: 621 4
+Alignment(null)
+  26 taxa
+  621 sites
+  141 patterns
+
+53
+Done 53.nex
+Processing RSV2.nex
+Alignment(null)
+  129 taxa
+  629 sites
+  332 patterns
+
+RSV2
+Done RSV2.nex
+Processing maddison.nex
+fish: 20 4
+frog: 20 4
+snake: 20 4
+mouse: 20 4
+Alignment(null)
+  4 taxa
+  20 sites
+  13 patterns
+
+maddison
+Done maddison.nex
+Processing Darwins-finches.nex
+AF_110423_C_olivacea: 1123 4
+AF_109015_C_olivacea: 1123 4
+AF_109025_C_olivacea: 1123 4
+AF_109060_C_parvulus: 1123 4
+AF_109018_C_parvulus: 1123 4
+AF_109019_C_parvulus: 1123 4
+AF_109037_G_magnirostris: 1123 4
+AF_109067_G_magnirostris: 1123 4
+AF_109053_G_fortis: 1123 4
+AF_109052_G_fortis: 1123 4
+AF_109035_G_magnirostris: 1123 4
+AF_109028_G_fortis: 1123 4
+AF_109036_G_magnirostris: 1123 4
+AF_109016_G_magnirostris: 1123 4
+AF_109027_G_fortis: 1123 4
+AF_109034_G_magnirostris: 1123 4
+Alignment(null)
+  16 taxa
+  1123 sites
+  72 patterns
+
+Darwins-finches
+Done Darwins-finches.nex
+Processing Dengue4.env.nex
+D4Brazi82: 1485 4
+D4ElSal83: 1485 4
+D4ElSal94: 1485 4
+D4Indon76: 1485 4
+D4Indon77: 1485 4
+D4Mexico84: 1485 4
+D4NewCal81: 1485 4
+D4Philip64: 1485 4
+D4Philip56: 1485 4
+D4Philip84: 1485 4
+D4PRico86: 1485 4
+D4SLanka78: 1485 4
+D4Tahiti79: 1485 4
+D4Tahiti85: 1485 4
+D4Thai63: 1485 4
+D4Thai78: 1485 4
+D4Thai84: 1485 4
+Alignment(null)
+  17 taxa
+  1485 sites
+  138 patterns
+
+D4Brazi82 = 1982 (12.0)
+D4ElSal83 = 1983 (11.0)
+D4ElSal94 = 1994 (0.0)
+D4Indon76 = 1976 (18.0)
+D4Indon77 = 1977 (17.0)
+D4Mexico84 = 1984 (10.0)
+D4NewCal81 = 1981 (13.0)
+D4Philip64 = 1964 (30.0)
+D4Philip56 = 1956 (38.0)
+D4Philip84 = 1984 (10.0)
+D4PRico86 = 1986 (8.0)
+D4SLanka78 = 1978 (16.0)
+D4Tahiti79 = 1979 (15.0)
+D4Tahiti85 = 1985 (9.0)
+D4Thai63 = 1963 (31.0)
+D4Thai78 = 1978 (16.0)
+D4Thai84 = 1984 (10.0)
+Dengue4
+Done Dengue4.env.nex
+Processing seaview.nxs
+Alignment(null)
+  54 taxa
+  456 sites
+  288 patterns
+
+seaview
+Done seaview.nxs
+Processing 26.nex
+Orthogeomys_heterodus: 614 4
+Thomomys_bottae_awahnee_a: 614 4
+Thomomys_bottae_awahnee_b: 614 4
+Thomomys_bottae_xerophilus: 614 4
+Thomomys_bottae_cactophilus: 614 4
+Thomomys_bottae_albatus: 614 4
+Thomomys_bottae_ruidosae: 614 4
+Thomomys_bottae_bottae: 614 4
+Thomomys_bottae_alpinus: 614 4
+Thomomys_bottae_riparius: 614 4
+Thomomys_bottae_mewa: 614 4
+Thomomys_bottae_saxatilis: 614 4
+Thomomys_bottae_laticeps: 614 4
+Thomomys_talpoides_ocius: 614 4
+Thomomys_idahoensis_pygmaeus_a: 614 4
+Thomomys_idahoensis_pygmaeus_b: 614 4
+Thomomys_mazama_mazama: 614 4
+Thomomys_mazama_nasicus: 614 4
+Thomomys_monticola_a: 614 4
+Thomomys_monticola_b: 614 4
+Thomomys_talpoides_yakimensis: 614 4
+Thomomys_talpoides_bridgeri: 614 4
+Thomomys_townsendii_townsendii: 614 4
+Thomomys_townsendii_relictus: 614 4
+Thomomys_umbrinus_chihuahuae: 614 4
+Thomomys_umbrinus_atroavarius: 614 4
+Alignment(null)
+  26 taxa
+  614 sites
+  144 patterns
+
+26
+Done 26.nex
+Processing anolis.nex
+Anolis_ahli: 1456 4
+Anolis_aliniger: 1456 4
+Anolis_alutaceus: 1456 4
+Anolis_angusticeps: 1456 4
+Anolis_bahorucoensis: 1456 4
+Anolis_barahonae: 1456 4
+Anolis_brevirostris: 1456 4
+Anolis_coelestinus: 1456 4
+Anolis_cristatellus: 1456 4
+Anolis_cuvieri: 1456 4
+Anolis_distichus: 1456 4
+Anolis_equestris: 1456 4
+Anolis_garmani: 1456 4
+Anolis_grahami: 1456 4
+Anolis_insolitus: 1456 4
+Anolis_krugi: 1456 4
+Anolis_lineatopus: 1456 4
+Anolis_loysiana: 1456 4
+Anolis_luteogularis: 1456 4
+Anolis_marcanoi: 1456 4
+Anolis_occultus: 1456 4
+Anolis_olssoni: 1456 4
+Anolis_ophiolepis: 1456 4
+Anolis_paternus: 1456 4
+Anolis_sagrei: 1456 4
+Anolis_strahmi: 1456 4
+Anolis_stratulus: 1456 4
+Anolis_valencienni: 1456 4
+Anolis_vanidicus: 1456 4
+Alignment(null)
+  29 taxa
+  1456 sites
+  934 patterns
+
+anolis
+Done anolis.nex
+Processing M243.nex
+Alignment(null)
+  89 taxa
+  697 sites
+  471 patterns
+
+M243
+Done M243.nex
+Processing humanChimpSNP.nex
+Chimp: 484 3
+San: 484 3
+Yoruba: 484 3
+European: 484 3
+Han: 484 3
+Korean: 484 3
+Alignment(null)
+  6 taxa
+  484 sites
+  484 patterns
+
+Chimp: 484 3
+San: 484 3
+Yoruba: 484 3
+European: 484 3
+Han: 484 3
+Korean: 484 3
+Alignment(humanChimpSNP)
+  6 taxa
+  484 sites with weight 361531
+  484 patterns
+
+humanChimpSNP
+Done humanChimpSNP.nex
+Processing traitlab.nex
+taxon_1: 30 4
+taxon_2: 30 4
+taxon_3: 30 4
+taxon_4: 30 4
+taxon_5: 30 4
+taxon_6: 30 4
+taxon_7: 30 4
+taxon_8: 30 4
+taxon_9: 30 4
+Alignment(null)
+  9 taxa
+  30 sites
+  24 patterns
+
+traitlab
+Done traitlab.nex
+Processing 29.nex
+Orthogeomys_heterodus: 601 4
+Thomomys_bottae_awahnee_a: 601 4
+Thomomys_bottae_awahnee_b: 601 4
+Thomomys_bottae_xerophilus: 601 4
+Thomomys_bottae_cactophilus: 601 4
+Thomomys_bottae_albatus: 601 4
+Thomomys_bottae_ruidosae: 601 4
+Thomomys_bottae_bottae: 601 4
+Thomomys_bottae_alpinus: 601 4
+Thomomys_bottae_riparius: 601 4
+Thomomys_bottae_mewa: 601 4
+Thomomys_bottae_saxatilis: 601 4
+Thomomys_bottae_laticeps: 601 4
+Thomomys_talpoides_ocius: 601 4
+Thomomys_idahoensis_pygmaeus_a: 601 4
+Thomomys_idahoensis_pygmaeus_b: 601 4
+Thomomys_mazama_mazama: 601 4
+Thomomys_mazama_nasicus: 601 4
+Thomomys_monticola_a: 601 4
+Thomomys_monticola_b: 601 4
+Thomomys_talpoides_yakimensis: 601 4
+Thomomys_talpoides_bridgeri: 601 4
+Thomomys_townsendii_townsendii: 601 4
+Thomomys_townsendii_relictus: 601 4
+Thomomys_umbrinus_chihuahuae: 601 4
+Thomomys_umbrinus_atroavarius: 601 4
+Alignment(null)
+  26 taxa
+  601 sites
+  71 patterns
+
+29
+Done 29.nex
+Processing primate-mtDNA.nex
+Lemur_catta: 898 4
+Homo_sapiens: 898 4
+Pan: 898 4
+Gorilla: 898 4
+Pongo: 898 4
+Hylobates: 898 4
+Macaca_fuscata: 898 4
+M._mulatta: 898 4
+M._fascicularis: 898 4
+M._sylvanus: 898 4
+Saimiri_sciureus: 898 4
+Tarsius_syrichta: 898 4
+Alignment(null)
+  12 taxa
+  898 sites
+  413 patterns
+
+Filter 2-457,660-896
+12 taxa
+693 sites
+361 patterns
+Filter 1,458-659,897-898
+12 taxa
+205 sites
+79 patterns
+Filter 2-457\3,660-896\3
+12 taxa
+231 sites
+120 patterns
+Filter 3-457\3,661-896\3
+12 taxa
+231 sites
+82 patterns
+Filter 4-457\3,662-.\3
+12 taxa
+231 sites
+204 patterns
+primate-mtDNA
+Done primate-mtDNA.nex
+Processing angiosperms.nex
+Alignment(null)
+  34 taxa
+  41 sites
+  39 patterns
+
+angiosperms
+Done angiosperms.nex
+Processing protein.nex
+Cow: 234 20
+Carp: 234 20
+Chicken: 234 20
+Human: 234 20
+Loach: 234 20
+Mouse: 234 20
+Rat: 234 20
+Seal: 234 20
+Whale: 234 20
+Frog: 234 20
+Alignment(null)
+  10 taxa
+  234 sites
+  137 patterns
+
+protein
+Done protein.nex
+Processing avian-ovomucoids.nex
+Alignment(null)
+  89 taxa
+  88 sites
+  88 patterns
+
+avian-ovomucoids
+Done avian-ovomucoids.nex
+Processing old.nex
+cae: 4 2
+Alignment(null)
+  1 taxa
+  4 sites
+  2 patterns
+
+old
+Done old.nex
+Processing FPV.nex
+CanineOralPV: 1434 4
+FelisPV1: 1434 4
+LynxPV1: 1434 4
+PumaPV1: 1434 4
+RacoonPV1: 1434 4
+AsianLionPV1: 1434 4
+SnowLeopardPV1: 1434 4
+Alignment(null)
+  7 taxa
+  1434 sites
+  535 patterns
+
+FPV
+Done FPV.nex
+Processing MP_analysis.nex
+A: 1200 4
+B: 1200 4
+C: 1200 4
+D: 1200 4
+E: 1200 4
+F: 1200 4
+G: 1200 4
+H: 1200 4
+Alignment(null)
+  8 taxa
+  1200 sites
+  1008 patterns
+
+Filter 1-600
+8 taxa
+600 sites
+447 patterns
+Filter 601-.
+8 taxa
+600 sites
+594 patterns
+MP_analysis
+Done MP_analysis.nex
+Processing gopher.nex
+Orthogeomys_heterodus: 614 4
+Thomomys_bottae_awahnee_a: 614 4
+Thomomys_bottae_awahnee_b: 614 4
+Thomomys_bottae_xerophilus: 614 4
+Thomomys_bottae_cactophilus: 614 4
+Thomomys_bottae_albatus: 614 4
+Thomomys_bottae_ruidosae: 614 4
+Thomomys_bottae_bottae: 614 4
+Thomomys_bottae_alpinus: 614 4
+Thomomys_bottae_riparius: 614 4
+Thomomys_bottae_mewa: 614 4
+Thomomys_bottae_saxatilis: 614 4
+Thomomys_bottae_laticeps: 614 4
+Thomomys_talpoides_ocius: 614 4
+Thomomys_idahoensis_pygmaeus_a: 614 4
+Thomomys_idahoensis_pygmaeus_b: 614 4
+Thomomys_mazama_mazama: 614 4
+Thomomys_mazama_nasicus: 614 4
+Thomomys_monticola_a: 614 4
+Thomomys_monticola_b: 614 4
+Thomomys_talpoides_yakimensis: 614 4
+Thomomys_talpoides_bridgeri: 614 4
+Thomomys_townsendii_townsendii: 614 4
+Thomomys_townsendii_relictus: 614 4
+Thomomys_umbrinus_chihuahuae: 614 4
+Thomomys_umbrinus_atroavarius: 614 4
+Alignment(null)
+  26 taxa
+  614 sites
+  144 patterns
+
+gopher
+Done gopher.nex
+Processing dna.nex
+Cow: 705 4
+Carp: 705 4
+Chicken: 705 4
+Human: 705 4
+Loach: 705 4
+Mouse: 705 4
+Rat: 705 4
+Seal: 705 4
+Whale: 705 4
+Frog: 705 4
+Alignment(null)
+  10 taxa
+  705 sites
+  358 patterns
+
+dna
+Done dna.nex
+Processing 59.nex
+Orthogeomys_heterodus: 553 4
+Thomomys_bottae_awahnee_a: 553 4
+Thomomys_bottae_awahnee_b: 553 4
+Thomomys_bottae_xerophilus: 553 4
+Thomomys_bottae_cactophilus: 553 4
+Thomomys_bottae_albatus: 553 4
+Thomomys_bottae_ruidosae: 553 4
+Thomomys_bottae_bottae: 553 4
+Thomomys_bottae_alpinus: 553 4
+Thomomys_bottae_riparius: 553 4
+Thomomys_bottae_mewa: 553 4
+Thomomys_bottae_saxatilis: 553 4
+Thomomys_bottae_laticeps: 553 4
+Thomomys_talpoides_ocius: 553 4
+Thomomys_idahoensis_pygmaeus_a: 553 4
+Thomomys_idahoensis_pygmaeus_b: 553 4
+Thomomys_mazama_mazama: 553 4
+Thomomys_mazama_nasicus: 553 4
+Thomomys_monticola_a: 553 4
+Thomomys_monticola_b: 553 4
+Thomomys_talpoides_yakimensis: 553 4
+Thomomys_talpoides_bridgeri: 553 4
+Thomomys_townsendii_townsendii: 553 4
+Thomomys_townsendii_relictus: 553 4
+Thomomys_umbrinus_chihuahuae: 553 4
+Thomomys_umbrinus_atroavarius: 553 4
+Alignment(null)
+  26 taxa
+  553 sites
+  92 patterns
+
+59
+Done 59.nex
+Processing 64.nex
+Orthogeomys_heterodus: 471 4
+Thomomys_bottae_awahnee_a: 471 4
+Thomomys_bottae_awahnee_b: 471 4
+Thomomys_bottae_xerophilus: 471 4
+Thomomys_bottae_cactophilus: 471 4
+Thomomys_bottae_albatus: 471 4
+Thomomys_bottae_ruidosae: 471 4
+Thomomys_bottae_bottae: 471 4
+Thomomys_bottae_alpinus: 471 4
+Thomomys_bottae_riparius: 471 4
+Thomomys_bottae_mewa: 471 4
+Thomomys_bottae_saxatilis: 471 4
+Thomomys_bottae_laticeps: 471 4
+Thomomys_talpoides_ocius: 471 4
+Thomomys_idahoensis_pygmaeus_a: 471 4
+Thomomys_idahoensis_pygmaeus_b: 471 4
+Thomomys_mazama_mazama: 471 4
+Thomomys_mazama_nasicus: 471 4
+Thomomys_monticola_a: 471 4
+Thomomys_monticola_b: 471 4
+Thomomys_talpoides_yakimensis: 471 4
+Thomomys_talpoides_bridgeri: 471 4
+Thomomys_townsendii_townsendii: 471 4
+Thomomys_townsendii_relictus: 471 4
+Thomomys_umbrinus_chihuahuae: 471 4
+Thomomys_umbrinus_atroavarius: 471 4
+Alignment(null)
+  26 taxa
+  471 sites
+  157 patterns
+
+64
+Done 64.nex
+Processing 72.nex
+Orthogeomys_heterodus: 706 4
+Thomomys_bottae_awahnee_a: 706 4
+Thomomys_bottae_awahnee_b: 706 4
+Thomomys_bottae_xerophilus: 706 4
+Thomomys_bottae_cactophilus: 706 4
+Thomomys_bottae_albatus: 706 4
+Thomomys_bottae_ruidosae: 706 4
+Thomomys_bottae_bottae: 706 4
+Thomomys_bottae_alpinus: 706 4
+Thomomys_bottae_riparius: 706 4
+Thomomys_bottae_mewa: 706 4
+Thomomys_bottae_saxatilis: 706 4
+Thomomys_bottae_laticeps: 706 4
+Thomomys_talpoides_ocius: 706 4
+Thomomys_idahoensis_pygmaeus_a: 706 4
+Thomomys_idahoensis_pygmaeus_b: 706 4
+Thomomys_mazama_mazama: 706 4
+Thomomys_mazama_nasicus: 706 4
+Thomomys_monticola_a: 706 4
+Thomomys_monticola_b: 706 4
+Thomomys_talpoides_yakimensis: 706 4
+Thomomys_talpoides_bridgeri: 706 4
+Thomomys_townsendii_townsendii: 706 4
+Thomomys_townsendii_relictus: 706 4
+Thomomys_umbrinus_chihuahuae: 706 4
+Thomomys_umbrinus_atroavarius: 706 4
+Alignment(null)
+  26 taxa
+  706 sites
+  85 patterns
+
+72
+Done 72.nex
+	est_ThatNexusExamplesProduces::Success
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><beast namespace="beast.core:beast.evolution.alignment:beast.evolution.tree.coalescent:beast.core.util:beast.evolution.nuc:beast.evolution.operators:beast.evolution.sitemodel:beast.evolution.substitutionmodel:beast.evolution.likelihood" required="BEAST v2.5.1" version="2.5">
+
+
+    
+
+
+    
+
+
+    
+
+
+    
+
+
+<run id="Nucleotide" spec="beast.evolution.datatype.Nucleotide"/>
+
+</beast>
+]]></system-out>
+  <system-err><![CDATA[Loading package BEAST v2.5.1
+Loading package BEASTShell v1.4.0
+Loading package MASTER v6.1.0
+Loading package BEASTLabs v1.8.2
+Loading package MODEL_SELECTION v1.4.2
+Loading package BEAST v2.5.1
+Ambiguity found in Russula_risigallina that is treated as missing value
+Ambiguity found in Russula_violacea that is treated as missing value
+Warning: expected datatype (e.g. something like 'format datatype=dna;') not '	format symbols = "012" ' Assuming integer dataType
+Warning: expected datatype (e.g. something like 'format datatype=dna;') not 'FORMAT MISSING=? GAP=- INTERLEAVE  ' Assuming integer dataType
+Warning: expected datatype (e.g. something like 'format datatype=dna;') not '	format symbols = "012" ' Assuming integer dataType
+]]></system-err>
+</testsuite>

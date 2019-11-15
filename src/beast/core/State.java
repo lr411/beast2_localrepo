@@ -70,7 +70,7 @@ public class State extends BEASTObject {
      * StateNode is copied.
      * Access through getNrStatNodes() and getStateNode(.).
      */
-    protected StateNode[] stateNode;
+    public StateNode[] stateNode; // Leo: changed from protected
 
     /**
      * number of state nodes *

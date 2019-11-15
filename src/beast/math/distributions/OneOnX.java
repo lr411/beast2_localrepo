@@ -18,6 +18,8 @@ public class OneOnX extends ParametricDistribution {
 
     @Override
     public void initAndValidate() {
+    	int i;
+    	i=3;
     }
 
     @Override

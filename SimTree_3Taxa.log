@@ -1,0 +1,43 @@
+#
+#model:
+#
+#<?xml version="1.0" encoding="UTF-8" standalone="no"?><input id="posterior" spec="beast.core.util.CompoundDistribution">
+#    <distribution id="prior" spec="beast.core.util.CompoundDistribution">
+#        <distribution id="CoalescentConstant.t:SimTree_3Taxa" spec="beast.evolution.tree.coalescent.Coalescent">
+#            <populationModel id="ConstantPopulation.t:SimTree_3Taxa" spec="beast.evolution.tree.coalescent.ConstantPopulation">
+#                <parameter id="popSize.t:SimTree_3Taxa" name="popSize">0.3</parameter>
+#            </populationModel>
+#            <treeIntervals id="TreeIntervals.t:SimTree_3Taxa" spec="beast.evolution.tree.coalescent.TreeIntervals">
+#                <tree id="Tree.t:SimTree_3Taxa">
+#                    <taxonset id="TaxonSet.SimTree_3Taxa" spec="beast.evolution.alignment.TaxonSet">
+#                    </taxonset>
+#                </tree>
+#            </treeIntervals>
+#        </distribution>
+#        <prior id="GammaShapePrior.s:SimTree_3Taxa" name="distribution">
+#            <parameter id="gammaShape.s:SimTree_3Taxa" name="x">1.0</parameter>
+#            <Exponential id="Exponential.0" name="distr">
+#                <parameter estimate="false" id="RealParameter.0" name="mean">1.0</parameter>
+#            </Exponential>
+#        </prior>
+#        <prior id="PopSizePrior.t:SimTree_3Taxa" name="distribution" x="@popSize.t:SimTree_3Taxa">
+#            <Exponential id="Exponential.1" name="distr">
+#                <parameter estimate="false" id="RealParameter.1" name="mean">0.33</parameter>
+#            </Exponential>
+#        </prior>
+#    </distribution>
+#    <distribution id="likelihood" spec="beast.core.util.CompoundDistribution" useThreads="true">
+#        <distribution data="@SimTree_3Taxa" id="treeLikelihood.SimTree_3Taxa" spec="beast.evolution.likelihood.ThreadedTreeLikelihood" tree="@Tree.t:SimTree_3Taxa">
+#            <siteModel gammaCategoryCount="4" id="SiteModel.s:SimTree_3Taxa" shape="@gammaShape.s:SimTree_3Taxa" spec="beast.evolution.sitemodel.SiteModel">
+#                <parameter estimate="false" id="mutationRate.s:SimTree_3Taxa" name="mutationRate">1.0</parameter>
+#                <parameter estimate="false" id="proportionInvariant.s:SimTree_3Taxa" lower="0.0" name="proportionInvariant" upper="1.0">0.0</parameter>
+#                <substModel id="JC69.s:SimTree_3Taxa" spec="beast.evolution.substitutionmodel.JukesCantor"/>
+#            </siteModel>
+#            <branchRateModel id="StrictClock.c:SimTree_3Taxa" spec="beast.evolution.branchratemodel.StrictClockModel">
+#                <parameter estimate="false" id="clockRate.c:SimTree_3Taxa" name="clock.rate">1.0</parameter>
+#            </branchRateModel>
+#        </distribution>
+#    </distribution>
+#</input>
+#
+Sample	posterior	likelihood	prior	treeLikelihood	TreeHeight	gammaShape	popSize	CoalescentConstant

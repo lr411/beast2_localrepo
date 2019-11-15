@@ -1,0 +1,20 @@
+<itsabeastystatewerein version='2.0' sample='100000'>
+<statenode id='Tree.t:apes'>((0:0.0066165496967850864,1:0.0066165496967850864)3:0.014042394495001817,2:0.020658944191786904)4:0.0</statenode>
+<statenode id='mutationRate.s:apes'>mutationRate.s:apes[1 1] (0.0,Infinity): 1.0 </statenode>
+<statenode id='gammaShape.s:apes'>gammaShape.s:apes[1 1] (0.001,1000.0): 0.6174663832347683 </statenode>
+<statenode id='popSize.t:apes'>popSize.t:apes[1 1] (-Infinity,Infinity): 0.1247519257729916 </statenode>
+</itsabeastystatewerein>
+<!--
+{"operators":[
+{"id":"gammaShapeScaler.s:apes","p":0.18873729102844758,"accept":3539,"reject":4812,"acceptFC":2308,"rejectFC":4271,"rejectIv":0,"rejectOp":0},
+{"id":"FixMeanMutationRatesOperator","p":344.9379419644992,"accept":5729,"reject":0,"acceptFC":4570,"rejectFC":0,"rejectIv":0,"rejectOp":0},
+{"id":"CoalescentConstantTreeScaler.t:apes","p":0.4443792670046985,"accept":2483,"reject":6094,"acceptFC":1933,"rejectFC":4921,"rejectIv":0,"rejectOp":0},
+{"id":"CoalescentConstantTreeRootScaler.t:apes","p":0.4257771814467009,"accept":2305,"reject":6299,"acceptFC":1754,"rejectFC":5066,"rejectIv":28,"rejectOp":28},
+{"id":"CoalescentConstantUniformOperator.t:apes","p":"NaN","accept":3808,"reject":10599,"acceptFC":3024,"rejectFC":8480,"rejectIv":0,"rejectOp":0},
+{"id":"CoalescentConstantSubtreeSlide.t:apes","p":0.8966932405499227,"accept":59,"reject":14257,"acceptFC":49,"rejectFC":11372,"rejectIv":7129,"rejectOp":7129},
+{"id":"CoalescentConstantNarrow.t:apes","p":"NaN","accept":0,"reject":14334,"acceptFC":0,"rejectFC":11399,"rejectIv":0,"rejectOp":0},
+{"id":"CoalescentConstantWide.t:apes","p":"NaN","accept":0,"reject":8680,"acceptFC":0,"rejectFC":6922,"rejectIv":5733,"rejectOp":5733},
+{"id":"CoalescentConstantWilsonBalding.t:apes","p":"NaN","accept":0,"reject":8481,"acceptFC":0,"rejectFC":6716,"rejectIv":7396,"rejectOp":7396},
+{"id":"PopSizeScaler.t:apes","p":0.21027022328178444,"accept":3878,"reject":4644,"acceptFC":2375,"rejectFC":4377,"rejectIv":0,"rejectOp":0}
+]}
+-->

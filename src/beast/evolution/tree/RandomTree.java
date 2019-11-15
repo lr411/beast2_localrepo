@@ -38,6 +38,7 @@ import java.util.TreeSet;
 
 import org.apache.commons.math.MathException;
 
+import beast.app.BeastMCMC;
 import beast.core.BEASTInterface;
 import beast.core.Description;
 import beast.core.Input;
@@ -66,6 +67,8 @@ public class RandomTree extends Tree implements StateNodeInitialiser {
 
     // total nr of taxa
     int nrOfTaxa;
+
+    public BeastMCMC m_bmcmc;
 
     class Bound {
         Double upper = Double.POSITIVE_INFINITY;
@@ -124,6 +127,11 @@ public class RandomTree extends Tree implements StateNodeInitialiser {
         super.initAndValidate();
     }
 
+    public void setBmcMc(BeastMCMC bmcmc)
+    {
+    	this.m_bmcmc=bmcmc;
+    }
+    
     @SuppressWarnings({"rawtypes", "unchecked"})
     private void swap(final List list, final int i, final int j) {
         final Object tmp = list.get(i);

@@ -1,0 +1,48 @@
+<itsabeastystatewerein version='2.0' sample='434999'>
+<statenode id='Tree.t:tree'>(0:107.99768108089702,(((1:6.156455212462209,2:6.156455212462209)5:2.9682964694282,3:9.124751681890409)6:17.892077955887302,4:27.01682963777771)7:80.98085144311932)8:0.0</statenode>
+<statenode id='kappa.s:noncoding'>kappa.s:noncoding[1 1] (0.0,Infinity): 8.79399933546387 </statenode>
+<statenode id='mutationRate.s:noncoding'>mutationRate.s:noncoding[1 1] (0.0,Infinity): 0.18774406510054795 </statenode>
+<statenode id='gammaShape.s:noncoding'>gammaShape.s:noncoding[1 1] (0.001,1000.0): 0.10652639745734364 </statenode>
+<statenode id='mutationRate.s:1stpos'>mutationRate.s:1stpos[1 1] (0.0,Infinity): 0.35329130655650526 </statenode>
+<statenode id='kappa.s:1stpos'>kappa.s:1stpos[1 1] (0.0,Infinity): 6.018545555786132 </statenode>
+<statenode id='gammaShape.s:1stpos'>gammaShape.s:1stpos[1 1] (0.001,1000.0): 0.15039710411208665 </statenode>
+<statenode id='mutationRate.s:2ndpos'>mutationRate.s:2ndpos[1 1] (0.0,Infinity): 0.08199403753396468 </statenode>
+<statenode id='kappa.s:2ndpos'>kappa.s:2ndpos[1 1] (0.0,Infinity): 9.373972671310495 </statenode>
+<statenode id='gammaShape.s:2ndpos'>gammaShape.s:2ndpos[1 1] (0.001,1000.0): 2.9092674854345617 </statenode>
+<statenode id='mutationRate.s:3rdpos'>mutationRate.s:3rdpos[1 1] (0.0,Infinity): 3.28554784488956 </statenode>
+<statenode id='kappa.s:3rdpos'>kappa.s:3rdpos[1 1] (0.0,Infinity): 53.48415724412796 </statenode>
+<statenode id='gammaShape.s:3rdpos'>gammaShape.s:3rdpos[1 1] (0.001,1000.0): 2.4143250495377924 </statenode>
+<statenode id='birthRateY.t:tree'>birthRateY.t:tree[1 1] (-Infinity,Infinity): 0.022715151476608807 </statenode>
+<statenode id='clockRate.c:clock'>clockRate.c:clock[1 1] (0.0,Infinity): 0.013310534969369256 </statenode>
+<statenode id='freqParameter.s:1stpos'>freqParameter.s:1stpos[4 1] (0.0,1.0): 0.44087846545991344 0.2916949886364983 0.12287367195071698 0.14455287395287114 </statenode>
+<statenode id='freqParameter.s:3rdpos'>freqParameter.s:3rdpos[4 1] (0.0,1.0): 0.3886130520586222 0.42362395210406223 0.028143959917966296 0.15961903591934923 </statenode>
+<statenode id='freqParameter.s:noncoding'>freqParameter.s:noncoding[4 1] (0.0,1.0): 0.29436352775520347 0.2547209332579402 0.1429475561348307 0.30796798285202526 </statenode>
+<statenode id='freqParameter.s:2ndpos'>freqParameter.s:2ndpos[4 1] (0.0,1.0): 0.17562231040042564 0.3203273182638531 0.14382208384164658 0.3602282874940745 </statenode>
+</itsabeastystatewerein>
+<!--
+{"operators":[
+{"id":"KappaScaler.s:noncoding","p":0.3216468039345464,"accept":172,"reject":327,"acceptFC":156,"rejectFC":307,"rejectIv":0,"rejectOp":0},
+{"id":"FixMeanMutationRatesOperator","p":0.5158247456243723,"accept":1373,"reject":8963,"acceptFC":1278,"rejectFC":8358,"rejectIv":3471,"rejectOp":3471},
+{"id":"gammaShapeScaler.s:noncoding","p":0.23747842230630128,"accept":147,"reject":372,"acceptFC":131,"rejectFC":355,"rejectIv":0,"rejectOp":0},
+{"id":"KappaScaler.s:1stpos","p":0.33384181289271425,"accept":174,"reject":354,"acceptFC":155,"rejectFC":334,"rejectIv":0,"rejectOp":0},
+{"id":"gammaShapeScaler.s:1stpos","p":0.3625540432296218,"accept":144,"reject":319,"acceptFC":132,"rejectFC":308,"rejectIv":0,"rejectOp":0},
+{"id":"KappaScaler.s:2ndpos","p":0.24903708693310947,"accept":163,"reject":352,"acceptFC":139,"rejectFC":341,"rejectIv":0,"rejectOp":0},
+{"id":"gammaShapeScaler.s:2ndpos","p":0.2315017719943667,"accept":173,"reject":339,"acceptFC":155,"rejectFC":324,"rejectIv":0,"rejectOp":0},
+{"id":"KappaScaler.s:3rdpos","p":0.42365692877691874,"accept":162,"reject":363,"acceptFC":150,"rejectFC":349,"rejectIv":0,"rejectOp":0},
+{"id":"gammaShapeScaler.s:3rdpos","p":0.2753637654929144,"accept":171,"reject":343,"acceptFC":155,"rejectFC":323,"rejectIv":0,"rejectOp":0},
+{"id":"CalibratedYuleModelTreeScaler.t:tree","p":0.676714003394807,"accept":3450,"reject":12215,"acceptFC":3346,"rejectFC":11372,"rejectIv":0,"rejectOp":0},
+{"id":"CalibratedYuleModelTreeRootScaler.t:tree","p":0.5174553226132106,"accept":3624,"reject":11826,"acceptFC":3442,"rejectFC":11076,"rejectIv":0,"rejectOp":0},
+{"id":"CalibratedYuleModelUniformOperator.t:tree","p":"NaN","accept":20515,"reject":134614,"acceptFC":18992,"rejectFC":126149,"rejectIv":0,"rejectOp":0},
+{"id":"CalibratedYuleModelSubtreeSlide.t:tree","p":9.167685036458709,"accept":28681,"reject":48962,"acceptFC":25836,"rejectFC":46933,"rejectIv":18448,"rejectOp":9368},
+{"id":"CalibratedYuleModelNarrow.t:tree","p":"NaN","accept":0,"reject":77312,"acceptFC":0,"rejectFC":72373,"rejectIv":25903,"rejectOp":0},
+{"id":"CalibratedYuleModelWide.t:tree","p":"NaN","accept":1,"reject":15350,"acceptFC":0,"rejectFC":14404,"rejectIv":12025,"rejectOp":8738},
+{"id":"CalibratedYuleModelWilsonBalding.t:tree","p":"NaN","accept":0,"reject":15452,"acceptFC":0,"rejectFC":14475,"rejectIv":12499,"rejectOp":9109},
+{"id":"CalibratedYuleBirthRateScaler.t:tree","p":0.16950820403696965,"accept":5143,"reject":10351,"acceptFC":4316,"rejectFC":10155,"rejectIv":0,"rejectOp":0},
+{"id":"StrictClockRateScaler.c:clock","p":0.6158443483862959,"accept":4087,"reject":11173,"acceptFC":3791,"rejectFC":10519,"rejectIv":0,"rejectOp":0},
+{"id":"strictClockUpDownOperator.c:clock","p":0.6002652834277205,"accept":4202,"reject":11544,"acceptFC":3729,"rejectFC":11015,"rejectIv":0,"rejectOp":0},
+{"id":"FrequenciesExchanger.s:1stpos","p":0.07310660141845768,"accept":225,"reject":279,"acceptFC":211,"rejectFC":277,"rejectIv":0,"rejectOp":0},
+{"id":"FrequenciesExchanger.s:3rdpos","p":0.06330715194180472,"accept":170,"reject":336,"acceptFC":155,"rejectFC":317,"rejectIv":28,"rejectOp":28},
+{"id":"FrequenciesExchanger.s:noncoding","p":0.08578378785191622,"accept":234,"reject":303,"acceptFC":211,"rejectFC":298,"rejectIv":0,"rejectOp":0},
+{"id":"FrequenciesExchanger.s:2ndpos","p":0.08249739818427886,"accept":246,"reject":294,"acceptFC":215,"rejectFC":288,"rejectIv":1,"rejectOp":1}
+]}
+-->

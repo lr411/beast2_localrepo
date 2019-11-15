@@ -1,0 +1,18 @@
+<itsabeastystatewerein version='2.0' sample='100000'>
+<statenode id='Tree.t:SimTree_3Taxa'>((1:0.37104234562777677,2:0.37104234562777677)3:2339.226391477765,0:2339.5974338233927)4:0.0</statenode>
+<statenode id='gammaShape.s:SimTree_3Taxa'>gammaShape.s:SimTree_3Taxa[1 1] (0.001,1000.0): 71.69018392707217 </statenode>
+<statenode id='popSize.t:SimTree_3Taxa'>popSize.t:SimTree_3Taxa[1 1] (-Infinity,Infinity): 34.91731237323103 </statenode>
+</itsabeastystatewerein>
+<!--
+{"operators":[
+{"id":"gammaShapeScaler.s:SimTree_3Taxa","p":0.25164340839137106,"accept":560,"reject":751,"acceptFC":539,"rejectFC":733,"rejectIv":0,"rejectOp":0},
+{"id":"CoalescentConstantTreeScaler.t:SimTree_3Taxa","p":0.2596668598558571,"accept":12346,"reject":27683,"acceptFC":11814,"rejectFC":26864,"rejectIv":0,"rejectOp":0},
+{"id":"CoalescentConstantTreeRootScaler.t:SimTree_3Taxa","p":0.48161385138566065,"accept":14041,"reject":25813,"acceptFC":13636,"rejectFC":24922,"rejectIv":932,"rejectOp":932},
+{"id":"CoalescentConstantUniformOperator.t:SimTree_3Taxa","p":"NaN","accept":115394,"reject":283615,"acceptFC":113118,"rejectFC":272633,"rejectIv":0,"rejectOp":0},
+{"id":"CoalescentConstantSubtreeSlide.t:SimTree_3Taxa","p":1.5885802938042455,"accept":97956,"reject":102242,"acceptFC":96140,"rejectFC":97394,"rejectIv":21908,"rejectOp":21908},
+{"id":"CoalescentConstantNarrow.t:SimTree_3Taxa","p":"NaN","accept":85041,"reject":114500,"acceptFC":84961,"rejectFC":107827,"rejectIv":0,"rejectOp":0},
+{"id":"CoalescentConstantWide.t:SimTree_3Taxa","p":"NaN","accept":5678,"reject":34192,"acceptFC":5669,"rejectFC":32836,"rejectIv":26650,"rejectOp":26650},
+{"id":"CoalescentConstantWilsonBalding.t:SimTree_3Taxa","p":"NaN","accept":1314,"reject":38787,"acceptFC":1313,"rejectFC":37458,"rejectIv":34977,"rejectOp":34977},
+{"id":"PopSizeScaler.t:SimTree_3Taxa","p":0.26427280429713335,"accept":15437,"reject":24660,"acceptFC":14520,"rejectFC":24285,"rejectIv":93,"rejectOp":0}
+]}
+-->

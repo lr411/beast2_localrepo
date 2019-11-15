@@ -1,0 +1,20 @@
+<itsabeastystatewerein version='2.0' sample='100000'>
+<statenode id='Tree.t:tree'>((0:0.17251132822431148,11:0.17251132822431148)12:0.07209767980613424,((((((1:0.04378956896454225,2:0.04378956896454225)18:0.015300809281089567,3:0.05909037824563182)19:0.04084827964705,4:0.09993865789268182)20:0.03053742787296436,5:0.13047608576564618)21:0.05995333372306169,(((6:0.021226861931550357,7:0.021226861931550357)14:0.02951550684073284,8:0.0507423687722832)15:0.019498338308401024,9:0.07024070708068422)13:0.12018871240802365)16:0.04955447204681135,10:0.23998389153551922)17:0.004625116494926501)22:0.0</statenode>
+<statenode id='mutationRate.s:site'>mutationRate.s:site[1 1] (0.0,Infinity): 1.0 </statenode>
+<statenode id='gammaShape.s:site'>gammaShape.s:site[1 1] (0.001,1000.0): 0.6523730284807192 </statenode>
+<statenode id='popSize.t:tree'>popSize.t:tree[1 1] (-Infinity,Infinity): 0.7523161134648627 </statenode>
+</itsabeastystatewerein>
+<!--
+{"operators":[
+{"id":"gammaShapeScaler.s:site","p":0.5402435765320329,"accept":37,"reject":197,"acceptFC":26,"rejectFC":152,"rejectIv":0,"rejectOp":0},
+{"id":"FixMeanMutationRatesOperator","p":350.1215748315054,"accept":5886,"reject":0,"acceptFC":4656,"rejectFC":0,"rejectIv":0,"rejectOp":0},
+{"id":"CoalescentConstantTreeScaler.t:tree","p":0.66384726010462,"accept":1309,"reject":7612,"acceptFC":1104,"rejectFC":5952,"rejectIv":0,"rejectOp":0},
+{"id":"CoalescentConstantTreeRootScaler.t:tree","p":0.6406506994916642,"accept":916,"reject":7700,"acceptFC":772,"rejectFC":6068,"rejectIv":2421,"rejectOp":2421},
+{"id":"CoalescentConstantUniformOperator.t:tree","p":"NaN","accept":3326,"reject":11344,"acceptFC":2619,"rejectFC":9041,"rejectIv":0,"rejectOp":0},
+{"id":"CoalescentConstantSubtreeSlide.t:tree","p":0.3781956585986928,"accept":240,"reject":14153,"acceptFC":209,"rejectFC":11185,"rejectIv":6340,"rejectOp":6340},
+{"id":"CoalescentConstantNarrow.t:tree","p":"NaN","accept":261,"reject":14505,"acceptFC":194,"rejectFC":11585,"rejectIv":0,"rejectOp":0},
+{"id":"CoalescentConstantWide.t:tree","p":"NaN","accept":11,"reject":8875,"acceptFC":10,"rejectFC":7024,"rejectIv":4708,"rejectOp":4708},
+{"id":"CoalescentConstantWilsonBalding.t:tree","p":"NaN","accept":10,"reject":8828,"acceptFC":8,"rejectFC":6979,"rejectIv":2369,"rejectOp":2369},
+{"id":"PopSizeScaler.t:tree","p":0.3260644240587852,"accept":6122,"reject":8669,"acceptFC":3724,"rejectFC":7918,"rejectIv":0,"rejectOp":0}
+]}
+-->

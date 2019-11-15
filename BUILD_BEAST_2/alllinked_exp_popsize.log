@@ -1,0 +1,55 @@
+#
+#model:
+#
+#<?xml version="1.0" encoding="UTF-8" standalone="no"?><input id="posterior" spec="beast.core.util.CompoundDistribution">
+#    <distribution id="prior" spec="beast.core.util.CompoundDistribution">
+#        <distribution id="CoalescentConstant.t:tree" spec="beast.evolution.tree.coalescent.Coalescent">
+#            <populationModel id="ConstantPopulation.t:tree" spec="beast.evolution.tree.coalescent.ConstantPopulation">
+#                <parameter id="popSize.t:tree" name="popSize">0.3</parameter>
+#            </populationModel>
+#            <treeIntervals id="TreeIntervals.t:tree" spec="beast.evolution.tree.coalescent.TreeIntervals">
+#                <tree id="Tree.t:tree">
+#                    <taxonset id="TaxonSet.noncoding" spec="beast.evolution.alignment.TaxonSet">
+#                        <alignment filter="1,458-659,897-898" id="noncoding" spec="beast.evolution.alignment.FilteredAlignment">
+#                        </alignment>
+#                    </taxonset>
+#                </tree>
+#            </treeIntervals>
+#        </distribution>
+#        <prior id="GammaShapePrior.s:site" name="distribution">
+#            <parameter id="gammaShape.s:site" name="x">1.0</parameter>
+#            <Exponential id="Exponential.1" name="distr">
+#                <parameter estimate="false" id="RealParameter.1" name="mean">1.0</parameter>
+#            </Exponential>
+#        </prior>
+#        <prior id="PopSizePrior.t:tree" name="distribution" x="@popSize.t:tree">
+#            <Exponential id="Exponential.5" name="distr">
+#                <parameter estimate="false" id="RealParameter.5" name="mean">0.33</parameter>
+#            </Exponential>
+#        </prior>
+#    </distribution>
+#    <distribution id="likelihood" spec="beast.core.util.CompoundDistribution" useThreads="true">
+#        <distribution data="@noncoding" id="treeLikelihood.noncoding" spec="beast.evolution.likelihood.ThreadedTreeLikelihood" tree="@Tree.t:tree">
+#            <siteModel gammaCategoryCount="4" id="SiteModel.s:site" shape="@gammaShape.s:site" spec="beast.evolution.sitemodel.SiteModel">
+#                <parameter id="mutationRate.s:site" name="mutationRate">1.0</parameter>
+#                <parameter estimate="false" id="proportionInvariant.s:site" lower="0.0" name="proportionInvariant" upper="1.0">0.0</parameter>
+#                <substModel id="JC69.s:site" spec="beast.evolution.substitutionmodel.JukesCantor"/>
+#            </siteModel>
+#            <branchRateModel id="StrictClock.c:clock" spec="beast.evolution.branchratemodel.StrictClockModel">
+#                <parameter estimate="false" id="clockRate.c:clock" name="clock.rate">1.0</parameter>
+#            </branchRateModel>
+#        </distribution>
+#        <distribution branchRateModel="@StrictClock.c:clock" id="treeLikelihood.1stpos" siteModel="@SiteModel.s:site" spec="beast.evolution.likelihood.ThreadedTreeLikelihood" tree="@Tree.t:tree">
+#            <data data="@primate-mtDNA" filter="2-457\3,660-896\3" id="1stpos" spec="beast.evolution.alignment.FilteredAlignment"/>
+#        </distribution>
+#        <distribution branchRateModel="@StrictClock.c:clock" id="treeLikelihood.2ndpos" siteModel="@SiteModel.s:site" spec="beast.evolution.likelihood.ThreadedTreeLikelihood" tree="@Tree.t:tree">
+#            <data data="@primate-mtDNA" filter="3-457\3,661-896\3" id="2ndpos" spec="beast.evolution.alignment.FilteredAlignment"/>
+#        </distribution>
+#        <distribution branchRateModel="@StrictClock.c:clock" id="treeLikelihood.3rdpos" siteModel="@SiteModel.s:site" spec="beast.evolution.likelihood.ThreadedTreeLikelihood" tree="@Tree.t:tree">
+#            <data data="@primate-mtDNA" filter="4-457\3,662-.\3" id="3rdpos" spec="beast.evolution.alignment.FilteredAlignment"/>
+#        </distribution>
+#    </distribution>
+#</input>
+#
+Sample	posterior	likelihood	prior	treeLikelihood.1stpos	treeLikelihood.2ndpos	treeLikelihood.3rdpos	treeLikelihood.noncoding	TreeHeight	mutationRate	gammaShape	popSize	CoalescentConstant
+0	-7987.895687615085	-7970.688475216885	-17.20721239819946	-1945.0226954053035	-1435.6160658427812	-3242.409067174228	-1347.6406467945724	0.7873439529022015	1.0	1.0	0.3	-16.406784113630163

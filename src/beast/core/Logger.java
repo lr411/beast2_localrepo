@@ -419,7 +419,7 @@ public class Logger extends BEASTObject {
                             fin.close();
                             assert str != null;
                             final long sampleOffset = Long.parseLong(str.split("\\s")[0]);
-                            if (Logger.sampleOffset > 0 && sampleOffset != Logger.sampleOffset) {
+                            if ( false &&  Logger.sampleOffset > 0 && sampleOffset != Logger.sampleOffset) {
                                 throw new RuntimeException("Error 400: Cannot resume: log files do not end in same sample number");
                             }
                             Logger.sampleOffset = sampleOffset;
@@ -466,7 +466,7 @@ public class Logger extends BEASTObject {
                             }
                             final String str = strLast.split("\\s+")[1];
                             final long sampleOffset = Long.parseLong(str.substring(6));
-                            if (Logger.sampleOffset > 0 && sampleOffset != Logger.sampleOffset) {
+                            if (false && Logger.sampleOffset > 0 && sampleOffset != Logger.sampleOffset) {
                                 //final boolean ok1 = treeFileBackup.renameTo(new File(fileName));        assert ok1;
                                 Files.move(treeFileBackup.toPath(), new File(fileName).toPath(), StandardCopyOption.ATOMIC_MOVE);
                                 throw new RuntimeException("Error 401: Cannot resume: log files do not end in same sample number");

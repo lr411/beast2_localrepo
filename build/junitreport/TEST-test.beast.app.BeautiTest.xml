@@ -1,0 +1,539 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuite errors="0" failures="3" hostname="Leonardos-MacBook-Pro.local" name="test.beast.app.BeautiTest" skipped="0" tests="3" time="3.902" timestamp="2019-06-11T12:12:26">
+  <properties>
+    <property name="java.vendor" value="Oracle Corporation" />
+    <property name="sun.java.launcher" value="SUN_STANDARD" />
+    <property name="BEAUti_name" value="BEAUti" />
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers" />
+    <property name="dist" value="/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/build/dist" />
+    <property name="lib" value="/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/lib" />
+    <property name="os.name" value="Mac OS X" />
+    <property name="sun.boot.class.path" value="/Library/Java/JavaVirtualMachines/jdk1.8.0_192.jdk/Contents/Home/jre/lib/resources.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_192.jdk/Contents/Home/jre/lib/rt.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_192.jdk/Contents/Home/jre/lib/sunrsasign.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_192.jdk/Contents/Home/jre/lib/jsse.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_192.jdk/Contents/Home/jre/lib/jce.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_192.jdk/Contents/Home/jre/lib/charsets.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_192.jdk/Contents/Home/jre/lib/jfr.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_192.jdk/Contents/Home/jre/classes" />
+    <property name="report" value="build/junitreport" />
+    <property name="common_dir" value="release/common" />
+    <property name="java.vm.specification.vendor" value="Oracle Corporation" />
+    <property name="ant.home" value="/usr/local/Cellar/ant/1.10.6/libexec" />
+    <property name="java.runtime.version" value="1.8.0_192-b12" />
+    <property name="main_class_BEAST" value="beast.app.beastapp.BeastMain" />
+    <property name="Mac_package_dir" value="release/Mac/BEAST" />
+    <property name="user.name" value="lr411" />
+    <property name="AppleSigner" value="Developer ID Application: Remco Bouckaert (LHFJWE5U63)" />
+    <property name="LogAnalyser_name" value="LogAnalyser" />
+    <property name="user.language" value="en" />
+    <property name="build" value="/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/build" />
+    <property name="sun.boot.library.path" value="/Library/Java/JavaVirtualMachines/jdk1.8.0_192.jdk/Contents/Home/jre/lib" />
+    <property name="ant.project.default-target" value="build_jar_all_BEAST" />
+    <property name="tools_dir" value="release/common/tools" />
+    <property name="ant.project.name" value="BUILD_BEAST_2" />
+    <property name="java.version" value="1.8.0_192" />
+    <property name="version" value="2.5.1" />
+    <property name="user.timezone" value="" />
+    <property name="sun.arch.data.model" value="64" />
+    <property name="Linux_dir" value="release/Linux" />
+    <property name="http.nonProxyHosts" value="local|*.local|169.254/16|*.169.254/16" />
+    <property name="java.endorsed.dirs" value="/Library/Java/JavaVirtualMachines/jdk1.8.0_192.jdk/Contents/Home/jre/lib/endorsed" />
+    <property name="doc" value="/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/doc" />
+    <property name="version_number" value="2.5.1" />
+    <property name="sun.cpu.isalist" value="" />
+    <property name="sun.jnu.encoding" value="UTF-8" />
+    <property name="file.encoding.pkg" value="sun.io" />
+    <property name="file.separator" value="/" />
+    <property name="java.specification.name" value="Java Platform API Specification" />
+    <property name="java.class.version" value="52.0" />
+    <property name="src" value="/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/src" />
+    <property name="Mac_bundle_dir" value="release/Mac/BEAST/BEAST" />
+    <property name="user.country" value="GB" />
+    <property name="java.home" value="/Library/Java/JavaVirtualMachines/jdk1.8.0_192.jdk/Contents/Home/jre" />
+    <property name="java.vm.info" value="mixed mode" />
+    <property name="Mac_dir" value="release/Mac" />
+    <property name="ant.file" value="/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/build.xml" />
+    <property name="os.version" value="10.14" />
+    <property name="release_dir" value="release" />
+    <property name="path.separator" value=":" />
+    <property name="java.vm.version" value="25.192-b12" />
+    <property name="ant.library.dir" value="/usr/local/Cellar/ant/1.10.6/libexec/lib" />
+    <property name="java.awt.printerjob" value="sun.lwawt.macosx.CPrinterJob" />
+    <property name="sun.io.unicode.encoding" value="UnicodeBig" />
+    <property name="beast1_dir" value="release/common/beast1" />
+    <property name="awt.toolkit" value="sun.lwawt.macosx.LWCToolkit" />
+    <property name="socksNonProxyHosts" value="local|*.local|169.254/16|*.169.254/16" />
+    <property name="ftp.nonProxyHosts" value="local|*.local|169.254/16|*.169.254/16" />
+    <property name="BEAST_name" value="BEAST" />
+    <property name="TreeAnnotator_name" value="TreeAnnotator" />
+    <property name="user.home" value="/Users/lr411" />
+    <property name="java.specification.vendor" value="Oracle Corporation" />
+    <property name="test" value="/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/test" />
+    <property name="ant.file.BUILD_BEAST_2" value="/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/build.xml" />
+    <property name="java.library.path" value="/Users/lr411/Library/Java/Extensions:/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java:." />
+    <property name="java.vendor.url" value="http://java.oracle.com/" />
+    <property name="java.vm.vendor" value="Oracle Corporation" />
+    <property name="gopherProxySet" value="false" />
+    <property name="copyright" value="Beast 2 development team 2011-2018" />
+    <property name="java.runtime.name" value="Java(TM) SE Runtime Environment" />
+    <property name="ant.version" value="Apache Ant(TM) version 1.10.6 compiled on May 2 2019" />
+    <property name="sun.java.command" value="org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner test.beast.app.BeautiTest skipNonTests=false filtertrace=true haltOnError=false haltOnFailure=false formatter=org.apache.tools.ant.taskdefs.optional.junit.SummaryJUnitResultFormatter showoutput=false outputtoformatters=true logfailedtests=true threadid=0 logtestlistenerevents=false formatter=org.apache.tools.ant.taskdefs.optional.junit.XMLJUnitResultFormatter,/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/build/junitreport/TEST-test.beast.app.BeautiTest.xml crashfile=/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/junitvmwatcher5948696947847699812.properties propsfile=/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/junit3881263123740149572.properties" />
+    <property name="java.class.path" value="/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/lib/beagle.jar:/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/lib/jam.jar:/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/lib/colt.jar:/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/lib/fest.jar:/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/lib/junit-4.8.2.jar:/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/lib/antlr-runtime-4.7.jar:/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/build:/usr/local/Cellar/ant/1.10.6/libexec/lib/ant-launcher.jar:/usr/local/Cellar/ant/1.10.6/libexec/lib/ant.jar:/usr/local/Cellar/ant/1.10.6/libexec/lib/ant-junit.jar:/usr/local/Cellar/ant/1.10.6/libexec/lib/ant-junit4.jar" />
+    <property name="sdk_dir" value="release/BEAST_SDK" />
+    <property name="ant.file.type.BUILD_BEAST_2" value="file" />
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification" />
+    <property name="ant.file.type" value="file" />
+    <property name="java.vm.specification.version" value="1.8" />
+    <property name="sun.os.patch.level" value="unknown" />
+    <property name="sun.cpu.endian" value="little" />
+    <property name="Linux_package_dir" value="release/Linux/beast" />
+    <property name="java.io.tmpdir" value="/var/folders/gf/rwhntprj2sqd6lkt8254md2m0000gn/T/" />
+    <property name="beast_name" value="beast" />
+    <property name="java.vendor.url.bug" value="http://bugreport.sun.com/bugreport/" />
+    <property name="java.awt.graphicsenv" value="sun.awt.CGraphicsEnvironment" />
+    <property name="os.arch" value="x86_64" />
+    <property name="java.ext.dirs" value="/Users/lr411/Library/Java/Extensions:/Library/Java/JavaVirtualMachines/jdk1.8.0_192.jdk/Contents/Home/jre/lib/ext:/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java" />
+    <property name="user.dir" value="/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2" />
+    <property name="line.separator" value="&#xa;" />
+    <property name="java.vm.name" value="Java HotSpot(TM) 64-Bit Server VM" />
+    <property name="basedir" value="/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2" />
+    <property name="ant.java.version" value="1.8" />
+    <property name="ant.core.lib" value="/usr/local/Cellar/ant/1.10.6/libexec/lib/ant.jar" />
+    <property name="Windows_dir" value="release/Windows" />
+    <property name="LogCombiner_name" value="LogCombiner" />
+    <property name="file.encoding" value="UTF-8" />
+    <property name="java.specification.version" value="1.8" />
+    <property name="ant.project.invoked-targets" value="build_jar_all_BEAST" />
+    <property name="AppLauncher_name" value="AppLauncher" />
+    <property name="Windows_package_dir" value="release/Windows/BEAST" />
+  </properties>
+  <testcase classname="test.beast.app.BeautiTest" name="testStandarBatchMode" time="3.034">
+    <failure message="expected:&lt;false&gt; but was:&lt;true&gt;" type="junit.framework.AssertionFailedError">junit.framework.AssertionFailedError: expected:&lt;false&gt; but was:&lt;true&gt;
+	at test.beast.app.BeautiTest.testStandarBatchMode(Unknown Source)
+</failure>
+  </testcase>
+  <testcase classname="test.beast.app.BeautiTest" name="testStarBeastBatchMode" time="0.572">
+    <failure message="expected:&lt;false&gt; but was:&lt;true&gt;" type="junit.framework.AssertionFailedError">junit.framework.AssertionFailedError: expected:&lt;false&gt; but was:&lt;true&gt;
+	at test.beast.app.BeautiTest.testStarBeastBatchMode(Unknown Source)
+</failure>
+  </testcase>
+  <testcase classname="test.beast.app.BeautiTest" name="testCustomBatchMode" time="0.246">
+    <failure message="expected:&lt;false&gt; but was:&lt;true&gt;" type="junit.framework.AssertionFailedError">junit.framework.AssertionFailedError: expected:&lt;false&gt; but was:&lt;true&gt;
+	at test.beast.app.BeautiTest.testCustomBatchMode(Unknown Source)
+</failure>
+  </testcase>
+  <system-out><![CDATA[Investigating /usr/local/Cellar/ant/1.10.6/libexec
+Investigating /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2
+Investigating .
+Investigating /usr/local/Cellar/ant/1.10.6/libexec
+Investigating /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2
+Investigating .
+Cow: 705 4
+Carp: 705 4
+Chicken: 705 4
+Human: 705 4
+Loach: 705 4
+Mouse: 705 4
+Rat: 705 4
+Seal: 705 4
+Whale: 705 4
+Frog: 705 4
+Alignment(null)
+  10 taxa
+  705 sites
+  358 patterns
+
+Investigating /usr/local/Cellar/ant/1.10.6/libexec
+Investigating /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2
+Investigating .
+Investigating /usr/local/Cellar/ant/1.10.6/libexec
+Investigating /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2
+Investigating .
+Orthogeomys_heterodus: 614 4
+Thomomys_bottae_awahnee_a: 614 4
+Thomomys_bottae_awahnee_b: 614 4
+Thomomys_bottae_xerophilus: 614 4
+Thomomys_bottae_cactophilus: 614 4
+Thomomys_bottae_albatus: 614 4
+Thomomys_bottae_ruidosae: 614 4
+Thomomys_bottae_bottae: 614 4
+Thomomys_bottae_alpinus: 614 4
+Thomomys_bottae_riparius: 614 4
+Thomomys_bottae_mewa: 614 4
+Thomomys_bottae_saxatilis: 614 4
+Thomomys_bottae_laticeps: 614 4
+Thomomys_talpoides_ocius: 614 4
+Thomomys_idahoensis_pygmaeus_a: 614 4
+Thomomys_idahoensis_pygmaeus_b: 614 4
+Thomomys_mazama_mazama: 614 4
+Thomomys_mazama_nasicus: 614 4
+Thomomys_monticola_a: 614 4
+Thomomys_monticola_b: 614 4
+Thomomys_talpoides_yakimensis: 614 4
+Thomomys_talpoides_bridgeri: 614 4
+Thomomys_townsendii_townsendii: 614 4
+Thomomys_townsendii_relictus: 614 4
+Thomomys_umbrinus_chihuahuae: 614 4
+Thomomys_umbrinus_atroavarius: 614 4
+Alignment(null)
+  26 taxa
+  614 sites
+  144 patterns
+
+Orthogeomys_heterodus: 601 4
+Thomomys_bottae_awahnee_a: 601 4
+Thomomys_bottae_awahnee_b: 601 4
+Thomomys_bottae_xerophilus: 601 4
+Thomomys_bottae_cactophilus: 601 4
+Thomomys_bottae_albatus: 601 4
+Thomomys_bottae_ruidosae: 601 4
+Thomomys_bottae_bottae: 601 4
+Thomomys_bottae_alpinus: 601 4
+Thomomys_bottae_riparius: 601 4
+Thomomys_bottae_mewa: 601 4
+Thomomys_bottae_saxatilis: 601 4
+Thomomys_bottae_laticeps: 601 4
+Thomomys_talpoides_ocius: 601 4
+Thomomys_idahoensis_pygmaeus_a: 601 4
+Thomomys_idahoensis_pygmaeus_b: 601 4
+Thomomys_mazama_mazama: 601 4
+Thomomys_mazama_nasicus: 601 4
+Thomomys_monticola_a: 601 4
+Thomomys_monticola_b: 601 4
+Thomomys_talpoides_yakimensis: 601 4
+Thomomys_talpoides_bridgeri: 601 4
+Thomomys_townsendii_townsendii: 601 4
+Thomomys_townsendii_relictus: 601 4
+Thomomys_umbrinus_chihuahuae: 601 4
+Thomomys_umbrinus_atroavarius: 601 4
+Alignment(null)
+  26 taxa
+  601 sites
+  71 patterns
+
+Investigating /usr/local/Cellar/ant/1.10.6/libexec
+Investigating /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2
+Investigating .
+Investigating /usr/local/Cellar/ant/1.10.6/libexec
+Investigating /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2
+Investigating .
+Anolis_ahli: 1456 4
+Anolis_aliniger: 1456 4
+Anolis_alutaceus: 1456 4
+Anolis_angusticeps: 1456 4
+Anolis_bahorucoensis: 1456 4
+Anolis_barahonae: 1456 4
+Anolis_brevirostris: 1456 4
+Anolis_coelestinus: 1456 4
+Anolis_cristatellus: 1456 4
+Anolis_cuvieri: 1456 4
+Anolis_distichus: 1456 4
+Anolis_equestris: 1456 4
+Anolis_garmani: 1456 4
+Anolis_grahami: 1456 4
+Anolis_insolitus: 1456 4
+Anolis_krugi: 1456 4
+Anolis_lineatopus: 1456 4
+Anolis_loysiana: 1456 4
+Anolis_luteogularis: 1456 4
+Anolis_marcanoi: 1456 4
+Anolis_occultus: 1456 4
+Anolis_olssoni: 1456 4
+Anolis_ophiolepis: 1456 4
+Anolis_paternus: 1456 4
+Anolis_sagrei: 1456 4
+Anolis_strahmi: 1456 4
+Anolis_stratulus: 1456 4
+Anolis_valencienni: 1456 4
+Anolis_vanidicus: 1456 4
+Alignment(null)
+  29 taxa
+  1456 sites
+  934 patterns
+
+]]></system-out>
+  <system-err><![CDATA[Loading template /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/templates/Standard.xml
+Processing /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/templates/ClockModels.xml
+Processing /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/templates/ParametricDistributions.xml
+Processing /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/templates/StarBeast.xml
+Processing /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/templates/TreePriors.xml
+Processing /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/templates/SubstModels.xml
+Skipping /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/./templates/ClockModels.xml since ClockModels.xml is already processed
+Processing /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/./templates/Standard.xml
+Skipping /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/./templates/ParametricDistributions.xml since ParametricDistributions.xml is already processed
+Skipping /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/./templates/StarBeast.xml since StarBeast.xml is already processed
+Skipping /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/./templates/TreePriors.xml since TreePriors.xml is already processed
+Skipping /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/./templates/SubstModels.xml since SubstModels.xml is already processed
+ch.randelshofer.quaqua.QuaquaLookAndFeel
+Loading template /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/templates/Standard.xml
+Processing /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/templates/ClockModels.xml
+Processing /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/templates/ParametricDistributions.xml
+Processing /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/templates/StarBeast.xml
+Processing /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/templates/TreePriors.xml
+Processing /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/templates/SubstModels.xml
+Skipping /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/./templates/ClockModels.xml since ClockModels.xml is already processed
+Processing /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/./templates/Standard.xml
+Skipping /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/./templates/ParametricDistributions.xml since ParametricDistributions.xml is already processed
+Skipping /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/./templates/StarBeast.xml since StarBeast.xml is already processed
+Skipping /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/./templates/TreePriors.xml since TreePriors.xml is already processed
+Skipping /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/./templates/SubstModels.xml since SubstModels.xml is already processed
+map
+map
+map
+map
+map
+map
+map
+map
+map
+map
+map
+map
+beauticonfig
+fragment
+run
+java.lang.NullPointerException
+	at beast.util.XMLParser.initBEASTObjects(Unknown Source)
+	at beast.util.XMLParser.parseTemplate(Unknown Source)
+	at beast.app.beauti.BeautiDoc.loadTemplate(Unknown Source)
+	at beast.app.beauti.BeautiDoc.mergeSequences(Unknown Source)
+	at beast.app.beauti.BeautiDoc.initialize(Unknown Source)
+	at beast.app.beauti.BeautiDoc.parseArgs(Unknown Source)
+	at beast.app.beauti.Beauti.main2(Unknown Source)
+	at beast.app.beauti.Beauti.main(Unknown Source)
+	at test.beast.app.BeautiTest.testStandarBatchMode(Unknown Source)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at junit.framework.TestCase.runTest(TestCase.java:168)
+	at junit.framework.TestCase.runBare(TestCase.java:134)
+	at junit.framework.TestResult$1.protect(TestResult.java:110)
+	at junit.framework.TestResult.runProtected(TestResult.java:128)
+	at junit.framework.TestResult.run(TestResult.java:113)
+	at junit.framework.TestCase.run(TestCase.java:124)
+	at junit.framework.TestSuite.runTest(TestSuite.java:243)
+	at junit.framework.TestSuite.run(TestSuite.java:238)
+	at org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner.run(JUnitTestRunner.java:534)
+	at org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner.launch(JUnitTestRunner.java:1196)
+	at org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner.main(JUnitTestRunner.java:1041)
+beast.util.XMLParserException: at unknown node (null)
+
+Error 110 parsing the xml input file
+
+validate and intialize error: null
+	at beast.util.XMLParser.initBEASTObjects(Unknown Source)
+	at beast.util.XMLParser.parseTemplate(Unknown Source)
+	at beast.app.beauti.BeautiDoc.loadTemplate(Unknown Source)
+	at beast.app.beauti.BeautiDoc.mergeSequences(Unknown Source)
+	at beast.app.beauti.BeautiDoc.initialize(Unknown Source)
+	at beast.app.beauti.BeautiDoc.parseArgs(Unknown Source)
+	at beast.app.beauti.Beauti.main2(Unknown Source)
+	at beast.app.beauti.Beauti.main(Unknown Source)
+	at test.beast.app.BeautiTest.testStandarBatchMode(Unknown Source)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at junit.framework.TestCase.runTest(TestCase.java:168)
+	at junit.framework.TestCase.runBare(TestCase.java:134)
+	at junit.framework.TestResult$1.protect(TestResult.java:110)
+	at junit.framework.TestResult.runProtected(TestResult.java:128)
+	at junit.framework.TestResult.run(TestResult.java:113)
+	at junit.framework.TestCase.run(TestCase.java:124)
+	at junit.framework.TestSuite.runTest(TestSuite.java:243)
+	at junit.framework.TestSuite.run(TestSuite.java:238)
+	at org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner.run(JUnitTestRunner.java:534)
+	at org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner.launch(JUnitTestRunner.java:1196)
+	at org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner.main(JUnitTestRunner.java:1041)
+Loading template /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/templates/StarBeast.xml
+Processing /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/templates/ClockModels.xml
+Processing /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/templates/Standard.xml
+Processing /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/templates/ParametricDistributions.xml
+Processing /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/templates/TreePriors.xml
+Processing /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/templates/SubstModels.xml
+Skipping /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/./templates/ClockModels.xml since ClockModels.xml is already processed
+Skipping /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/./templates/Standard.xml since Standard.xml is already processed
+Skipping /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/./templates/ParametricDistributions.xml since ParametricDistributions.xml is already processed
+Processing /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/./templates/StarBeast.xml
+Skipping /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/./templates/TreePriors.xml since TreePriors.xml is already processed
+Skipping /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/./templates/SubstModels.xml since SubstModels.xml is already processed
+ch.randelshofer.quaqua.QuaquaLookAndFeel
+Loading template /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/templates/StarBeast.xml
+Processing /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/templates/ClockModels.xml
+Processing /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/templates/Standard.xml
+Processing /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/templates/ParametricDistributions.xml
+Processing /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/templates/TreePriors.xml
+Processing /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/templates/SubstModels.xml
+Skipping /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/./templates/ClockModels.xml since ClockModels.xml is already processed
+Skipping /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/./templates/Standard.xml since Standard.xml is already processed
+Skipping /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/./templates/ParametricDistributions.xml since ParametricDistributions.xml is already processed
+Processing /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/./templates/StarBeast.xml
+Skipping /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/./templates/TreePriors.xml since TreePriors.xml is already processed
+Skipping /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/./templates/SubstModels.xml since SubstModels.xml is already processed
+map
+map
+map
+map
+map
+map
+map
+map
+map
+map
+map
+map
+beauticonfig
+fragment
+taxonset
+tree
+treetop
+run
+java.lang.NullPointerException
+	at beast.util.XMLParser.initBEASTObjects(Unknown Source)
+	at beast.util.XMLParser.parseTemplate(Unknown Source)
+	at beast.app.beauti.BeautiDoc.loadTemplate(Unknown Source)
+	at beast.app.beauti.BeautiDoc.mergeSequences(Unknown Source)
+	at beast.app.beauti.BeautiDoc.initialize(Unknown Source)
+	at beast.app.beauti.BeautiDoc.parseArgs(Unknown Source)
+	at beast.app.beauti.Beauti.main2(Unknown Source)
+	at beast.app.beauti.Beauti.main(Unknown Source)
+	at test.beast.app.BeautiTest.testStarBeastBatchMode(Unknown Source)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at junit.framework.TestCase.runTest(TestCase.java:168)
+	at junit.framework.TestCase.runBare(TestCase.java:134)
+	at junit.framework.TestResult$1.protect(TestResult.java:110)
+	at junit.framework.TestResult.runProtected(TestResult.java:128)
+	at junit.framework.TestResult.run(TestResult.java:113)
+	at junit.framework.TestCase.run(TestCase.java:124)
+	at junit.framework.TestSuite.runTest(TestSuite.java:243)
+	at junit.framework.TestSuite.run(TestSuite.java:238)
+	at org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner.run(JUnitTestRunner.java:534)
+	at org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner.launch(JUnitTestRunner.java:1196)
+	at org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner.main(JUnitTestRunner.java:1041)
+beast.util.XMLParserException: at unknown node (null)
+
+Error 110 parsing the xml input file
+
+validate and intialize error: null
+	at beast.util.XMLParser.initBEASTObjects(Unknown Source)
+	at beast.util.XMLParser.parseTemplate(Unknown Source)
+	at beast.app.beauti.BeautiDoc.loadTemplate(Unknown Source)
+	at beast.app.beauti.BeautiDoc.mergeSequences(Unknown Source)
+	at beast.app.beauti.BeautiDoc.initialize(Unknown Source)
+	at beast.app.beauti.BeautiDoc.parseArgs(Unknown Source)
+	at beast.app.beauti.Beauti.main2(Unknown Source)
+	at beast.app.beauti.Beauti.main(Unknown Source)
+	at test.beast.app.BeautiTest.testStarBeastBatchMode(Unknown Source)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at junit.framework.TestCase.runTest(TestCase.java:168)
+	at junit.framework.TestCase.runBare(TestCase.java:134)
+	at junit.framework.TestResult$1.protect(TestResult.java:110)
+	at junit.framework.TestResult.runProtected(TestResult.java:128)
+	at junit.framework.TestResult.run(TestResult.java:113)
+	at junit.framework.TestCase.run(TestCase.java:124)
+	at junit.framework.TestSuite.runTest(TestSuite.java:243)
+	at junit.framework.TestSuite.run(TestSuite.java:238)
+	at org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner.run(JUnitTestRunner.java:534)
+	at org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner.launch(JUnitTestRunner.java:1196)
+	at org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner.main(JUnitTestRunner.java:1041)
+Loading template /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/test/template123x666.xml
+Processing /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/templates/ClockModels.xml
+Cannot find merge point named clockModelTemplates from ClockModels.xml in template. MergeWith ignored.
+Processing /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/templates/Standard.xml
+Processing /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/templates/ParametricDistributions.xml
+Cannot find merge point named parametricDistributions from ParametricDistributions.xml in template. MergeWith ignored.
+Processing /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/templates/StarBeast.xml
+Processing /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/templates/TreePriors.xml
+Cannot find merge point named misc from TreePriors.xml in template. MergeWith ignored.
+Cannot find merge point named treePriorTemplates from TreePriors.xml in template. MergeWith ignored.
+Processing /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/templates/SubstModels.xml
+Cannot find merge point named substModelTemplates from SubstModels.xml in template. MergeWith ignored.
+Skipping /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/./templates/ClockModels.xml since ClockModels.xml is already processed
+Skipping /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/./templates/Standard.xml since Standard.xml is already processed
+Skipping /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/./templates/ParametricDistributions.xml since ParametricDistributions.xml is already processed
+Skipping /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/./templates/StarBeast.xml since StarBeast.xml is already processed
+Skipping /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/./templates/TreePriors.xml since TreePriors.xml is already processed
+Skipping /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/./templates/SubstModels.xml since SubstModels.xml is already processed
+ch.randelshofer.quaqua.QuaquaLookAndFeel
+Loading template /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/test/template123x666.xml
+Processing /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/templates/ClockModels.xml
+Cannot find merge point named clockModelTemplates from ClockModels.xml in template. MergeWith ignored.
+Processing /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/templates/Standard.xml
+Processing /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/templates/ParametricDistributions.xml
+Cannot find merge point named parametricDistributions from ParametricDistributions.xml in template. MergeWith ignored.
+Processing /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/templates/StarBeast.xml
+Processing /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/templates/TreePriors.xml
+Cannot find merge point named misc from TreePriors.xml in template. MergeWith ignored.
+Cannot find merge point named treePriorTemplates from TreePriors.xml in template. MergeWith ignored.
+Processing /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/templates/SubstModels.xml
+Cannot find merge point named substModelTemplates from SubstModels.xml in template. MergeWith ignored.
+Skipping /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/./templates/ClockModels.xml since ClockModels.xml is already processed
+Skipping /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/./templates/Standard.xml since Standard.xml is already processed
+Skipping /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/./templates/ParametricDistributions.xml since ParametricDistributions.xml is already processed
+Skipping /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/./templates/StarBeast.xml since StarBeast.xml is already processed
+Skipping /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/./templates/TreePriors.xml since TreePriors.xml is already processed
+Skipping /Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/./templates/SubstModels.xml since SubstModels.xml is already processed
+data
+input
+input
+input
+parameter
+tree
+run
+java.lang.NullPointerException
+	at beast.util.XMLParser.initBEASTObjects(Unknown Source)
+	at beast.util.XMLParser.parseTemplate(Unknown Source)
+	at beast.app.beauti.BeautiDoc.loadTemplate(Unknown Source)
+	at beast.app.beauti.BeautiDoc.mergeSequences(Unknown Source)
+	at beast.app.beauti.BeautiDoc.initialize(Unknown Source)
+	at beast.app.beauti.BeautiDoc.parseArgs(Unknown Source)
+	at beast.app.beauti.Beauti.main2(Unknown Source)
+	at beast.app.beauti.Beauti.main(Unknown Source)
+	at test.beast.app.BeautiTest.testCustomBatchMode(Unknown Source)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at junit.framework.TestCase.runTest(TestCase.java:168)
+	at junit.framework.TestCase.runBare(TestCase.java:134)
+	at junit.framework.TestResult$1.protect(TestResult.java:110)
+	at junit.framework.TestResult.runProtected(TestResult.java:128)
+	at junit.framework.TestResult.run(TestResult.java:113)
+	at junit.framework.TestCase.run(TestCase.java:124)
+	at junit.framework.TestSuite.runTest(TestSuite.java:243)
+	at junit.framework.TestSuite.run(TestSuite.java:238)
+	at org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner.run(JUnitTestRunner.java:534)
+	at org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner.launch(JUnitTestRunner.java:1196)
+	at org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner.main(JUnitTestRunner.java:1041)
+beast.util.XMLParserException: at unknown node (null)
+
+Error 110 parsing the xml input file
+
+validate and intialize error: null
+	at beast.util.XMLParser.initBEASTObjects(Unknown Source)
+	at beast.util.XMLParser.parseTemplate(Unknown Source)
+	at beast.app.beauti.BeautiDoc.loadTemplate(Unknown Source)
+	at beast.app.beauti.BeautiDoc.mergeSequences(Unknown Source)
+	at beast.app.beauti.BeautiDoc.initialize(Unknown Source)
+	at beast.app.beauti.BeautiDoc.parseArgs(Unknown Source)
+	at beast.app.beauti.Beauti.main2(Unknown Source)
+	at beast.app.beauti.Beauti.main(Unknown Source)
+	at test.beast.app.BeautiTest.testCustomBatchMode(Unknown Source)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at junit.framework.TestCase.runTest(TestCase.java:168)
+	at junit.framework.TestCase.runBare(TestCase.java:134)
+	at junit.framework.TestResult$1.protect(TestResult.java:110)
+	at junit.framework.TestResult.runProtected(TestResult.java:128)
+	at junit.framework.TestResult.run(TestResult.java:113)
+	at junit.framework.TestCase.run(TestCase.java:124)
+	at junit.framework.TestSuite.runTest(TestSuite.java:243)
+	at junit.framework.TestSuite.run(TestSuite.java:238)
+	at org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner.run(JUnitTestRunner.java:534)
+	at org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner.launch(JUnitTestRunner.java:1196)
+	at org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner.main(JUnitTestRunner.java:1041)
+]]></system-err>
+</testsuite>

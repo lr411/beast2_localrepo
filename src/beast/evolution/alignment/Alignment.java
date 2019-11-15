@@ -175,6 +175,8 @@ public class Alignment extends Map<String> {
     public boolean isAscertained;
 
     public Alignment() {
+    	int a;
+    	a=2;
     }
 
     /**

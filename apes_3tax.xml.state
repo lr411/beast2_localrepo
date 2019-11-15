@@ -1,0 +1,20 @@
+<itsabeastystatewerein version='2.0' sample='210'>
+<statenode id='Tree.t:apes'>((0:0.008674380764070611,1:0.008674380764070611)3:0.03280875951852032,2:0.04148314028259093)4:0.0</statenode>
+<statenode id='mutationRate.s:apes'>mutationRate.s:apes[1 1] (0.0,Infinity): 1.0 </statenode>
+<statenode id='gammaShape.s:apes'>gammaShape.s:apes[1 1] (0.001,1000.0): 0.3129362807566442 </statenode>
+<statenode id='popSize.t:apes'>popSize.t:apes[1 1] (-Infinity,Infinity): 0.10752935191895743 </statenode>
+</itsabeastystatewerein>
+<!--
+{"operators":[
+{"id":"gammaShapeScaler.s:apes","p":0.5,"accept":51,"reject":42,"acceptFC":0,"rejectFC":0,"rejectIv":0,"rejectOp":0},
+{"id":"FixMeanMutationRatesOperator","p":0.75,"accept":62,"reject":0,"acceptFC":0,"rejectFC":0,"rejectIv":0,"rejectOp":0},
+{"id":"CoalescentConstantTreeScaler.t:apes","p":0.5,"accept":24,"reject":53,"acceptFC":0,"rejectFC":0,"rejectIv":0,"rejectOp":0},
+{"id":"CoalescentConstantTreeRootScaler.t:apes","p":0.5,"accept":32,"reject":68,"acceptFC":0,"rejectFC":0,"rejectIv":1,"rejectOp":1},
+{"id":"CoalescentConstantUniformOperator.t:apes","p":"NaN","accept":40,"reject":109,"acceptFC":0,"rejectFC":0,"rejectIv":0,"rejectOp":0},
+{"id":"CoalescentConstantSubtreeSlide.t:apes","p":1,"accept":5,"reject":135,"acceptFC":0,"rejectFC":0,"rejectIv":56,"rejectOp":56},
+{"id":"CoalescentConstantNarrow.t:apes","p":"NaN","accept":9,"reject":143,"acceptFC":0,"rejectFC":0,"rejectIv":0,"rejectOp":0},
+{"id":"CoalescentConstantWide.t:apes","p":"NaN","accept":1,"reject":90,"acceptFC":0,"rejectFC":0,"rejectIv":65,"rejectOp":65},
+{"id":"CoalescentConstantWilsonBalding.t:apes","p":"NaN","accept":1,"reject":85,"acceptFC":0,"rejectFC":0,"rejectIv":67,"rejectOp":67},
+{"id":"PopSizeScaler.t:apes","p":0.75,"accept":89,"reject":16,"acceptFC":0,"rejectFC":0,"rejectIv":0,"rejectOp":0}
+]}
+-->

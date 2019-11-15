@@ -1,0 +1,23 @@
+#
+#model:
+#
+#<?xml version="1.0" encoding="UTF-8" standalone="no"?><input id="posterior" spec="beast.core.util.CompoundDistribution">
+#    <distribution id="prior" spec="beast.core.util.CompoundDistribution">
+#        <distribution id="CoalescentConstant.t:tree" spec="beast.evolution.tree.coalescent.Coalescent">
+#            <populationModel id="ConstantPopulation.t:tree" spec="beast.evolution.tree.coalescent.ConstantPopulation">
+#                <parameter estimate="false" id="popSize.t:tree" name="popSize">3.0</parameter>
+#            </populationModel>
+#            <treeIntervals id="TreeIntervals.t:tree" spec="beast.evolution.tree.coalescent.TreeIntervals">
+#                <tree id="Tree.t:tree">
+#                    <taxonset id="TaxonSet.noncoding" spec="beast.evolution.alignment.TaxonSet">
+#                        <alignment filter="1,458-659,897-898" id="noncoding" spec="beast.evolution.alignment.FilteredAlignment">
+#                        </alignment>
+#                    </taxonset>
+#                </tree>
+#            </treeIntervals>
+#        </distribution>
+#    </distribution>
+#</input>
+#
+Sample	posterior	likelihood	prior	treeLikelihood.1stpos	treeLikelihood.2ndpos	treeLikelihood.3rdpos	treeLikelihood.noncoding	TreeHeight	CoalescentConstant	mutationRate.1stpos	mutationRate.2ndpos	mutationRate.3rdpos
+0	-15.049783671470749	NaN	-15.049783671470749	NaN	NaN	NaN	NaN	0.7873439529022015	-15.049783671470749	1.0	1.0	1.0

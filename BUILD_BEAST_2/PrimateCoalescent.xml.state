@@ -1,0 +1,18 @@
+<itsabeastystatewerein version='2.0' sample='1000000'>
+<statenode id='Tree.t:tree'>(((0:0.13956394119030605,11:0.13956394119030605)12:0.05767299899118125,10:0.1972369401814873)21:0.013379997205935523,(((((1:0.03877023761673935,2:0.03877023761673935)19:0.017376799004606362,3:0.056147036621345715)17:0.050161702460082995,4:0.10630873908142871)18:0.02493813208532239,5:0.1312468711667511)20:0.0522166238835389,(((6:0.017432385120291678,7:0.017432385120291678)14:0.028981325471902627,8:0.046413710592194304)13:0.019873109024706792,9:0.0662868196169011)16:0.1171766754333889)15:0.02715344233713282)22:0.0</statenode>
+<statenode id='mutationRate.s:noncoding'>mutationRate.s:noncoding[1 1] (0.0,Infinity): 1.0 </statenode>
+<statenode id='popSize.t:tree'>popSize.t:tree[1 1] (-Infinity,Infinity): 0.7266341573462318 </statenode>
+</itsabeastystatewerein>
+<!--
+{"operators":[
+{"id":"FixMeanMutationRatesOperator","p":1273.6184993085637,"accept":25970,"reject":0,"acceptFC":25155,"rejectFC":0,"rejectIv":0,"rejectOp":0},
+{"id":"CoalescentConstantTreeScaler.t:tree","p":0.7694767549694852,"accept":6556,"reject":32619,"acceptFC":6480,"rejectFC":31504,"rejectIv":0,"rejectOp":0},
+{"id":"CoalescentConstantTreeRootScaler.t:tree","p":0.7305886313708038,"accept":4947,"reject":34458,"acceptFC":4869,"rejectFC":33293,"rejectIv":12464,"rejectOp":12464},
+{"id":"CoalescentConstantUniformOperator.t:tree","p":"NaN","accept":81570,"reject":308341,"acceptFC":79021,"rejectFC":298687,"rejectIv":0,"rejectOp":0},
+{"id":"CoalescentConstantSubtreeSlide.t:tree","p":0.14734244698470747,"accept":7667,"reject":186917,"acceptFC":7620,"rejectFC":180751,"rejectIv":70035,"rejectOp":70035},
+{"id":"CoalescentConstantNarrow.t:tree","p":"NaN","accept":5588,"reject":188552,"acceptFC":5410,"rejectFC":182645,"rejectIv":0,"rejectOp":0},
+{"id":"CoalescentConstantWide.t:tree","p":"NaN","accept":79,"reject":38658,"acceptFC":77,"rejectFC":37419,"rejectIv":20078,"rejectOp":20078},
+{"id":"CoalescentConstantWilsonBalding.t:tree","p":"NaN","accept":32,"reject":38876,"acceptFC":31,"rejectFC":37693,"rejectIv":10662,"rejectOp":10662},
+{"id":"PopSizeScaler.t:tree","p":0.285511870752469,"accept":11461,"reject":27710,"acceptFC":10517,"rejectFC":27469,"rejectIv":0,"rejectOp":0}
+]}
+-->

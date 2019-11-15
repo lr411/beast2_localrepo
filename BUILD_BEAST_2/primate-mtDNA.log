@@ -1,0 +1,74 @@
+#
+#model:
+#
+#<?xml version="1.0" encoding="UTF-8" standalone="no"?><input id="posterior" spec="beast.core.util.CompoundDistribution">
+#    <distribution id="prior" spec="beast.core.util.CompoundDistribution">
+#        <distribution id="CoalescentConstant.t:tree" spec="beast.evolution.tree.coalescent.Coalescent">
+#            <populationModel id="ConstantPopulation.t:tree" spec="beast.evolution.tree.coalescent.ConstantPopulation">
+#                <parameter id="popSize.t:tree" name="popSize">0.3</parameter>
+#            </populationModel>
+#            <treeIntervals id="TreeIntervals.t:tree" spec="beast.evolution.tree.coalescent.TreeIntervals">
+#                <tree id="Tree.t:tree">
+#                    <taxonset id="TaxonSet.1stpos" spec="beast.evolution.alignment.TaxonSet">
+#                        <alignment filter="2-457\3,660-896\3" id="1stpos" spec="beast.evolution.alignment.FilteredAlignment">
+#                        </alignment>
+#                    </taxonset>
+#                </tree>
+#            </treeIntervals>
+#        </distribution>
+#        <prior id="GammaShapePrior.s:1stpos" name="distribution">
+#            <parameter id="gammaShape.s:1stpos" name="x">1.0</parameter>
+#            <Exponential id="Exponential.2" name="distr">
+#                <parameter estimate="false" id="RealParameter.2" name="mean">1.0</parameter>
+#            </Exponential>
+#        </prior>
+#        <prior id="GammaShapePrior.s:2ndpos" name="distribution">
+#            <parameter id="gammaShape.s:2ndpos" name="x">1.0</parameter>
+#            <Exponential id="Exponential.2.2ndpos" name="distr">
+#                <parameter estimate="false" id="RealParameter.2.2ndpos" name="mean">1.0</parameter>
+#            </Exponential>
+#        </prior>
+#        <prior id="GammaShapePrior.s:3rdpos" name="distribution">
+#            <parameter id="gammaShape.s:3rdpos" name="x">1.0</parameter>
+#            <Exponential id="Exponential.2.3rdpos" name="distr">
+#                <parameter estimate="false" id="RealParameter.2.3rdpos" name="mean">1.0</parameter>
+#            </Exponential>
+#        </prior>
+#        <prior id="PopSizePrior.t:tree" name="distribution" x="@popSize.t:tree">
+#            <Exponential id="Exponential.5" name="distr">
+#                <parameter estimate="false" id="RealParameter.5" name="mean">0.33</parameter>
+#            </Exponential>
+#        </prior>
+#    </distribution>
+#    <distribution id="likelihood" spec="beast.core.util.CompoundDistribution" useThreads="true">
+#        <distribution data="@1stpos" id="treeLikelihood.1stpos" spec="beast.evolution.likelihood.ThreadedTreeLikelihood" tree="@Tree.t:tree">
+#            <siteModel gammaCategoryCount="4" id="SiteModel.s:1stpos" shape="@gammaShape.s:1stpos" spec="beast.evolution.sitemodel.SiteModel">
+#                <parameter id="mutationRate.s:1stpos" name="mutationRate">1.0</parameter>
+#                <parameter estimate="false" id="proportionInvariant.s:1stpos" lower="0.0" name="proportionInvariant" upper="1.0">0.0</parameter>
+#                <substModel id="JC69.s:1stpos" spec="beast.evolution.substitutionmodel.JukesCantor"/>
+#            </siteModel>
+#            <branchRateModel id="StrictClock.c:clock" spec="beast.evolution.branchratemodel.StrictClockModel">
+#                <parameter estimate="false" id="clockRate.c:clock" name="clock.rate">1.0</parameter>
+#            </branchRateModel>
+#        </distribution>
+#        <distribution branchRateModel="@StrictClock.c:clock" id="treeLikelihood.2ndpos" spec="beast.evolution.likelihood.ThreadedTreeLikelihood" tree="@Tree.t:tree">
+#            <data data="@primate-mtDNA" filter="3-457\3,661-896\3" id="2ndpos" spec="beast.evolution.alignment.FilteredAlignment"/>
+#            <siteModel gammaCategoryCount="4" id="SiteModel.s:2ndpos" shape="@gammaShape.s:2ndpos" spec="beast.evolution.sitemodel.SiteModel">
+#                <parameter id="mutationRate.s:2ndpos" name="mutationRate">1.0</parameter>
+#                <parameter estimate="false" id="proportionInvariant.s:2ndpos" lower="0.0" name="proportionInvariant" upper="1.0">0.0</parameter>
+#                <substModel id="JC69.s:2ndpos" spec="beast.evolution.substitutionmodel.JukesCantor"/>
+#            </siteModel>
+#        </distribution>
+#        <distribution branchRateModel="@StrictClock.c:clock" id="treeLikelihood.3rdpos" spec="beast.evolution.likelihood.ThreadedTreeLikelihood" tree="@Tree.t:tree">
+#            <data data="@primate-mtDNA" filter="4-457\3,662-.\3" id="3rdpos" spec="beast.evolution.alignment.FilteredAlignment"/>
+#            <siteModel gammaCategoryCount="4" id="SiteModel.s:3rdpos" shape="@gammaShape.s:3rdpos" spec="beast.evolution.sitemodel.SiteModel">
+#                <parameter id="mutationRate.s:3rdpos" name="mutationRate">1.0</parameter>
+#                <parameter estimate="false" id="proportionInvariant.s:3rdpos" lower="0.0" name="proportionInvariant" upper="1.0">0.0</parameter>
+#                <substModel id="JC69.s:3rdpos" spec="beast.evolution.substitutionmodel.JukesCantor"/>
+#            </siteModel>
+#        </distribution>
+#    </distribution>
+#</input>
+#
+Sample	posterior	likelihood	prior	treeLikelihood.1stpos	treeLikelihood.2ndpos	treeLikelihood.3rdpos	TreeHeight	popSize	CoalescentConstant	mutationRate.1stpos	mutationRate.2ndpos	mutationRate.3rdpos	gammaShape.1stpos	gammaShape.2ndpos	gammaShape.3rdpos
+0	-6642.2550408205125	-6623.047828422313	-19.20721239819946	-1945.0226954053035	-1435.6160658427812	-3242.409067174228	0.7873439529022015	0.3	-16.406784113630163	1.0	1.0	1.0	1.0	1.0	1.0

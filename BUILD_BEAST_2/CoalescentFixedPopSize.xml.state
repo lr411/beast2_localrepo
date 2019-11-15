@@ -1,0 +1,16 @@
+<itsabeastystatewerein version='2.0' sample='100000'>
+<statenode id='Tree.t:tree'>((0:0.167576970524108,11:0.167576970524108)12:0.07253884787619078,((((((1:0.044693040514588965,2:0.044693040514588965)19:0.006982459354923483,3:0.05167549986951245)20:0.04879172899831127,4:0.10046722886782372)18:0.036319093980611256,5:0.13678632284843498)17:0.05666643314272296,(((6:0.02067057216539008,7:0.02067057216539008)14:0.022224646479473368,8:0.042895218644863446)15:0.025086728358923303,9:0.06798194700378675)16:0.12547080898737117)13:0.03557584874427416,10:0.2290286047354321)21:0.011087213664866674)22:0.0</statenode>
+<statenode id='gammaShape.s:noncoding'>gammaShape.s:noncoding[1 1] (0.001,1000.0): 0.32000702138110776 </statenode>
+</itsabeastystatewerein>
+<!--
+{"operators":[
+{"id":"gammaShapeScaler.s:noncoding","p":0.4069211494635935,"accept":47,"reject":81,"acceptFC":28,"rejectFC":49,"rejectIv":0,"rejectOp":0},
+{"id":"CoalescentConstantTreeScaler.t:tree","p":0.743647279742145,"accept":559,"reject":3536,"acceptFC":463,"rejectFC":2167,"rejectIv":0,"rejectOp":0},
+{"id":"CoalescentConstantTreeRootScaler.t:tree","p":0.6991604319443074,"accept":429,"reject":3716,"acceptFC":316,"rejectFC":2327,"rejectIv":1235,"rejectOp":1235},
+{"id":"CoalescentConstantUniformOperator.t:tree","p":"NaN","accept":8800,"reject":32975,"acceptFC":5511,"rejectFC":20855,"rejectIv":0,"rejectOp":0},
+{"id":"CoalescentConstantSubtreeSlide.t:tree","p":0.19133908592779317,"accept":511,"reject":20279,"acceptFC":454,"rejectFC":12765,"rejectIv":8684,"rejectOp":8684},
+{"id":"CoalescentConstantNarrow.t:tree","p":"NaN","accept":556,"reject":20250,"acceptFC":348,"rejectFC":12822,"rejectIv":0,"rejectOp":0},
+{"id":"CoalescentConstantWide.t:tree","p":"NaN","accept":5,"reject":4114,"acceptFC":1,"rejectFC":2594,"rejectIv":2126,"rejectOp":2126},
+{"id":"CoalescentConstantWilsonBalding.t:tree","p":"NaN","accept":7,"reject":4136,"acceptFC":3,"rejectFC":2591,"rejectIv":1160,"rejectOp":1160}
+]}
+-->

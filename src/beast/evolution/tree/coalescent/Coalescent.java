@@ -124,6 +124,10 @@ public class Coalescent extends TreeDistribution {
 
                 final double demographicAtCoalPoint = popSizeFunction.getPopSize(finishTime);
 
+	                if(demographicAtCoalPoint != 0.3) {
+	                	int antonello;
+	                	antonello=3;
+	                }
                 // if value at end is many orders of magnitude different than mean over interval reject the interval
                 // This is protection against cases where ridiculous infinitesimal
                 // population size at the end of a linear interval drive coalescent values to infinity.
@@ -136,6 +140,29 @@ public class Coalescent extends TreeDistribution {
                     //  System.err.println("Warning: " + i + " " + demographicAtCoalPoint + " " + (intervalArea/duration) );
                     return Double.NEGATIVE_INFINITY;
                 }
+            }
+            else // this else branch is for debug only
+            {
+            	int antonello=0;
+            	switch (intervals.getIntervalType(i)) {
+            	    case SAMPLE: {
+	                	antonello=1;
+	                }
+            	    break;
+            	    
+            	    case MIGRATION: {
+	                	antonello=2;
+	                }
+            	    break;
+            	    
+            	    case NOTHING: {
+	                	antonello=4;
+	                }
+            	    break;            	    	
+            	}
+            	
+            	int prova=antonello;
+            	prova += lineageCount;
             }
             startTime = finishTime;
         }

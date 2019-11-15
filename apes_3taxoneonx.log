@@ -1,0 +1,43 @@
+#
+#model:
+#
+#<?xml version="1.0" encoding="UTF-8" standalone="no"?><input id="posterior" spec="beast.core.util.CompoundDistribution">
+#    <distribution id="prior" spec="beast.core.util.CompoundDistribution">
+#        <distribution id="CoalescentConstant.t:apes" spec="beast.evolution.tree.coalescent.Coalescent">
+#            <populationModel id="ConstantPopulation.t:apes" spec="beast.evolution.tree.coalescent.ConstantPopulation">
+#                <parameter id="popSize.t:apes" name="popSize">0.3</parameter>
+#            </populationModel>
+#            <treeIntervals id="TreeIntervals.t:apes" spec="beast.evolution.tree.coalescent.TreeIntervals">
+#                <tree id="Tree.t:apes">
+#                    <taxonset id="TaxonSet.apes" spec="beast.evolution.alignment.TaxonSet">
+#                    </taxonset>
+#                </tree>
+#            </treeIntervals>
+#        </distribution>
+#        <prior id="GammaShapePrior.s:apes" name="distribution">
+#            <parameter id="gammaShape.s:apes" name="x">1.0</parameter>
+#            <Exponential id="Exponential.0" name="distr">
+#                <parameter estimate="false" id="RealParameter.0" name="mean">1.0</parameter>
+#            </Exponential>
+#        </prior>
+#        <prior id="PopSizePrior.t:apes" name="distribution" x="@popSize.t:apes">
+#            <OneOnX id="OneOnX.1" name="distr"/>
+#        </prior>
+#    </distribution>
+#    <distribution id="likelihood" spec="beast.core.util.CompoundDistribution" useThreads="true">
+#        <distribution data="@apes" id="treeLikelihood.apes" spec="beast.evolution.likelihood.ThreadedTreeLikelihood" tree="@Tree.t:apes">
+#            <siteModel gammaCategoryCount="4" id="SiteModel.s:apes" shape="@gammaShape.s:apes" spec="beast.evolution.sitemodel.SiteModel">
+#                <parameter id="mutationRate.s:apes" name="mutationRate">1.0</parameter>
+#                <parameter estimate="false" id="proportionInvariant.s:apes" lower="0.0" name="proportionInvariant" upper="1.0">0.0</parameter>
+#                <substModel id="JC69.s:apes" spec="beast.evolution.substitutionmodel.JukesCantor"/>
+#            </siteModel>
+#            <branchRateModel id="StrictClock.c:apes" spec="beast.evolution.branchratemodel.StrictClockModel">
+#                <parameter estimate="false" id="clockRate.c:apes" name="clock.rate">1.0</parameter>
+#            </branchRateModel>
+#        </distribution>
+#    </distribution>
+#</input>
+#
+Sample	posterior	likelihood	prior	treeLikelihood	TreeHeight	mutationRate	gammaShape	popSize	CoalescentConstant
+0	-1426.366945723834	-1427.2158798353576	0.8489341115235836	-1427.2158798353576	0.21785884119674334	1.0	0.11593738172776512	0.1027464102786146	-1.3106198694259086
+200	-1308.6698524457026	-1313.307153715953	4.637301270250396	-1313.307153715953	0.032148301507464144	1.0	0.11593738172776512	0.18807833305479504	3.08234191423022

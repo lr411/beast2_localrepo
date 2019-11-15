@@ -1,0 +1,644 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuite errors="0" failures="0" hostname="Leonardos-MacBook-Pro.local" name="test.beast.evolution.likelihood.TreeLikelihoodTest" skipped="0" tests="35" time="0.74" timestamp="2019-06-11T12:12:39">
+  <properties>
+    <property name="java.vendor" value="Oracle Corporation" />
+    <property name="sun.java.launcher" value="SUN_STANDARD" />
+    <property name="BEAUti_name" value="BEAUti" />
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers" />
+    <property name="dist" value="/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/build/dist" />
+    <property name="lib" value="/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/lib" />
+    <property name="os.name" value="Mac OS X" />
+    <property name="sun.boot.class.path" value="/Library/Java/JavaVirtualMachines/jdk1.8.0_192.jdk/Contents/Home/jre/lib/resources.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_192.jdk/Contents/Home/jre/lib/rt.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_192.jdk/Contents/Home/jre/lib/sunrsasign.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_192.jdk/Contents/Home/jre/lib/jsse.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_192.jdk/Contents/Home/jre/lib/jce.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_192.jdk/Contents/Home/jre/lib/charsets.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_192.jdk/Contents/Home/jre/lib/jfr.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_192.jdk/Contents/Home/jre/classes" />
+    <property name="report" value="build/junitreport" />
+    <property name="common_dir" value="release/common" />
+    <property name="java.vm.specification.vendor" value="Oracle Corporation" />
+    <property name="ant.home" value="/usr/local/Cellar/ant/1.10.6/libexec" />
+    <property name="java.runtime.version" value="1.8.0_192-b12" />
+    <property name="main_class_BEAST" value="beast.app.beastapp.BeastMain" />
+    <property name="Mac_package_dir" value="release/Mac/BEAST" />
+    <property name="user.name" value="lr411" />
+    <property name="AppleSigner" value="Developer ID Application: Remco Bouckaert (LHFJWE5U63)" />
+    <property name="LogAnalyser_name" value="LogAnalyser" />
+    <property name="user.language" value="en" />
+    <property name="build" value="/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/build" />
+    <property name="sun.boot.library.path" value="/Library/Java/JavaVirtualMachines/jdk1.8.0_192.jdk/Contents/Home/jre/lib" />
+    <property name="ant.project.default-target" value="build_jar_all_BEAST" />
+    <property name="tools_dir" value="release/common/tools" />
+    <property name="ant.project.name" value="BUILD_BEAST_2" />
+    <property name="java.version" value="1.8.0_192" />
+    <property name="version" value="2.5.1" />
+    <property name="user.timezone" value="" />
+    <property name="sun.arch.data.model" value="64" />
+    <property name="Linux_dir" value="release/Linux" />
+    <property name="http.nonProxyHosts" value="local|*.local|169.254/16|*.169.254/16" />
+    <property name="java.endorsed.dirs" value="/Library/Java/JavaVirtualMachines/jdk1.8.0_192.jdk/Contents/Home/jre/lib/endorsed" />
+    <property name="doc" value="/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/doc" />
+    <property name="version_number" value="2.5.1" />
+    <property name="sun.cpu.isalist" value="" />
+    <property name="sun.jnu.encoding" value="UTF-8" />
+    <property name="file.encoding.pkg" value="sun.io" />
+    <property name="file.separator" value="/" />
+    <property name="java.specification.name" value="Java Platform API Specification" />
+    <property name="java.class.version" value="52.0" />
+    <property name="src" value="/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/src" />
+    <property name="Mac_bundle_dir" value="release/Mac/BEAST/BEAST" />
+    <property name="user.country" value="GB" />
+    <property name="java.home" value="/Library/Java/JavaVirtualMachines/jdk1.8.0_192.jdk/Contents/Home/jre" />
+    <property name="java.vm.info" value="mixed mode" />
+    <property name="Mac_dir" value="release/Mac" />
+    <property name="ant.file" value="/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/build.xml" />
+    <property name="os.version" value="10.14" />
+    <property name="release_dir" value="release" />
+    <property name="path.separator" value=":" />
+    <property name="java.vm.version" value="25.192-b12" />
+    <property name="ant.library.dir" value="/usr/local/Cellar/ant/1.10.6/libexec/lib" />
+    <property name="java.awt.printerjob" value="sun.lwawt.macosx.CPrinterJob" />
+    <property name="sun.io.unicode.encoding" value="UnicodeBig" />
+    <property name="beast1_dir" value="release/common/beast1" />
+    <property name="awt.toolkit" value="sun.lwawt.macosx.LWCToolkit" />
+    <property name="socksNonProxyHosts" value="local|*.local|169.254/16|*.169.254/16" />
+    <property name="ftp.nonProxyHosts" value="local|*.local|169.254/16|*.169.254/16" />
+    <property name="BEAST_name" value="BEAST" />
+    <property name="TreeAnnotator_name" value="TreeAnnotator" />
+    <property name="user.home" value="/Users/lr411" />
+    <property name="java.specification.vendor" value="Oracle Corporation" />
+    <property name="test" value="/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/test" />
+    <property name="ant.file.BUILD_BEAST_2" value="/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/build.xml" />
+    <property name="java.library.path" value="/Users/lr411/Library/Java/Extensions:/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java:." />
+    <property name="java.vendor.url" value="http://java.oracle.com/" />
+    <property name="java.vm.vendor" value="Oracle Corporation" />
+    <property name="gopherProxySet" value="false" />
+    <property name="copyright" value="Beast 2 development team 2011-2018" />
+    <property name="java.runtime.name" value="Java(TM) SE Runtime Environment" />
+    <property name="ant.version" value="Apache Ant(TM) version 1.10.6 compiled on May 2 2019" />
+    <property name="sun.java.command" value="org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner test.beast.evolution.likelihood.TreeLikelihoodTest skipNonTests=false filtertrace=true haltOnError=false haltOnFailure=false formatter=org.apache.tools.ant.taskdefs.optional.junit.SummaryJUnitResultFormatter showoutput=false outputtoformatters=true logfailedtests=true threadid=0 logtestlistenerevents=false formatter=org.apache.tools.ant.taskdefs.optional.junit.XMLJUnitResultFormatter,/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/build/junitreport/TEST-test.beast.evolution.likelihood.TreeLikelihoodTest.xml crashfile=/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/junitvmwatcher2931261150759571787.properties propsfile=/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/junit5964712019709403708.properties" />
+    <property name="java.class.path" value="/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/lib/beagle.jar:/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/lib/jam.jar:/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/lib/colt.jar:/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/lib/fest.jar:/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/lib/junit-4.8.2.jar:/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/lib/antlr-runtime-4.7.jar:/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2/build:/usr/local/Cellar/ant/1.10.6/libexec/lib/ant-launcher.jar:/usr/local/Cellar/ant/1.10.6/libexec/lib/ant.jar:/usr/local/Cellar/ant/1.10.6/libexec/lib/ant-junit.jar:/usr/local/Cellar/ant/1.10.6/libexec/lib/ant-junit4.jar" />
+    <property name="sdk_dir" value="release/BEAST_SDK" />
+    <property name="junitfailed" value="true" />
+    <property name="ant.file.type.BUILD_BEAST_2" value="file" />
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification" />
+    <property name="ant.file.type" value="file" />
+    <property name="java.vm.specification.version" value="1.8" />
+    <property name="sun.os.patch.level" value="unknown" />
+    <property name="sun.cpu.endian" value="little" />
+    <property name="Linux_package_dir" value="release/Linux/beast" />
+    <property name="java.io.tmpdir" value="/var/folders/gf/rwhntprj2sqd6lkt8254md2m0000gn/T/" />
+    <property name="beast_name" value="beast" />
+    <property name="java.vendor.url.bug" value="http://bugreport.sun.com/bugreport/" />
+    <property name="java.awt.graphicsenv" value="sun.awt.CGraphicsEnvironment" />
+    <property name="os.arch" value="x86_64" />
+    <property name="java.ext.dirs" value="/Users/lr411/Library/Java/Extensions:/Library/Java/JavaVirtualMachines/jdk1.8.0_192.jdk/Contents/Home/jre/lib/ext:/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java" />
+    <property name="user.dir" value="/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2" />
+    <property name="line.separator" value="&#xa;" />
+    <property name="java.vm.name" value="Java HotSpot(TM) 64-Bit Server VM" />
+    <property name="basedir" value="/Users/lr411/Documents/workspace/LeoBEAST2_local/beast2" />
+    <property name="ant.java.version" value="1.8" />
+    <property name="ant.core.lib" value="/usr/local/Cellar/ant/1.10.6/libexec/lib/ant.jar" />
+    <property name="Windows_dir" value="release/Windows" />
+    <property name="LogCombiner_name" value="LogCombiner" />
+    <property name="file.encoding" value="UTF-8" />
+    <property name="java.specification.version" value="1.8" />
+    <property name="ant.project.invoked-targets" value="build_jar_all_BEAST" />
+    <property name="AppLauncher_name" value="AppLauncher" />
+    <property name="Windows_package_dir" value="release/Windows/BEAST" />
+  </properties>
+  <testcase classname="test.beast.evolution.likelihood.TreeLikelihoodTest" name="testHKY85Likelihood" time="0.312" />
+  <testcase classname="test.beast.evolution.likelihood.TreeLikelihoodTest" name="testHKY85GLikelihood" time="0.023" />
+  <testcase classname="test.beast.evolution.likelihood.TreeLikelihoodTest" name="testHKY85ILikelihood" time="0.013" />
+  <testcase classname="test.beast.evolution.likelihood.TreeLikelihoodTest" name="testHKY85GILikelihood" time="0.019" />
+  <testcase classname="test.beast.evolution.likelihood.TreeLikelihoodTest" name="testGTRLikelihood" time="0.015" />
+  <testcase classname="test.beast.evolution.likelihood.TreeLikelihoodTest" name="testGTRILikelihood" time="0.011" />
+  <testcase classname="test.beast.evolution.likelihood.TreeLikelihoodTest" name="testGTRGLikelihood" time="0.013" />
+  <testcase classname="test.beast.evolution.likelihood.TreeLikelihoodTest" name="testGTRGILikelihood" time="0.011" />
+  <testcase classname="test.beast.evolution.likelihood.TreeLikelihoodTest" name="testAminoAcidLikelihoodWAG" time="0.01" />
+  <testcase classname="test.beast.evolution.likelihood.TreeLikelihoodTest" name="testAminoAcidLikelihoodJTT" time="0.01" />
+  <testcase classname="test.beast.evolution.likelihood.TreeLikelihoodTest" name="testAminoAcidLikelihoodBlosum62" time="0.011" />
+  <testcase classname="test.beast.evolution.likelihood.TreeLikelihoodTest" name="testAminoAcidLikelihoodDayhoff" time="0.01" />
+  <testcase classname="test.beast.evolution.likelihood.TreeLikelihoodTest" name="testAminoAcidLikelihoodcpRev" time="0.008" />
+  <testcase classname="test.beast.evolution.likelihood.TreeLikelihoodTest" name="testAminoAcidLikelihoodMTRev" time="0.009" />
+  <testcase classname="test.beast.evolution.likelihood.TreeLikelihoodTest" name="testAminoAcidLikelihoodIWAG" time="0.007" />
+  <testcase classname="test.beast.evolution.likelihood.TreeLikelihoodTest" name="testAminoAcidLikelihoodIJTT" time="0.013" />
+  <testcase classname="test.beast.evolution.likelihood.TreeLikelihoodTest" name="testAminoAcidLikelihoodIBlosum62" time="0.008" />
+  <testcase classname="test.beast.evolution.likelihood.TreeLikelihoodTest" name="testAminoAcidLikelihoodIDayhoff" time="0.006" />
+  <testcase classname="test.beast.evolution.likelihood.TreeLikelihoodTest" name="testAminoAcidLikelihoodIcpRev" time="0.006" />
+  <testcase classname="test.beast.evolution.likelihood.TreeLikelihoodTest" name="testAminoAcidLikelihoodIMTRev" time="0.014" />
+  <testcase classname="test.beast.evolution.likelihood.TreeLikelihoodTest" name="testAminoAcidLikelihoodGIWAG" time="0.007" />
+  <testcase classname="test.beast.evolution.likelihood.TreeLikelihoodTest" name="testAminoAcidLikelihoodGIJTT" time="0.006" />
+  <testcase classname="test.beast.evolution.likelihood.TreeLikelihoodTest" name="testAminoAcidLikelihoodGIBlosum62" time="0.007" />
+  <testcase classname="test.beast.evolution.likelihood.TreeLikelihoodTest" name="testAminoAcidLikelihoodGIDayhoff" time="0.007" />
+  <testcase classname="test.beast.evolution.likelihood.TreeLikelihoodTest" name="testAminoAcidLikelihoodGIcpRev" time="0.006" />
+  <testcase classname="test.beast.evolution.likelihood.TreeLikelihoodTest" name="testAminoAcidLikelihoodGIMTRev" time="0.007" />
+  <testcase classname="test.beast.evolution.likelihood.TreeLikelihoodTest" name="testSDolloLikelihood" time="0.02" />
+  <testcase classname="test.beast.evolution.likelihood.TreeLikelihoodTest" name="testBinaryCovarionLikelihood" time="0.015" />
+  <testcase classname="test.beast.evolution.likelihood.TreeLikelihoodTest" name="testMarginalisationOfLikelihoodBinary" time="0.004" />
+  <testcase classname="test.beast.evolution.likelihood.TreeLikelihoodTest" name="testMarginalisationOfLikelihoodNucleotide" time="0.004" />
+  <testcase classname="test.beast.evolution.likelihood.TreeLikelihoodTest" name="testBeagleRNALikelihood" time="0.016" />
+  <testcase classname="test.beast.evolution.likelihood.TreeLikelihoodTest" name="testJC69LikelihoodWithUncertainCharacters" time="0.015" />
+  <testcase classname="test.beast.evolution.likelihood.TreeLikelihoodTest" name="testK80Likelihood" time="0.006" />
+  <testcase classname="test.beast.evolution.likelihood.TreeLikelihoodTest" name="testAscertainedJC69Likelihood" time="0.006" />
+  <testcase classname="test.beast.evolution.likelihood.TreeLikelihoodTest" name="testJC69Likelihood" time="0.006" />
+  <system-out><![CDATA[human: 768 4
+chimp: 768 4
+bonobo: 768 4
+gorilla: 768 4
+orangutan: 768 4
+siamang: 768 4
+Alignment(null)
+  6 taxa
+  768 sites
+  69 patterns
+
+Starting frequencies: [0.33909429008672115, 0.24655436447178358, 0.1531393568179342, 0.26121198862355866]
+TreeLikelihood(null) uses BeerLikelihoodCore4
+  Alignment(null): [taxa, patterns, sites] = [6, 69, 768]
+TreeLikelihood(null) uses BeerLikelihoodCore4
+  Alignment(null): [taxa, patterns, sites] = [6, 69, 768]
+human: 768 4
+chimp: 768 4
+bonobo: 768 4
+gorilla: 768 4
+orangutan: 768 4
+siamang: 768 4
+Alignment(null)
+  6 taxa
+  768 sites
+  69 patterns
+
+Starting frequencies: [0.33909429008672115, 0.24655436447178358, 0.1531393568179342, 0.26121198862355866]
+TreeLikelihood(null) uses BeerLikelihoodCore4
+  Alignment(null): [taxa, patterns, sites] = [6, 69, 768]
+TreeLikelihood(null) uses BeerLikelihoodCore4
+  Alignment(null): [taxa, patterns, sites] = [6, 69, 768]
+human: 768 4
+chimp: 768 4
+bonobo: 768 4
+gorilla: 768 4
+orangutan: 768 4
+siamang: 768 4
+Alignment(null)
+  6 taxa
+  768 sites
+  69 patterns
+
+Starting frequencies: [0.33909429008672115, 0.24655436447178358, 0.1531393568179342, 0.26121198862355866]
+TreeLikelihood(null) uses BeerLikelihoodCore4
+  Alignment(null): [taxa, patterns, sites] = [6, 69, 768]
+TreeLikelihood(null) uses BeerLikelihoodCore4
+  Alignment(null): [taxa, patterns, sites] = [6, 69, 768]
+human: 768 4
+chimp: 768 4
+bonobo: 768 4
+gorilla: 768 4
+orangutan: 768 4
+siamang: 768 4
+Alignment(null)
+  6 taxa
+  768 sites
+  69 patterns
+
+Starting frequencies: [0.33909429008672115, 0.24655436447178358, 0.1531393568179342, 0.26121198862355866]
+TreeLikelihood(null) uses BeerLikelihoodCore4
+  Alignment(null): [taxa, patterns, sites] = [6, 69, 768]
+TreeLikelihood(null) uses BeerLikelihoodCore4
+  Alignment(null): [taxa, patterns, sites] = [6, 69, 768]
+human: 768 4
+chimp: 768 4
+bonobo: 768 4
+gorilla: 768 4
+orangutan: 768 4
+siamang: 768 4
+Alignment(null)
+  6 taxa
+  768 sites
+  69 patterns
+
+Starting frequencies: [0.33909429008672115, 0.24655436447178358, 0.1531393568179342, 0.26121198862355866]
+TreeLikelihood(null) uses BeerLikelihoodCore4
+  Alignment(null): [taxa, patterns, sites] = [6, 69, 768]
+TreeLikelihood(null) uses BeerLikelihoodCore4
+  Alignment(null): [taxa, patterns, sites] = [6, 69, 768]
+human: 768 4
+chimp: 768 4
+bonobo: 768 4
+gorilla: 768 4
+orangutan: 768 4
+siamang: 768 4
+Alignment(null)
+  6 taxa
+  768 sites
+  69 patterns
+
+Starting frequencies: [0.33909429008672115, 0.24655436447178358, 0.1531393568179342, 0.26121198862355866]
+TreeLikelihood(null) uses BeerLikelihoodCore4
+  Alignment(null): [taxa, patterns, sites] = [6, 69, 768]
+TreeLikelihood(null) uses BeerLikelihoodCore4
+  Alignment(null): [taxa, patterns, sites] = [6, 69, 768]
+human: 768 4
+chimp: 768 4
+bonobo: 768 4
+gorilla: 768 4
+orangutan: 768 4
+siamang: 768 4
+Alignment(null)
+  6 taxa
+  768 sites
+  69 patterns
+
+Starting frequencies: [0.33909429008672115, 0.24655436447178358, 0.1531393568179342, 0.26121198862355866]
+TreeLikelihood(null) uses BeerLikelihoodCore4
+  Alignment(null): [taxa, patterns, sites] = [6, 69, 768]
+TreeLikelihood(null) uses BeerLikelihoodCore4
+  Alignment(null): [taxa, patterns, sites] = [6, 69, 768]
+human: 768 4
+chimp: 768 4
+bonobo: 768 4
+gorilla: 768 4
+orangutan: 768 4
+siamang: 768 4
+Alignment(null)
+  6 taxa
+  768 sites
+  69 patterns
+
+Starting frequencies: [0.33909429008672115, 0.24655436447178358, 0.1531393568179342, 0.26121198862355866]
+TreeLikelihood(null) uses BeerLikelihoodCore4
+  Alignment(null): [taxa, patterns, sites] = [6, 69, 768]
+TreeLikelihood(null) uses BeerLikelihoodCore4
+  Alignment(null): [taxa, patterns, sites] = [6, 69, 768]
+Struthio_camelus: 85 20
+Rhea_americana: 85 20
+Pterocnemia_pennata: 85 20
+Alignment(null)
+  3 taxa
+  85 sites
+  32 patterns
+
+TreeLikelihood(null) uses BeerLikelihoodCore
+  Alignment(null): [taxa, patterns, sites] = [3, 32, 85]
+Struthio_camelus: 85 20
+Rhea_americana: 85 20
+Pterocnemia_pennata: 85 20
+Alignment(null)
+  3 taxa
+  85 sites
+  32 patterns
+
+TreeLikelihood(null) uses BeerLikelihoodCore
+  Alignment(null): [taxa, patterns, sites] = [3, 32, 85]
+Struthio_camelus: 85 20
+Rhea_americana: 85 20
+Pterocnemia_pennata: 85 20
+Alignment(null)
+  3 taxa
+  85 sites
+  32 patterns
+
+TreeLikelihood(null) uses BeerLikelihoodCore
+  Alignment(null): [taxa, patterns, sites] = [3, 32, 85]
+Struthio_camelus: 85 20
+Rhea_americana: 85 20
+Pterocnemia_pennata: 85 20
+Alignment(null)
+  3 taxa
+  85 sites
+  32 patterns
+
+TreeLikelihood(null) uses BeerLikelihoodCore
+  Alignment(null): [taxa, patterns, sites] = [3, 32, 85]
+Struthio_camelus: 85 20
+Rhea_americana: 85 20
+Pterocnemia_pennata: 85 20
+Alignment(null)
+  3 taxa
+  85 sites
+  32 patterns
+
+TreeLikelihood(null) uses BeerLikelihoodCore
+  Alignment(null): [taxa, patterns, sites] = [3, 32, 85]
+Struthio_camelus: 85 20
+Rhea_americana: 85 20
+Pterocnemia_pennata: 85 20
+Alignment(null)
+  3 taxa
+  85 sites
+  32 patterns
+
+TreeLikelihood(null) uses BeerLikelihoodCore
+  Alignment(null): [taxa, patterns, sites] = [3, 32, 85]
+Struthio_camelus: 85 20
+Rhea_americana: 85 20
+Pterocnemia_pennata: 85 20
+Alignment(null)
+  3 taxa
+  85 sites
+  32 patterns
+
+TreeLikelihood(null) uses BeerLikelihoodCore
+  Alignment(null): [taxa, patterns, sites] = [3, 32, 85]
+Struthio_camelus: 85 20
+Rhea_americana: 85 20
+Pterocnemia_pennata: 85 20
+Alignment(null)
+  3 taxa
+  85 sites
+  32 patterns
+
+TreeLikelihood(null) uses BeerLikelihoodCore
+  Alignment(null): [taxa, patterns, sites] = [3, 32, 85]
+Struthio_camelus: 85 20
+Rhea_americana: 85 20
+Pterocnemia_pennata: 85 20
+Alignment(null)
+  3 taxa
+  85 sites
+  32 patterns
+
+TreeLikelihood(null) uses BeerLikelihoodCore
+  Alignment(null): [taxa, patterns, sites] = [3, 32, 85]
+Struthio_camelus: 85 20
+Rhea_americana: 85 20
+Pterocnemia_pennata: 85 20
+Alignment(null)
+  3 taxa
+  85 sites
+  32 patterns
+
+TreeLikelihood(null) uses BeerLikelihoodCore
+  Alignment(null): [taxa, patterns, sites] = [3, 32, 85]
+Struthio_camelus: 85 20
+Rhea_americana: 85 20
+Pterocnemia_pennata: 85 20
+Alignment(null)
+  3 taxa
+  85 sites
+  32 patterns
+
+TreeLikelihood(null) uses BeerLikelihoodCore
+  Alignment(null): [taxa, patterns, sites] = [3, 32, 85]
+Struthio_camelus: 85 20
+Rhea_americana: 85 20
+Pterocnemia_pennata: 85 20
+Alignment(null)
+  3 taxa
+  85 sites
+  32 patterns
+
+TreeLikelihood(null) uses BeerLikelihoodCore
+  Alignment(null): [taxa, patterns, sites] = [3, 32, 85]
+Struthio_camelus: 85 20
+Rhea_americana: 85 20
+Pterocnemia_pennata: 85 20
+Alignment(null)
+  3 taxa
+  85 sites
+  32 patterns
+
+TreeLikelihood(null) uses BeerLikelihoodCore
+  Alignment(null): [taxa, patterns, sites] = [3, 32, 85]
+Struthio_camelus: 85 20
+Rhea_americana: 85 20
+Pterocnemia_pennata: 85 20
+Alignment(null)
+  3 taxa
+  85 sites
+  32 patterns
+
+TreeLikelihood(null) uses BeerLikelihoodCore
+  Alignment(null): [taxa, patterns, sites] = [3, 32, 85]
+Struthio_camelus: 85 20
+Rhea_americana: 85 20
+Pterocnemia_pennata: 85 20
+Alignment(null)
+  3 taxa
+  85 sites
+  32 patterns
+
+TreeLikelihood(null) uses BeerLikelihoodCore
+  Alignment(null): [taxa, patterns, sites] = [3, 32, 85]
+Struthio_camelus: 85 20
+Rhea_americana: 85 20
+Pterocnemia_pennata: 85 20
+Alignment(null)
+  3 taxa
+  85 sites
+  32 patterns
+
+TreeLikelihood(null) uses BeerLikelihoodCore
+  Alignment(null): [taxa, patterns, sites] = [3, 32, 85]
+Struthio_camelus: 85 20
+Rhea_americana: 85 20
+Pterocnemia_pennata: 85 20
+Alignment(null)
+  3 taxa
+  85 sites
+  32 patterns
+
+TreeLikelihood(null) uses BeerLikelihoodCore
+  Alignment(null): [taxa, patterns, sites] = [3, 32, 85]
+Struthio_camelus: 85 20
+Rhea_americana: 85 20
+Pterocnemia_pennata: 85 20
+Alignment(null)
+  3 taxa
+  85 sites
+  32 patterns
+
+TreeLikelihood(null) uses BeerLikelihoodCore
+  Alignment(null): [taxa, patterns, sites] = [3, 32, 85]
+German_ST: 5051 2
+Dutch_List: 5051 2
+English_ST: 5051 2
+French: 5051 2
+Italian: 5051 2
+Spanish: 5051 2
+Alignment(null)
+  6 taxa
+  5051 sites
+  50 patterns
+
+TreeLikelihood(null) uses BeerLikelihoodCore
+  Alignment(null): [taxa, patterns, sites] = [6, 50, 5051]
+TreeLikelihood(null) uses BeerLikelihoodCore
+  Alignment(null): [taxa, patterns, sites] = [6, 50, 5051]
+German_ST: 5051 4
+Dutch_List: 5051 4
+English_ST: 5051 4
+French: 5051 4
+Italian: 5051 4
+Spanish: 5051 4
+Stripping invariant sites
+ <0>  <1>  removed 4486 sites 
+Alignment(null)
+  6 taxa
+  5051 sites with weight 565
+  50 patterns
+
+TreeLikelihood(null) uses BeerLikelihoodCore4
+  Alignment(null): [taxa, patterns, sites] = [6, 50, 565]
+TreeLikelihood(null) uses BeerLikelihoodCore4
+  Alignment(null): [taxa, patterns, sites] = [6, 50, 565]
+German_ST: 8 2
+Dutch_List: 8 2
+English_ST: 8 2
+Alignment(null)
+  3 taxa
+  8 sites
+  8 patterns
+
+TreeLikelihood(null) uses BeerLikelihoodCore
+  Alignment(null): [taxa, patterns, sites] = [3, 8, 8]
+TreeLikelihood(null) uses BeerLikelihoodCore
+  Alignment(null): [taxa, patterns, sites] = [3, 8, 8]
+German_ST: 64 4
+Dutch_List: 64 4
+English_ST: 64 4
+Alignment(null)
+  3 taxa
+  64 sites
+  64 patterns
+
+TreeLikelihood(null) uses BeerLikelihoodCore4
+  Alignment(null): [taxa, patterns, sites] = [3, 64, 64]
+TreeLikelihood(null) uses BeerLikelihoodCore4
+  Alignment(null): [taxa, patterns, sites] = [3, 64, 64]
+t1: 12 4
+t2: 12 4
+t3: 12 4
+Alignment(null)
+  3 taxa
+  12 sites
+  4 patterns
+
+TreeLikelihood(null) uses BeerLikelihoodCore4
+  Alignment(null): [taxa, patterns, sites] = [3, 4, 12]
+  Using BEAGLE version: 3.0.2 resource 0: CPU
+    with instance flags:  PRECISION_DOUBLE COMPUTATION_SYNCH EIGEN_REAL SCALING_MANUAL SCALERS_RAW VECTOR_NONE PROCESSOR_CPU FRAMEWORK_CPU
+seq1: 3 4
+seq2: 3 4
+seq3: 3 4
+Alignment(null)
+  3 taxa
+  3 sites
+  3 patterns
+
+seq1: 3 4
+seq2: 3 4
+seq3: 3 4
+Alignment(null)
+  3 taxa
+  3 sites
+  3 patterns
+
+Most probable sequences:
+ATT
+ATC
+GCC
+
+Tree A:
+Without tip likelihoods:
+TreeLikelihood(null) uses BeerLikelihoodCore4
+  Alignment(null): [taxa, patterns, sites] = [3, 3, 3]
+-11.853202336328778
+With tip likelihoods:
+TreeLikelihood(null) uses BeerLikelihoodCore4
+  Alignment(null): [taxa, patterns, sites] = [3, 3, 3]
+-11.853202336328778
+Without tip likelihoods:
+TreeLikelihood(null) uses BeerLikelihoodCore4
+  Alignment(null): [taxa, patterns, sites] = [3, 3, 3]
+-11.853202336328778
+With tip likelihoods:
+TreeLikelihood(null) uses BeerLikelihoodCore4
+  Alignment(null): [taxa, patterns, sites] = [3, 3, 3]
+-12.069603116476458
+
+Tree B:
+Without tip likelihoods:
+TreeLikelihood(null) uses BeerLikelihoodCore4
+  Alignment(null): [taxa, patterns, sites] = [3, 3, 3]
+-12.421114302827698
+With tip likelihoods:
+TreeLikelihood(null) uses BeerLikelihoodCore4
+  Alignment(null): [taxa, patterns, sites] = [3, 3, 3]
+-12.421114302827698
+Without tip likelihoods:
+TreeLikelihood(null) uses BeerLikelihoodCore4
+  Alignment(null): [taxa, patterns, sites] = [3, 3, 3]
+-12.421114302827698
+With tip likelihoods:
+TreeLikelihood(null) uses BeerLikelihoodCore4
+  Alignment(null): [taxa, patterns, sites] = [3, 3, 3]
+-11.62105662310513
+
+Testing alignment doubling:
+seq1: 6 4
+seq2: 6 4
+seq3: 6 4
+Alignment(null)
+  3 taxa
+  6 sites
+  6 patterns
+
+Most probable sequences:
+ATTATT
+ATCATC
+GCCGCC
+Without tip likelihoods:
+TreeLikelihood(null) uses BeerLikelihoodCore4
+  Alignment(null): [taxa, patterns, sites] = [3, 6, 6]
+-24.842228605655393
+With tip likelihoods:
+TreeLikelihood(null) uses BeerLikelihoodCore4
+  Alignment(null): [taxa, patterns, sites] = [3, 6, 6]
+-23.24211324621026
+human: 768 4
+chimp: 768 4
+bonobo: 768 4
+gorilla: 768 4
+orangutan: 768 4
+siamang: 768 4
+Alignment(null)
+  6 taxa
+  768 sites
+  69 patterns
+
+TreeLikelihood(null) uses BeerLikelihoodCore4
+  Alignment(null): [taxa, patterns, sites] = [6, 69, 768]
+TreeLikelihood(null) uses BeerLikelihoodCore4
+  Alignment(null): [taxa, patterns, sites] = [6, 69, 768]
+human: 772 4
+chimp: 772 4
+bonobo: 772 4
+gorilla: 772 4
+orangutan: 772 4
+siamang: 772 4
+Alignment(null)
+  6 taxa
+  772 sites with weight 145
+  69 patterns
+
+TreeLikelihood(null) uses BeerLikelihoodCore4
+  Alignment(null): [taxa, patterns, sites] = [6, 69, 145]
+human: 768 4
+chimp: 768 4
+bonobo: 768 4
+gorilla: 768 4
+orangutan: 768 4
+siamang: 768 4
+Alignment(null)
+  6 taxa
+  768 sites
+  69 patterns
+
+TreeLikelihood(null) uses BeerLikelihoodCore4
+  Alignment(null): [taxa, patterns, sites] = [6, 69, 768]
+TreeLikelihood(null) uses BeerLikelihoodCore4
+  Alignment(null): [taxa, patterns, sites] = [6, 69, 768]
+]]></system-out>
+  <system-err><![CDATA[1.1368683772161603E-12
+  Ignoring ambiguities in tree likelihood.
+  Ignoring character uncertainty in tree likelihood.
+  With 4 unique site patterns.
+  Using rescaling scheme : dynamic
+]]></system-err>
+</testsuite>

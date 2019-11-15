@@ -141,5 +141,5 @@ public class ConstantPopulation extends PopulationFunction.Abstract {
     // private stuff
     //
 
-    private double N0 = 1.0;
+    public double N0 = 1.0;
 }

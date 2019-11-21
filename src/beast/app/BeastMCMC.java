@@ -56,14 +56,11 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
+// Leo: used to set the random seed with milliseconds
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import java.util.Calendar; // Leo: used to set the random seed with milliseconds
-import java.util.ArrayList;
-
 import java.nio.file.Files;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
@@ -79,7 +76,7 @@ public class BeastMCMC {
     final public static String VERSION = "2.0 Release candidate";
     final public static String DEVELOPERS = "Beast 2 development team";
     final public static String COPYRIGHT = "Beast 2 development team 2011";
-    public static final long NR_OF_PARTICLES = 1000;
+    public static final long NR_OF_PARTICLES = 10;
     public BEASTInterface m_treeobj=null;
     public double m_initPopSize;
     public double m_gammaShapeLog;
@@ -640,6 +637,17 @@ public class BeastMCMC {
 
     } // class BeastStartDialog
 
+    // this get max val is obsolete
+    public static double getMaxValue(double[] numbers){
+    	  double maxValue = numbers[0];
+    	  for(int i=1;i < numbers.length;i++){
+    	    if(numbers[i] > maxValue){
+    		  maxValue = numbers[i];
+    		}
+    	  }
+    	  return maxValue;
+    	}
+
     public static double logSumOfExponentials(double[] xs, double max) {
         //if (xs.length == 1) return xs[0];
         //double max = maximum(xs);
@@ -650,7 +658,39 @@ public class BeastMCMC {
         return max + java.lang.Math.log1p(sum);
     }
 
+    public static double logSumOfExponentials(double[] xs) {
+        OptionalDouble max = Arrays.stream(xs).max();
+        
+        return logSumOfExponentials(xs, max.getAsDouble());
+    }
 
+    // this function takes as input the normalized weights (log format)
+    // and provides as output the indices of the particles that have survived the resample
+//    public static ArrayList<Integer> stratified_resample(double[] log_weights)
+//    		{
+//    	      //Arrays.stream(log_weights).
+//    	      P = length(log_weights)
+//    		  W = exp(log_weights)
+//    		  cw = cumsum(W / sum(W))
+//    		  n = length(W)
+//    		  u = runif(n,0,1)/n
+//    		  v = u + (0:(n-1))/n
+//    		  
+//    		  j = 1
+//    		  indices = matrix(0,n)
+//    		  for (i in 1:n)
+//    		  {
+//    		    while(cw[j] < v[i])
+//    		    {
+//    		      j = j+1
+//    		    }
+//    		    indices[i] = j
+//    		  }
+//    		  
+//    		  indices
+//    		}
+
+    
     public static void main(String[] args) {
         try {
             System.setProperty("beast.debug", "true");
@@ -672,6 +712,7 @@ public class BeastMCMC {
             BeastDialog dlg=CreateAndShowDialog();
             double currentExponent, previousExponent; //exponent to be used for simulated annhealing
             long exponentCnt;
+            double log1, log2; // auxiliary variables for weights calculation
             // here open the file for the weights
             Path currentRelativePath = Paths.get("");
             String s = currentRelativePath.toAbsolutePath().toString();
@@ -699,37 +740,45 @@ public class BeastMCMC {
                }
             }
             FileWriter fr = new FileWriter(weightsFile, true);
+            long N=BeastMCMC.NR_OF_PARTICLES;
 
-            for (long particleNr=0; particleNr<BeastMCMC.NR_OF_PARTICLES; particleNr++)
+            //for (long particleNr=0; particleNr<BeastMCMC.NR_OF_PARTICLES; particleNr++)
+   //         for (long particleNr=0; particleNr<1; particleNr++)
             {
-               	BeastMCMC app = new BeastMCMC();
-               	app.SetDlg(dlg);
-             	// here draw from population size
-               	app.parseArgs(args);
-            	
-            	// here add parameters drawn from the prior
-            	popSizeList.add(app.m_initPopSize);
-            	
-            	BEASTInterface treeobj=app.m_treeobj;
-            	smcParticles.add(treeobj);
-            	
-            	gammaShapeLogList.add(app.m_gammaShapeLog);
-            	gammaShapeList.add(app.m_gammaShape);
-            	// calculate pi on the points
-            	// evaluate the prior
-            	// do the thing for the likelihood
-                MCMC mc=(MCMC)app.m_runnable; 
-                
-                // the following reads the prior, likelihood and posterior from the xml
-                mc.SetDistributionsFromInput();
-                // initialise the state of the posterior
-                mc.initStateAndPosterior();
-            	State state=mc.getState();
-            	//state.robustlyCalcPosterior(posterior);
-            	//smcStates.add(state);
-            	
-            	// init the logweight accumulator
-            	logweight=0.0;
+               	//Vector <BeastMCMC> appvector = new Vector <BeastMCMC>((int)BeastMCMC.NR_OF_PARTICLES);
+               	List<BeastMCMC> beastMClist = new ArrayList<BeastMCMC>();
+               	// state list used only for debug
+               	// List<State> stateList = new ArrayList<State>();
+               	for (long itemnr=0; itemnr<BeastMCMC.NR_OF_PARTICLES; itemnr++)
+                {
+               		beastMClist.add(new BeastMCMC());
+                }
+               	
+               	//int position_counter=0;
+
+               	// in this we sample from the prior
+               	for (BeastMCMC bmc : beastMClist ) {
+               	    bmc.SetDlg(dlg);
+               	    bmc.parseArgs(args);
+               	    //int position=beastMClist.indexOf(bmc);
+               	    // initialize all the weights to 1/N
+               	    //logWeights[position_counter++]= -java.lang.Math.log(N);
+               	    
+               	    MCMC mc=(MCMC)bmc.m_runnable; 
+                    // the following reads the prior, likelihood and posterior from the xml
+                    mc.SetDistributionsFromInput();
+                    // initialise the state of the posterior
+                    mc.initStateAndPosterior();
+                    // stateList.add(mc.getState());
+                    // here the state is ready so we can sample                    
+               	}
+               	
+               	// we have sampled from the prior in the previous for cycle
+               	
+               	// in the following initialize the weights to 1/N
+				Arrays.parallelSetAll(logWeights, e->{return -java.lang.Math.log(N);});
+				
+               	//logweight=0.0;
             	currentExponent=0.0;
             	
             	for (exponentCnt=0; exponentCnt<maxvalcnt; exponentCnt++)
@@ -739,21 +788,85 @@ public class BeastMCMC {
                 	
                 	currentExponent=((double)exponentCnt+1)/((double)maxvalcnt);
                 	// updates the weights with the ratio of future-current functions calculated at the current state
-                	double log1=mc.calculateLogPSimulatedAnnhealing(currentExponent);
-                	double log2=mc.calculateLogPSimulatedAnnhealing(previousExponent);
-                	logweight=+(log1-log2);
-                	
-                	mc.setSimulatedAnnhealingExponent(currentExponent);
-                	
-                	app.run();
-                	// end of mcmc, get state here
+                   	
+                	for (BeastMCMC bmc : beastMClist ) {
+                   	    int position=beastMClist.indexOf(bmc);
+                   	    
+                   	    // here update the weights
+                   	    MCMC mc=(MCMC)bmc.m_runnable; 
+                    	log1=mc.calculateLogPSimulatedAnnhealing(currentExponent);
+                    	log2=mc.calculateLogPSimulatedAnnhealing(previousExponent);
+                    	logWeights[position]=+(log1-log2);
+                    	
+                    	
+                    	// ?? is it ok to set the exponent here????
+                    	//mc.setSimulatedAnnhealingExponent(currentExponent);
+                    	
+                    	//bmc.run();
+                    	// end of mcmc, get state here
+                   	}
+                    normalizingConstant=logSumOfExponentials(logWeights);
+                    
+                   	// in the following initialize the weights to 1/N
+    				//Arrays.parallelSetAll(logWeights, e->{return (e-normalizingConstant);});
+
+                    // normalize weights
+                    for(int normalweightcnt=0; normalweightcnt<N; normalweightcnt++)
+                    {
+                    	logWeights[normalweightcnt]-=normalizingConstant;
+                    }
+
                 }
+
+               	
+               	// BeastMCMC app = new BeastMCMC();
+                // MCMC mc=(MCMC)app.m_runnable; 
+
+               	//app.SetDlg(dlg);
+             	// here draw from population size
+               	//app.parseArgs(args);
+            	
+            	// here add parameters drawn from the prior
+            	//popSizeList.add(app.m_initPopSize);
+            	
+            	//BEASTInterface treeobj=app.m_treeobj;
+            	//smcParticles.add(treeobj);
+            	
+            	//gammaShapeLogList.add(app.m_gammaShapeLog);
+            	//gammaShapeList.add(app.m_gammaShape);
+            	// calculate pi on the points
+            	// evaluate the prior
+            	// do the thing for the likelihood
+                
+            	//state.robustlyCalcPosterior(posterior);
+            	//smcStates.add(state);
+            	
+            	// init the logweight accumulator
+//            	logweight=0.0;
+//            	currentExponent=0.0;
+//            	
+//            	for (exponentCnt=0; exponentCnt<maxvalcnt; exponentCnt++)
+//                {// starts from the prior and goes to target (reached when the exponent is equal to 1)
+//                	// smcStates[(int)i][(int)exponentCnt]=mc.getState();
+//                	previousExponent=currentExponent;                	
+//                	
+//                	currentExponent=((double)exponentCnt+1)/((double)maxvalcnt);
+//                	// updates the weights with the ratio of future-current functions calculated at the current state
+//                	double log1=mc.calculateLogPSimulatedAnnhealing(currentExponent);
+//                	double log2=mc.calculateLogPSimulatedAnnhealing(previousExponent);
+//                	logweight=+(log1-log2);
+//                	
+//                	mc.setSimulatedAnnhealingExponent(currentExponent);
+//                	
+//                	app.run();
+//                	// end of mcmc, get state here
+//                }
             	// here we save the weights
-            	mc.log(particleNr);
-            	mc.close();
-            	String strw=Double.toString(logweight)+"\r\n";
-            	fr.write(strw);
-            	fr.flush();
+//            	mc.log(particleNr);
+//            	mc.close();
+//            	String strw=Double.toString(logweight)+"\r\n";
+//            	fr.write(strw);
+//            	fr.flush();
             	// here take the last state corresponding to the posterior
                 //smcStates[(int)i][(int)exponentCnt]=mc.getState();
             	

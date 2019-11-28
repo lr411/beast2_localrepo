@@ -61,6 +61,8 @@ import java.util.*;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.nio.file.Files;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
@@ -115,6 +117,21 @@ public class BeastMCMC {
     public void SetDlg(BeastDialog dialog)
     {
     	m_dialog=dialog;
+    }
+    
+    // the following two functions initialize the randomizer (useful for random nr generation)
+    public static void initRandomizer(long seed)
+    {
+    	
+        Randomizer.setSeed(seed);
+    }
+    
+    public static void initRandomizer()
+    {
+	    Calendar calendar = Calendar.getInstance();
+	    long randSeed = calendar.getTimeInMillis();
+    	
+        Randomizer.setSeed(randSeed);
     }
     
     /**
@@ -370,13 +387,8 @@ public class BeastMCMC {
         
 
         // parse xml
-        //if(false)
-        {
-            Calendar calendar = Calendar.getInstance();
-            m_nSeed = calendar.getTimeInMillis();
-        }
-    	
-        Randomizer.setSeed(m_nSeed);
+        // Randomizer.setSeed(m_nSeed);
+        initRandomizer();
 
     	
         if (beastFile.getPath().toLowerCase().endsWith(".json")) {
@@ -666,29 +678,51 @@ public class BeastMCMC {
 
     // this function takes as input the normalized weights (log format)
     // and provides as output the indices of the particles that have survived the resample
-//    public static ArrayList<Integer> stratified_resample(double[] log_weights)
-//    		{
-//    	      //Arrays.stream(log_weights).
-//    	      P = length(log_weights)
-//    		  W = exp(log_weights)
-//    		  cw = cumsum(W / sum(W))
-//    		  n = length(W)
-//    		  u = runif(n,0,1)/n
-//    		  v = u + (0:(n-1))/n
-//    		  
-//    		  j = 1
-//    		  indices = matrix(0,n)
-//    		  for (i in 1:n)
-//    		  {
-//    		    while(cw[j] < v[i])
-//    		    {
-//    		      j = j+1
-//    		    }
-//    		    indices[i] = j
-//    		  }
-//    		  
-//    		  indices
-//    		}
+    public static List<Integer> stratified_resample(double[] log_weights)
+    		{
+    	      // the length of the weights is the number of particles
+    	      int P = log_weights.length, N=P;
+              double N_double=(double)N;
+              List<Integer> resampleList = Arrays.asList(new Integer[N]);
+              //ArrayList<Integer> resampleList = new ArrayList<Integer>(N); 
+    	      // define and set the array of weights (exponential of log weights)
+    	      double weights[] = Arrays.copyOf(log_weights, P);
+    	      Arrays.parallelSetAll(weights, e->{return java.lang.Math.exp(e);});
+    	      
+    	      // create variables for cumulative sum
+    	      double sumW=Arrays.stream(weights).sum();
+    	      double cw[] = Arrays.copyOf(weights, P);
+              Arrays.parallelPrefix(cw, Double::sum);
+    	      Arrays.parallelSetAll(cw, e->{return e/sumW;});
+              
+    	      // create and initialize vector of uniform distribution in [0,1]
+    	      //double unifVector[] = new double[(int) BeastMCMC.NR_OF_PARTICLES]; // vector that will contain the control for the resampling
+    	      //Arrays.parallelSetAll(unifVector, e->{return new Random().nextDouble();});
+
+    	      // Set<Integer> range = IntStream.rangeClosed(0, N-1).boxed().collect(Collectors.toSet());
+    	      //Integer[] range = IntStream.rangeClosed(0, N-1).boxed().collect(Collectors.toSet()).toArray(new Integer[(int) BeastMCMC.NR_OF_PARTICLES]);
+    	      Double[] range = IntStream.rangeClosed(0, N-1).boxed().collect(Collectors.toSet()).toArray(new Double[N]);
+//    	      for (Double strTemp : unifVector){
+//    	          System.out.println(strTemp);
+    	     
+    	      double v[] = new double[N];
+    	      Arrays.setAll(v, i -> (range[i] + (new Random().nextDouble()))/N_double);
+
+    	      {
+	    	      int i=0,j=1;
+	    	      
+	    	      for(;i<N;i++)
+	    	      {
+	    	    	  while(cw[j]<v[i])
+	    	    	  {
+	    	    		  j++;
+	    	    	  }
+	    	    	  resampleList.set(i, j);
+	    	      }
+    	      }
+    	      
+              return resampleList;
+    		}
 
     
     public static void main(String[] args) {
@@ -723,6 +757,8 @@ public class BeastMCMC {
             options.add(CREATE);
             */
             
+            initRandomizer();
+
             File weightsFile = new File(s+"//weights.txt");
             {
                boolean exists = weightsFile.exists();
@@ -809,12 +845,14 @@ public class BeastMCMC {
                     
                    	// in the following initialize the weights to 1/N
     				//Arrays.parallelSetAll(logWeights, e->{return (e-normalizingConstant);});
-
+//Arrays.stream(logWeights).forEach(e->e);
                     // normalize weights
                     for(int normalweightcnt=0; normalweightcnt<N; normalweightcnt++)
                     {
                     	logWeights[normalweightcnt]-=normalizingConstant;
                     }
+                    
+                    stratified_resample((double [])logWeights);
 
                 }
 

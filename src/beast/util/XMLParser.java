@@ -394,14 +394,7 @@ public class XMLParser {
         	    // BeastInterfaceSerializable beastObject = (BeastInterfaceSerializable) beastObjectsWaitingToInit.get(i);
          		String IDobj=beastObject.getID();
 
-         		if(beastObject.getID().equals("popSize.t:apes"))
-        		{// initialization of population size
-        			int yull;
-        					yull=3;
-        		}
-
-
-         		if(beastObject.getID().equals("RandomTree.t:apes"))
+         		if(beastObject.getID().contains("RandomTree.t"))
         		{// initialization of random tree times
         			int yull;
         					yull=3;
@@ -412,7 +405,7 @@ public class XMLParser {
         	    node = nodesWaitingToInit.get(i);
         		beastObject.initAndValidate();
         		
-         		if(beastObject.getID().equals("GammaShapePrior.s:apes"))
+         		if(beastObject.getID().contains("GammaShapePrior.s"))
         		{// initialization of gammashape: we sample and calculate the logp
         			int yull;
         			yull=3;
@@ -424,9 +417,8 @@ public class XMLParser {
         			m_bmcmc.m_gammaShapeLog=pr.getCurrentLogP();
         			m_bmcmc.m_gammaShape=pr.getArrayValue();
         		}
-        		
-        		
-         		if(beastObject.getID().equals("popSize.t:apes"))
+        		        		
+         		if(beastObject.getID().contains("popSize.t:apes"))
         		{// for the effective population size
          			RealParameter thisparam=(RealParameter) beastObject;
                     final int dim = thisparam.getDimension();// should be just one dimension
@@ -456,12 +448,12 @@ public class XMLParser {
         		}
         		int j;
         		j=3;
-        		if(beastObject.getID().equals("Tree.t:apes"))
-        		{
-        			String path="//Users//lr411//Leo//Github//Genomics//R_scripts//Beast2files//LogFiles//Coalescent//fl.srlz";
-        			m_bmcmc.m_treeobj=beastObject;
-        			//BeastInterfaceSerializable.WriteObjectToFile(beastObject,path);
-        		}
+//        		if(beastObject.getID().equals("Tree.t:apes"))
+//        		{
+//        			String path="//Users//lr411//Leo//Github//Genomics//R_scripts//Beast2files//LogFiles//Coalescent//fl.srlz";
+//        			m_bmcmc.m_treeobj=beastObject;
+//        			//BeastInterfaceSerializable.WriteObjectToFile(beastObject,path);
+//        		}
         	}
         	int i;
         	i=2;

@@ -61,6 +61,7 @@ import java.util.*;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.nio.file.Files;
@@ -707,7 +708,7 @@ public class BeastMCMC {
 //    	          System.out.println(strTemp);
     	     
     	      double v[] = new double[N];
-    	      Arrays.parallelSetAll(v, i -> (range[i] + (new Random().nextDouble()))/N_double);
+    	      Arrays.parallelSetAll(v, i -> (range[i] + (ThreadLocalRandom.current().nextDouble()))/N_double);
 
     	      {
 	    	      int i=0,j=1;
@@ -747,7 +748,7 @@ public class BeastMCMC {
             BeastDialog dlg=CreateAndShowDialog();
             double currentExponent, previousExponent; //exponent to be used for simulated annhealing
             long exponentCnt;
-            double log1, log2; // auxiliary variables for weights calculation
+            //double log1, log2; // auxiliary variables for weights calculation
             // here open the file for the weights
             Path currentRelativePath = Paths.get("");
             String s = currentRelativePath.toAbsolutePath().toString();
@@ -826,8 +827,22 @@ public class BeastMCMC {
                 	
                 	currentExponent=((double)exponentCnt+1)/((double)maxvalcnt);
                 	// updates the weights with the ratio of future-current functions calculated at the current state
-                   	
-                	for (BeastMCMC bmc : beastMClist ) {
+                   	final double currentExponent_final=currentExponent;
+                   	final double previousExponent_final=previousExponent;
+    				
+                   	Arrays.parallelSetAll(logWeights, e->{
+    					BeastMCMC bmc=beastMClist.get(e);
+    					MCMC mc=(MCMC)bmc.m_runnable;
+    					// performance wise, we don't need the log1 and log 2 we could substitute the full expressions to log1 and 2
+    					double log1=mc.calculateLogPSimulatedAnnhealing(currentExponent_final);
+    					double log2=mc.calculateLogPSimulatedAnnhealing(previousExponent_final);
+                    	// ?? is it ok to set the exponent here????
+                    	mc.setSimulatedAnnhealingExponent(currentExponent_final);
+    					return logWeights[e]+(log1-log2);
+    					});
+
+    				/*
+    				for (BeastMCMC bmc : beastMClist ) {
                    	    int position=beastMClist.indexOf(bmc);
                    	    
                    	    // here update the weights
@@ -843,6 +858,7 @@ public class BeastMCMC {
                     	//bmc.run();
                     	// end of mcmc, get state here
                    	}
+                   	*/
                     normalizingConstant=logSumOfExponentials(logWeights);
                     final double normalizingConstant_cnst=normalizingConstant;
                     
@@ -850,8 +866,35 @@ public class BeastMCMC {
     				Arrays.parallelSetAll(logWeights, e->logWeights[e]-normalizingConstant_cnst);
                     
                     List<Integer> stratifiedList=stratified_resample((double [])logWeights);
-                	int yul;
-                	yul=3;
+                    
+                	// process the resample: set particles according to the stratified list of particles who made it
+                    for(int i=(int) (N-1);i>=0;i--)
+                	{
+                		beastMClist.set(i, beastMClist.get(stratifiedList.get(i)));
+                	}
+                                    	
+                	// in the following do the mcmc move and initialize the weights to 1/N
+    				Arrays.parallelSetAll(logWeights, e->{
+    					BeastMCMC bmc=beastMClist.get(e);
+    					MCMC mc=(MCMC)bmc.m_runnable;
+    					// put here the length of the chain
+    					mc.chainLengthInput.set(10);
+    					try {
+								mc.run();
+									} catch (IOException e1) {
+										// TODO Auto-generated catch block
+										e1.printStackTrace();
+									} catch (SAXException e1) {
+										// TODO Auto-generated catch block
+										e1.printStackTrace();
+									} catch (ParserConfigurationException e1) {
+										// TODO Auto-generated catch block
+										e1.printStackTrace();
+							}
+    					return minuslogN;
+    					});
+    				
+    				// here save the logs: one log per particle
 
                 }
 

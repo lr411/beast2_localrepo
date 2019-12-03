@@ -98,6 +98,19 @@ public class MCMC extends Runnable {
      */
     protected OperatorSchedule operatorSchedule;
 
+    // this is used  by algorithms like SMC which rely on particle numbering
+    protected long particleNr;
+    
+    public void setParticleNr(long newNr)
+    {
+    	particleNr=newNr;
+    }
+    
+    public long getParticleNr()
+    {
+    	return particleNr;
+    }
+    
     /**
      * The state that takes care of managing StateNodes,
      * operations on StateNodes and propagates store/restore/requireRecalculation

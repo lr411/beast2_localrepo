@@ -80,6 +80,7 @@ public class BeastMCMC {
     final public static String DEVELOPERS = "Beast 2 development team";
     final public static String COPYRIGHT = "Beast 2 development team 2011";
     public static final long NR_OF_PARTICLES = 10;
+    public static final int NR_OF_MCMC_MOVES = 10;
     public BEASTInterface m_treeobj=null;
     public double m_initPopSize;
     public double m_gammaShapeLog;
@@ -710,22 +711,30 @@ public class BeastMCMC {
     	      double v[] = new double[N];
     	      Arrays.parallelSetAll(v, i -> (range[i] + (ThreadLocalRandom.current().nextDouble()))/N_double);
 
-    	      {
-	    	      int i=0,j=1;
-	    	      
-	    	      for(;i<N;i++)
 	    	      {
-	    	    	  while(cw[j]<v[i])
-	    	    	  {
-	    	    		  j++;
-	    	    	  }
-	    	    	  resampleList.set(i, j);
+		    	      int i=0,j=0;
+		    	      
+		    	      for(;i<N;i++)
+		    	      {
+		    	    	  while(cw[j]<v[i])
+		    	    	  {
+		    	    		  j++;
+		    	    	  }
+		    	    	  resampleList.set(i, j);
+		    	      }
 	    	      }
-    	      }
     	      
               return resampleList;
-    		}
+    		}// end of stratified resample
 
+    public static double ESS(double[] normalized_log_weights)
+    {
+    	double[] weightsSquared=Arrays.copyOf(normalized_log_weights, normalized_log_weights.length);
+    	// multiply by 2
+    	Arrays.parallelSetAll(weightsSquared, e->2*normalized_log_weights[e]);
+    	
+    	return logSumOfExponentials(weightsSquared);
+    }
     
     public static void main(String[] args) {
         try {
@@ -740,8 +749,8 @@ public class BeastMCMC {
             
         	final int maxvalcnt=100; // this is nr of steps minus 1
             double logweight; // accumulator for the weight of a single particle
-            double logWeights[] = new double[(int) BeastMCMC.NR_OF_PARTICLES]; // vector of weights for the particles
-            State smcStates[][] = new State[(int) BeastMCMC.NR_OF_PARTICLES][maxvalcnt+1];
+            double logWeights[] = new double[(int) NR_OF_PARTICLES]; // vector of weights for the particles
+            State smcStates[][] = new State[(int) NR_OF_PARTICLES][maxvalcnt+1];
             double logweightmax=-1;
             double normalizingConstant;
             
@@ -761,23 +770,6 @@ public class BeastMCMC {
             
             initRandomizer();
 
-            File weightsFile = new File(s+"//weights.txt");
-            {
-               boolean exists = weightsFile.exists();
-               if(exists==true)
-               {
-            	   //weightsFile.deleteOnExit();
-            	   weightsFile.delete();
-               }
-               
-               boolean created=weightsFile.createNewFile();
-               if(created==false)
-               {
-            	   int ohcaz;
-            	   ohcaz=3;
-               }
-            }
-            FileWriter fr = new FileWriter(weightsFile, true);
             long N=BeastMCMC.NR_OF_PARTICLES;
             double minuslogN=-java.lang.Math.log(N); // log(1/N) using log properties
 
@@ -808,6 +800,9 @@ public class BeastMCMC {
                     mc.SetDistributionsFromInput();
                     // initialise the state of the posterior
                     mc.initStateAndPosterior();
+                    
+                    // set default chain length moves
+                    mc.chainLengthInput.set(NR_OF_MCMC_MOVES);
                     // stateList.add(mc.getState());
                     // here the state is ready so we can sample                    
                	}
@@ -837,7 +832,6 @@ public class BeastMCMC {
     					double log1=mc.calculateLogPSimulatedAnnhealing(currentExponent_final);
     					double log2=mc.calculateLogPSimulatedAnnhealing(previousExponent_final);
                     	// ?? is it ok to set the exponent here????
-                    	mc.setSimulatedAnnhealingExponent(currentExponent_final);
     					return logWeights[e]+(log1-log2);
     					});
 
@@ -870,16 +864,24 @@ public class BeastMCMC {
                 	// process the resample: set particles according to the stratified list of particles who made it
                     for(int i=(int) (N-1);i>=0;i--)
                 	{
-                		beastMClist.set(i, beastMClist.get(stratifiedList.get(i)));
+                    	if(stratifiedList.get(i)!=i)
+                    	{// only if the former position is different from the current
+                		   beastMClist.set(i, (BeastMCMC) beastMClist.get(stratifiedList.get(i)).clone());      
+                    	}
                 	}
                                     	
                 	// in the following do the mcmc move and initialize the weights to 1/N
     				Arrays.parallelSetAll(logWeights, e->{
     					BeastMCMC bmc=beastMClist.get(e);
     					MCMC mc=(MCMC)bmc.m_runnable;
+    					// let each particle know its number
+    					mc.setParticleNr(e);
     					// put here the length of the chain
     					mc.chainLengthInput.set(10);
+    					// set here the exponent of the algorithm
+    					mc.setSimulatedAnnhealingExponent(currentExponent_final);
     					try {
+    						  // do the mcmc moves
 								mc.run();
 									} catch (IOException e1) {
 										// TODO Auto-generated catch block
@@ -894,18 +896,14 @@ public class BeastMCMC {
     					return minuslogN;
     					});
     				
-    				// here save the logs: one log per particle
-
                 }
-
+				// here save the logs: one row per particle
+            	
                	
             //	Distribution dstr1=mc1.GetPosterior();
             	int yul;
             	yul=3;
             }
-           fr.flush();
-           fr.close();
-            normalizingConstant=logSumOfExponentials(logWeights, logweightmax);
             
 
         } catch (XMLParserException e) {

@@ -796,7 +796,12 @@ public class BeastMCMC {
 			               	{
 			               		BeastMCMC bmc= new BeastMCMC();
 			               	    bmc.SetDlg(dlg);
-			               	    bmc.parseArgs(args);
+			               	    try {
+									bmc.parseArgs(args);
+								} catch (IOException | XMLParserException | JSONException e1) {
+									// TODO Auto-generated catch block
+									e1.printStackTrace();
+								}
 			               	    //int position=beastMClist.indexOf(bmc);
 			               	    // initialize all the weights to 1/N
 			               	    //logWeights[position_counter++]= -java.lang.Math.log(N);
@@ -848,7 +853,7 @@ public class BeastMCMC {
                    	final double previousExponent_final=previousExponent;
     				
                    	Arrays.parallelSetAll(logWeights, e->{
-    					BeastMCMC bmc=beastMClist.get(e);
+    					BeastMCMC bmc=beastMClist[e];
     					MCMC mc=(MCMC)bmc.m_runnable;
     					// performance wise, we don't need the log1 and log 2 we could substitute the full expressions to log1 and 2
     					double log1=mc.calculateLogPSimulatedAnnhealing(currentExponent_final);
@@ -907,7 +912,8 @@ public class BeastMCMC {
     					// let each particle know its number
     					mc.setParticleNr(e);
     					// put here the length of the chain
-    					//mc.chainLengthInput.set(10);
+    					
+    					mc.chainLengthInput.set((long)NR_OF_MCMC_MOVES);
     					// set here the exponent of the algorithm
     					mc.setSimulatedAnnhealingExponent(currentExponent_final);
     					try {
@@ -926,7 +932,8 @@ public class BeastMCMC {
     					return minuslogN;
     					});
     				
-                }
+                } // for loop exponent counter
+            	
 				// here save the logs: one row per particle
             	
                	
@@ -936,9 +943,9 @@ public class BeastMCMC {
             }
             
 
-        } catch (XMLParserException e) {
-            System.out.println(e.getMessage());
-            //e.printStackTrace();
+//        } catch (XMLParserException e) {
+//            System.out.println(e.getMessage());
+//            //e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println(BeastMCMC.getUsage());

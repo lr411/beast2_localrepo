@@ -90,7 +90,7 @@ public class MCMC extends Runnable {
 
     final public Input<OperatorSchedule> operatorScheduleInput = new Input<>("operatorschedule", "specify operator selection and optimisation schedule", new OperatorSchedule());
 
-    protected boolean useOldMcmcCode=true;
+    protected boolean useOldMcmcCode=false;
     
     /**
      * Alternative representation of operatorsInput that allows random selection
@@ -98,6 +98,19 @@ public class MCMC extends Runnable {
      */
     protected OperatorSchedule operatorSchedule;
 
+    // this is used  by algorithms like SMC which rely on particle numbering
+    protected long particleNr;
+    
+    public void setParticleNr(long newNr)
+    {
+    	particleNr=newNr;
+    }
+    
+    public long getParticleNr()
+    {
+    	return particleNr;
+    }
+    
     /**
      * The state that takes care of managing StateNodes,
      * operations on StateNodes and propagates store/restore/requireRecalculation
@@ -287,7 +300,7 @@ public class MCMC extends Runnable {
     protected Distribution m_likelihood_fromInput=null;
     protected Distribution m_posterior_fromInput=null;
 
-    public List<Logger> loggers;
+    protected List<Logger> loggers;
     
     
     public void setSimulatedAnnhealingExponent(double exponent)
@@ -328,44 +341,30 @@ public class MCMC extends Runnable {
     {
     	state.initAndValidate();
     	state.robustlyCalcPosterior(m_posterior_fromInput);
-
-    	
-        loggers = loggersInput.get();
-
-        // put the loggers logging to stdout at the bottom of the logger list so that screen output is tidier.
-        Collections.sort(loggers, (o1, o2) -> {
-            if (o1.isLoggingToStdout()) {
-                return o2.isLoggingToStdout() ? 0 : 1;
-            } else {
-                return o2.isLoggingToStdout() ? -1 : 0;
-            }
-        });
-    	
-        // initialises log so that log file headers are written, etc.
-        for (final Logger log : loggers) {
-            try {
-				log.init();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-        }
     }
     
     public double calculateLogPSimulatedAnnhealing(double exponent)
     {
-    	double result;
+    	double result, result1;
 /*    	if(setDirty)
     	{
     		state.setEverythingDirty(true);
     	}
 */    			
     	double priorres=m_prior_fromInput.calculateLogP();
-    	double allres=m_posterior_fromInput.calculateLogP();
+    	double likelihoodres=m_likelihood_fromInput.calculateLogP();
+    	double posteriorres=m_posterior_fromInput.calculateLogP();
+    	double posteriorres_check=priorres+likelihoodres;
+    	double errorcheck=posteriorres-posteriorres_check;
     	double priorres2=priorres*(1-exponent);
-    	double allres2=allres*exponent;
-    	result=m_prior_fromInput.calculateLogP()*(1-exponent)+
-    			m_posterior_fromInput.calculateLogP()*exponent;
+    	double posteriorres2=posteriorres*exponent;
+    	double likelihoodres2=likelihoodres*exponent;
+    	result1=priorres2+
+    			posteriorres2;
+    	result=priorres+
+    			likelihoodres2;
+    	
+    	// result and result1 should be equal
     	return result;
     }
     // the following function sets the prior and the likelihood as taken from the input
@@ -419,7 +418,7 @@ public class MCMC extends Runnable {
         operatorSchedule.setStateFileName(stateFileName);
 
         burnIn = burnInInput.get();
-        chainLength = 210;//LEO: changed chainLengthInput.get();
+        chainLength = chainLengthInput.get(); //210
         int initialisationAttempts = 0;
         state.setEverythingDirty(true);
         posterior = posteriorInput.get();
@@ -733,13 +732,13 @@ public class MCMC extends Runnable {
             }
             if (printDebugInfo) System.err.print(" direct reject");
         }
-        log(sampleNr);
+        // log(sampleNr); // Leo, for AIS we want only to log the particles
         return operator;
     }
 
     private boolean isTooDifferent(double logLikelihood, double originalLogP) {
     	//return Math.abs((logLikelihood - originalLogP)/originalLogP) > 1e-6;
-    	return Math.abs(logLikelihood - originalLogP) > 1e-6;
+    	return false; //Math.abs(logLikelihood - originalLogP) > 1e-6;
 	}
 
 

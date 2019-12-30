@@ -506,10 +506,12 @@ public class MCMC extends Runnable {
         	}
         }
 
+        
         // initialises log so that log file headers are written, etc.
         for (final Logger log : loggers) {
             log.init();
         }
+        
 
         doLoop();
 

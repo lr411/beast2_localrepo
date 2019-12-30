@@ -797,6 +797,7 @@ public class BeastMCMC {
 			               		BeastMCMC bmc= new BeastMCMC();
 			               	    bmc.SetDlg(dlg);
 			               	    try {
+			               	    	// parseargs is where the shit is done
 									bmc.parseArgs(args);
 								} catch (IOException | XMLParserException | JSONException e1) {
 									// TODO Auto-generated catch block
@@ -853,8 +854,8 @@ public class BeastMCMC {
                    	final double previousExponent_final=previousExponent;
     				
                    	Arrays.parallelSetAll(logWeights, e->{
-    					BeastMCMC bmc=beastMClist[e];
-    					MCMC mc=(MCMC)bmc.m_runnable;
+    					//BeastMCMC bmc=beastMClist[e];
+    					MCMC mc=(MCMC)beastMClist[e].m_runnable;
     					// performance wise, we don't need the log1 and log 2 we could substitute the full expressions to log1 and 2
     					double log1=mc.calculateLogPSimulatedAnnhealing(currentExponent_final);
     					double log2=mc.calculateLogPSimulatedAnnhealing(previousExponent_final);
@@ -890,18 +891,28 @@ public class BeastMCMC {
     				
                     List<Integer> stratifiedList=stratified_resample((double [])logWeightsNormalized);
                     
-                    int localIndex;
+                    int localIndex=0;
                     // BeastMCMC[] beastMClist_array=beastMClist.toArray(new BeastMCMC[N_int]);
                 	// process the resample: set particles according to the stratified list of particles who made it
                     for(int i=N_int-1;i>=0;i--)
                 	{
+                    	int machee = stratifiedList.get(i);
+                    	//int pesce = machee;
                     	if(stratifiedList.get(i)!=i)
+                        //if(i==(N_int-1))
                     	{// only if the former position is different from the current
                 		    // clone method does not work
                     		// beastMClist.set(i, (BeastMCMC) beastMClist.get(stratifiedList.get(i)).clone());
-                    		localIndex = stratifiedList.get(i);
+                    		localIndex = 0;//stratifiedList.get(i);
                     		// beastMClist.set(i, Arrays.copyOfRange(beastMClist_array, localIndex, localIndex+1)[0]);
+                    		//System.
+                    		
+        					//MCMC mc=(MCMC)beastMClist[i].m_runnable;
+
+        					///mc.close();
+                    		//System.gc();
                     		beastMClist[i] = Arrays.copyOfRange(beastMClist, localIndex, localIndex+1)[0];
+                    		
                     		//Arrays.copyOfRange(original, from, to, newType)
                     		//Arrays.copyOfRange(beastMClist_array, localIndex, localIndex+1);
                     	}
@@ -909,8 +920,8 @@ public class BeastMCMC {
 /// !!!!last step no resample and no move   	
                 	// in the following do the mcmc move and initialize the weights to 1/N
     				Arrays.parallelSetAll(logWeights, e->{
-    					BeastMCMC bmc=beastMClist[e];
-    					MCMC mc=(MCMC)bmc.m_runnable;
+    					// BeastMCMC bmc=beastMClist[e];
+    					MCMC mc=(MCMC)beastMClist[e].m_runnable;
     					// let each particle know its number
     					mc.setParticleNr(e);
     					// put here the length of the chain
@@ -919,6 +930,10 @@ public class BeastMCMC {
     					// set here the exponent of the algorithm
     					mc.setSimulatedAnnhealingExponent(currentExponent_final);
     					try {
+    						  if(e==(N_int-1))
+    						  {
+    							  int ippo=e;
+    						  }
     						  // do the mcmc moves
 								mc.run();
 									} catch (IOException e1) {
@@ -942,7 +957,17 @@ public class BeastMCMC {
             //	Distribution dstr1=mc1.GetPosterior();
             	int yul;
             	yul=3;
-            }
+            	// here save log, one per particle
+            	{
+            		int cnt=0;
+            		for (; cnt<N_int; cnt++)
+            		{
+            			//((MCMC)beastMClist[cnt].m_runnable).log(cnt);
+            			yul=cnt;
+            		}
+            	}
+            	yul=4;
+            }// outer parentheses 
             
 
 //        } catch (XMLParserException e) {
@@ -951,7 +976,10 @@ public class BeastMCMC {
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println(BeastMCMC.getUsage());
-        }
+        } catch (Throwable e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
         if (System.getProperty("beast.useWindow") == null) {
             // this indicates no window is open
             System.exit(0);

@@ -79,7 +79,7 @@ public class BeastMCMC {
     final public static String VERSION = "2.0 Release candidate";
     final public static String DEVELOPERS = "Beast 2 development team";
     final public static String COPYRIGHT = "Beast 2 development team 2011";
-    public static final long NR_OF_PARTICLES = 1;
+    public static final long NR_OF_PARTICLES = 3;
     public static final int NR_OF_MCMC_MOVES = 10;
     public BEASTInterface m_treeobj=null;
     public double m_initPopSize;
@@ -767,7 +767,6 @@ public class BeastMCMC {
             Path currentRelativePath = Paths.get("");
             String s = currentRelativePath.toAbsolutePath().toString();
 
-
             /*
             Set<OpenOption> options = new HashSet<OpenOption>();
             options.add(APPEND);
@@ -782,7 +781,7 @@ public class BeastMCMC {
             {
                	//Vector <BeastMCMC> appvector = new Vector <BeastMCMC>((int)BeastMCMC.NR_OF_PARTICLES);
                	//List<BeastMCMC> beastMClist = new ArrayList<BeastMCMC>(Arrays.asList(new BeastMCMC[N_int]));
-            	Sequential[] beastMClist = new Sequential[N_int];
+            	BeastMCMC[] beastMClist = new BeastMCMC[N_int];
                	// state list used only for debug
                	// List<State> stateList = new ArrayList<State>();
 //               	for (long itemnr=0; itemnr<N; itemnr++)
@@ -793,28 +792,31 @@ public class BeastMCMC {
                	//int position_counter=0;
 
                	// in this we sample from the prior
-                // BeastMCMC[] beastMClist_array1=beastMClist.toArray(new BeastMCMC[N_int]);
-                BeastMCMC appbmcmc = new BeastMCMC();
-                appbmcmc.SetDlg(dlg);
-                appbmcmc.parseArgs(args);
+               //  BeastMCMC[] beastMClist_array1=beastMClist.toArray(new BeastMCMC[N_int]);
+               	Arrays.parallelSetAll(beastMClist, e ->
+			               	{
+			               		BeastMCMC bmc= new BeastMCMC();
+			               	    bmc.SetDlg(dlg);
+			               	    try {
+			               	    	// parseargs is where the shit is done
+									bmc.parseArgs(args);
+								} catch (IOException | XMLParserException | JSONException e1) {
+									// TODO Auto-generated catch block
+									e1.printStackTrace();
+								}
+			               	    //int position=beastMClist.indexOf(bmc);
+			               	    // initialize all the weights to 1/N
+			               	    //logWeights[position_counter++]= -java.lang.Math.log(N);
+			               	    
+			               	    MCMC mc=(MCMC)bmc.m_runnable; 
+			                    // the following reads the prior, likelihood and posterior from the xml
+			                    mc.SetDistributionsFromInput();
+			                    // initialise the state of the posterior
+			                    mc.initStateAndPosterior();
+	
+			                    return bmc;
+			               	});
 
-                {
-	                MCMC mc[]= {(MCMC)appbmcmc.m_runnable};
-	                mc[0].SetDistributionsFromInput();
-	                // initialise the state of the posterior
-	                mc[0].initStateAndPosterior();
-	           		Sequential bmc2= new Sequential();	
-	
-	
-	                Arrays.parallelSetAll(beastMClist, e ->
-				               	{
-				               		Sequential bmc= new Sequential();	
-				               		MCMC mctocopy[] = Arrays.copyOf(mc, 1);
-				               		bmc.m_runnable=mctocopy[0];
-				                    return bmc;
-				               	}
-				               	);
-                }
 //               	for (BeastMCMC bmc : beastMClist ) {
 //               	    bmc.SetDlg(dlg);
 //               	    bmc.parseArgs(args);
@@ -858,7 +860,7 @@ public class BeastMCMC {
     					// performance wise, we don't need the log1 and log 2 we could substitute the full expressions to log1 and 2
     					double log1=mc.calculateLogPSimulatedAnnhealing(currentExponent_final);
     					double log2=mc.calculateLogPSimulatedAnnhealing(previousExponent_final);
-//                    	// ?? is it ok to set the exponent here????
+                    	// ?? is it ok to set the exponent here????
     					return logWeights[e]+(log1-log2);
     					});
 
@@ -910,13 +912,13 @@ public class BeastMCMC {
 
         					///mc.close();
                     		//System.gc();
-                    	//	beastMClist[i] = Arrays.copyOfRange(beastMClist, localIndex, localIndex+1)[0];
+                    		beastMClist[i] = Arrays.copyOfRange(beastMClist, localIndex, localIndex+1)[0];
                     		
                     		//Arrays.copyOfRange(original, from, to, newType)
                     		//Arrays.copyOfRange(beastMClist_array, localIndex, localIndex+1);
                     	}
                 	}
-/// !!!!last step no resample and no move   toggled	
+/// !!!!last step no resample and no move   	
                 	// in the following do the mcmc move and initialize the weights to 1/N
     				Arrays.parallelSetAll(logWeights, e->{
     					// BeastMCMC bmc=beastMClist[e];

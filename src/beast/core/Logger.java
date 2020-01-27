@@ -114,6 +114,24 @@ public class Logger extends BEASTObject {
     long startLogTime = -5;
     long startSample;
 
+    public String getFileName()
+    {
+    	return fileName;
+    }
+    
+    public void SetFileName(String newName)
+    {
+    	fileName=newName;
+    }
+
+    public void SetFileNameWithParticleNr(long particleNr)
+    {
+    	if(fileName != null)
+    	{
+    		fileName += String.valueOf(particleNr);
+    	}
+    }
+
     @Override
     public void initAndValidate() {
 
@@ -419,9 +437,9 @@ public class Logger extends BEASTObject {
                             fin.close();
                             assert str != null;
                             final long sampleOffset = Long.parseLong(str.split("\\s")[0]);
-                            if ( false &&  Logger.sampleOffset > 0 && sampleOffset != Logger.sampleOffset) {
+                            if (/* false && */ Logger.sampleOffset > 0 && sampleOffset != Logger.sampleOffset) {
                                 throw new RuntimeException("Error 400: Cannot resume: log files do not end in same sample number");
-                            }
+                            } // Leo this logger part changed to deal with resume of files
                             Logger.sampleOffset = sampleOffset;
                             // open the file for appending
                             final FileOutputStream out2 = new FileOutputStream(fileName, true);

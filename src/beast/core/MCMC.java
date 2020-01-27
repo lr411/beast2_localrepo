@@ -98,17 +98,19 @@ public class MCMC extends Runnable {
      */
     protected OperatorSchedule operatorSchedule;
 
+    protected boolean m_loggerNameInitialised=false;
+    
     // this is used  by algorithms like SMC which rely on particle numbering
-    protected long particleNr;
+    protected long m_particleNr;
     
     public void setParticleNr(long newNr)
     {
-    	particleNr=newNr;
+    	m_particleNr=newNr;
     }
     
     public long getParticleNr()
     {
-    	return particleNr;
+    	return m_particleNr;
     }
     
     /**
@@ -477,6 +479,17 @@ public class MCMC extends Runnable {
         }
 
         loggers = loggersInput.get();
+        
+        
+        if(m_loggerNameInitialised==false)
+        {
+	        for (final Logger log : loggers) {
+	            	log.fileNameInput.setValue(log.fileNameInput.value + String.valueOf(m_particleNr), log);// .value += String.valueOf(m_particleNr);
+	            	log.SetFileNameWithParticleNr(m_particleNr);
+	        }
+	        m_loggerNameInitialised=true;
+        }
+
 
         // put the loggers logging to stdout at the bottom of the logger list so that screen output is tidier.
         Collections.sort(loggers, (o1, o2) -> {

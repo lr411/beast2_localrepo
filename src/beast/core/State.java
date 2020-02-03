@@ -332,7 +332,8 @@ public class State extends BEASTObject {
      * @param sample TODO
      */
     public void storeToFile(final long sample) {
-        try {
+    	if(false)
+    	try {
             PrintStream out = new PrintStream(stateFileName + ".new");
             out.print(toXML(sample));
             //out.print(new XMLProducer().toXML(this));

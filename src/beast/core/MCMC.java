@@ -91,7 +91,7 @@ public class MCMC extends Runnable {
     final public Input<OperatorSchedule> operatorScheduleInput = new Input<>("operatorschedule", "specify operator selection and optimisation schedule", new OperatorSchedule());
 
     protected boolean useOldMcmcCode=false;
-    
+    public boolean blockLogging=true;
     /**
      * Alternative representation of operatorsInput that allows random selection
      * of operators and calculation of statistics.
@@ -275,12 +275,14 @@ public class MCMC extends Runnable {
     } // init
 
     public void log(final long sampleNr) {
-        for (final Logger log : loggers) {
+        if(blockLogging==false)
+    	for (final Logger log : loggers) {
             log.log(sampleNr);
         }
     } // log
 
     public void close() {
+        if(blockLogging==false)
         for (final Logger log : loggers) {
             log.close();
         }
@@ -481,6 +483,7 @@ public class MCMC extends Runnable {
         loggers = loggersInput.get();
         
         
+        if(blockLogging==false)
         if(m_loggerNameInitialised==false)
         {
 	        for (final Logger log : loggers) {
@@ -492,6 +495,7 @@ public class MCMC extends Runnable {
 
 
         // put the loggers logging to stdout at the bottom of the logger list so that screen output is tidier.
+        if(blockLogging==false)
         Collections.sort(loggers, (o1, o2) -> {
             if (o1.isLoggingToStdout()) {
                 return o2.isLoggingToStdout() ? 0 : 1;
@@ -521,6 +525,7 @@ public class MCMC extends Runnable {
 
         
         // initialises log so that log file headers are written, etc.
+        if(blockLogging==false)
         for (final Logger log : loggers) {
             log.init();
         }
@@ -538,7 +543,9 @@ public class MCMC extends Runnable {
 
         Log.warning.println("End likelihood: " + oldLogLikelihood);
 //        System.err.println(state);
+        if(blockLogging==false)
         state.storeToFile(chainLength);
+        if(blockLogging==false)
         operatorSchedule.storeToFile();
         //Randomizer.storeToFile(stateFileName);
     } // run;

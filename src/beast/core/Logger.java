@@ -437,7 +437,7 @@ public class Logger extends BEASTObject {
                             fin.close();
                             assert str != null;
                             final long sampleOffset = Long.parseLong(str.split("\\s")[0]);
-                            if (/* false && */ Logger.sampleOffset > 0 && sampleOffset != Logger.sampleOffset) {
+                            if ( Logger.sampleOffset > 0 && sampleOffset != Logger.sampleOffset) {
                                 throw new RuntimeException("Error 400: Cannot resume: log files do not end in same sample number");
                             } // Leo this logger part changed to deal with resume of files
                             Logger.sampleOffset = sampleOffset;

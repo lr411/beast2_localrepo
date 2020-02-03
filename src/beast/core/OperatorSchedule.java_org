@@ -284,10 +284,7 @@ public class OperatorSchedule extends BEASTObject {
      */
     public void storeToFile() throws IOException {
         // appends state of operator set to state file
-        if(true)
-        	return;
-        
-    	File file = new File(stateFileName);
+        File file = new File(stateFileName);
         PrintWriter out = new PrintWriter(new FileWriter(file, true));
 
         out.println("<!--");

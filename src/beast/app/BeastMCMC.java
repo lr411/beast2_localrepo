@@ -79,7 +79,7 @@ public class BeastMCMC {
     final public static String VERSION = "2.0 Release candidate";
     final public static String DEVELOPERS = "Beast 2 development team";
     final public static String COPYRIGHT = "Beast 2 development team 2011";
-    public static final long NR_OF_PARTICLES = 1;
+    public static final long NR_OF_PARTICLES = 10;
     public static final int NR_OF_MCMC_MOVES = 10;
     public BEASTInterface m_treeobj=null;
     public double m_initPopSize;
@@ -779,7 +779,7 @@ public class BeastMCMC {
 
             //for (long particleNr=0; particleNr<BeastMCMC.NR_OF_PARTICLES; particleNr++)
    //         for (long particleNr=0; particleNr<1; particleNr++)
-            {
+       //     {
                	//Vector <BeastMCMC> appvector = new Vector <BeastMCMC>((int)BeastMCMC.NR_OF_PARTICLES);
                	//List<BeastMCMC> beastMClist = new ArrayList<BeastMCMC>(Arrays.asList(new BeastMCMC[N_int]));
             	Sequential[] beastMClist = new Sequential[N_int];
@@ -810,6 +810,7 @@ public class BeastMCMC {
 				               	{
 				               		Sequential bmc= new Sequential();	
 				               		MCMC mctocopy[] = Arrays.copyOf(mc, 1);
+				               		// here sample from prior
 				               		bmc.m_runnable=mctocopy[0];
 				                    return bmc;
 				               	}
@@ -849,37 +850,43 @@ public class BeastMCMC {
                 	
                 	currentExponent=((double)exponentCnt+1)/((double)maxvalcnt);
                 	// updates the weights with the ratio of future-current functions calculated at the current state
-                   	final double currentExponent_final=currentExponent;
+                   	final double nextExponent_final=currentExponent;
                    	final double previousExponent_final=previousExponent;
     				
+                   	// set the exponent to all, at this stage
                    	Arrays.parallelSetAll(logWeights, e->{
     					//BeastMCMC bmc=beastMClist[e];
     					MCMC mc=(MCMC)beastMClist[e].m_runnable;
     					// performance wise, we don't need the log1 and log 2 we could substitute the full expressions to log1 and 2
-    					double log1=mc.calculateLogPSimulatedAnnhealing(currentExponent_final);
+    					double log1=mc.calculateLogPSimulatedAnnhealing(nextExponent_final);
     					double log2=mc.calculateLogPSimulatedAnnhealing(previousExponent_final);
 //                    	// ?? is it ok to set the exponent here????
     					return logWeights[e]+(log1-log2);
     					});
+                   	
+                   	// if we can parallelize the step below then eliminate these vars
+                   	double log1, log2;
+                   	BeastMCMC bmc;
 
-    				/*
-    				for (BeastMCMC bmc : beastMClist ) {
-                   	    int position=beastMClist.indexOf(bmc);
-                   	    
-                   	    // here update the weights
-                   	    MCMC mc=(MCMC)bmc.m_runnable; 
-                    	log1=mc.calculateLogPSimulatedAnnhealing(currentExponent);
-                    	log2=mc.calculateLogPSimulatedAnnhealing(previousExponent);
-                    	logWeights[position]=+(log1-log2);
-                    	
-                    	
-                    	// ?? is it ok to set the exponent here????
-                    	mc.setSimulatedAnnhealingExponent(currentExponent);
-                    	
-                    	//bmc.run();
-                    	// end of mcmc, get state here
+    				
+                   	if(exponentCnt<maxvalcnt-1) // in the last step no mcmc move
+                   	{ // use Markov kernel to make the move, sequentially one for each
+	                   	for (int position=0; position<N_int;position++) { // BeastMCMC bmc : beastMClist ) {
+	                   	    //int position=beastMClist.indexOf(bmc);
+	    					bmc=beastMClist[position];
+	                   	    // here update the weights
+	                   	    MCMC mc=(MCMC)bmc.m_runnable;
+	
+	                   	    // the mcmc run is done with the previous exponent
+	                    	bmc.run();
+	
+	                    	// setting the exponent sets the target distribution
+	                    	mc.setSimulatedAnnhealingExponent(currentExponent);
+	                    	
+	                    	// end of mcmc, get state here
+	                   	}
                    	}
-                   	*/
+                   	
                     normalizingConstant=logSumOfExponentials(logWeights);
                     final double normalizingConstant_cnst=normalizingConstant;
                     
@@ -890,66 +897,31 @@ public class BeastMCMC {
     				
                     List<Integer> stratifiedList=stratified_resample((double [])logWeightsNormalized);
                     
-                    int localIndex=0;
-                    // BeastMCMC[] beastMClist_array=beastMClist.toArray(new BeastMCMC[N_int]);
-                	// process the resample: set particles according to the stratified list of particles who made it
-                    for(int i=N_int-1;i>=0;i--)
-                	{
-                    	int machee = stratifiedList.get(i);
-                    	//int pesce = machee;
-                    	if(stratifiedList.get(i)!=i)
-                        //if(i==(N_int-1))
-                    	{// only if the former position is different from the current
-                		    // clone method does not work
-                    		// beastMClist.set(i, (BeastMCMC) beastMClist.get(stratifiedList.get(i)).clone());
-                    		localIndex = 0;//stratifiedList.get(i);
-                    		// beastMClist.set(i, Arrays.copyOfRange(beastMClist_array, localIndex, localIndex+1)[0]);
-                    		//System.
-                    		
-        					//MCMC mc=(MCMC)beastMClist[i].m_runnable;
-
-        					///mc.close();
-                    		//System.gc();
-                    	//	beastMClist[i] = Arrays.copyOfRange(beastMClist, localIndex, localIndex+1)[0];
-                    		
-                    		//Arrays.copyOfRange(original, from, to, newType)
-                    		//Arrays.copyOfRange(beastMClist_array, localIndex, localIndex+1);
-                    	}
-                	}
-/// !!!!last step no resample and no move   toggled	
-                	// in the following do the mcmc move and initialize the weights to 1/N
-    				Arrays.parallelSetAll(logWeights, e->{
-    					// BeastMCMC bmc=beastMClist[e];
-    					MCMC mc=(MCMC)beastMClist[e].m_runnable;
-    					// let each particle know its number
-    					mc.setParticleNr(e);
-    					// put here the length of the chain
-    					
-    					mc.chainLengthInput.set((long)NR_OF_MCMC_MOVES);
-    					// set here the exponent of the algorithm
-    					mc.setSimulatedAnnhealingExponent(currentExponent_final);
-    					try {
-    						  if(e==(N_int-1))
-    						  {
-    							  int ippo=e;
-    						  }
-    						  // do the mcmc moves
-								mc.run();
-									} catch (IOException e1) {
-										// TODO Auto-generated catch block
-										e1.printStackTrace();
-									} catch (SAXException e1) {
-										// TODO Auto-generated catch block
-										e1.printStackTrace();
-									} catch (ParserConfigurationException e1) {
-										// TODO Auto-generated catch block
-										e1.printStackTrace();
-							}
-    					return minuslogN;
-    					});
-    				
-                } // for loop exponent counter
-            	
+                   	if(exponentCnt<maxvalcnt-1) // in the last step no resample
+                   	{
+	                    int localIndex;
+	
+	                	// process the resample: set particles according to the stratified list of particles who made it
+	                    for(int i=N_int-1;i>=0;i--)
+	                	{
+	                    	localIndex = stratifiedList.get(i);
+	
+	                    	if(localIndex!=i)
+	                    	{// only if the former position is different from the current
+	                		    // clone method does not work
+	                    		// beastMClist.set(i, (BeastMCMC) beastMClist.get(stratifiedList.get(i)).clone());
+	                    		// beastMClist.set(i, Arrays.copyOfRange(beastMClist_array, localIndex, localIndex+1)[0]);
+	
+	                    		///mc.close();
+	                    		//System.gc();
+	                    		beastMClist[i] = Arrays.copyOfRange(beastMClist, localIndex, localIndex+1)[0];
+	                    		
+	                    	}
+	                	}
+	                   	// in the following initialize the weights to 1/N
+	    				Arrays.parallelSetAll(logWeights, e->{return minuslogN;});
+                   	}
+                                	
 				// here save the logs: one row per particle
             	
                	

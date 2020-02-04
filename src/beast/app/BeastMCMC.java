@@ -79,8 +79,8 @@ public class BeastMCMC {
     final public static String VERSION = "2.0 Release candidate";
     final public static String DEVELOPERS = "Beast 2 development team";
     final public static String COPYRIGHT = "Beast 2 development team 2011";
-    public static final long NR_OF_PARTICLES = 10;
-    public static final int NR_OF_MCMC_MOVES = 10;
+    public static final long NR_OF_PARTICLES = 5;
+    public static final int NR_OF_MCMC_MOVES = 100;
     public BEASTInterface m_treeobj=null;
     public double m_initPopSize;
     public double m_gammaShapeLog;
@@ -914,7 +914,7 @@ public class BeastMCMC {
 	
 	                    		///mc.close();
 	                    		//System.gc();
-	                    		beastMClist[i] = Arrays.copyOfRange(beastMClist, localIndex, localIndex+1)[0];
+	                    		//beastMClist[i] = Arrays.copyOfRange(beastMClist, localIndex, localIndex+1)[0];
 	                    		
 	                    	}
 	                	}
@@ -930,10 +930,15 @@ public class BeastMCMC {
             	yul=3;
             	// here save log, one per particle
             	{
-            		int cnt=0;
-            		for (; cnt<N_int; cnt++)
+            		int cnt;
+            		MCMC mcmc = (MCMC)beastMClist[0].m_runnable;
+                    for (final Logger log : mcmc.getLoggers()) {
+                        log.init();
+                    }
+            		
+            		for (cnt=0; cnt<N_int; cnt++)
             		{
-            			//((MCMC)beastMClist[cnt].m_runnable).log(cnt);
+            			((MCMC)beastMClist[cnt].m_runnable).log_particle(cnt);
             			yul=cnt;
             		}
             	}

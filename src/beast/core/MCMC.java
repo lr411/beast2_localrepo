@@ -274,6 +274,12 @@ public class MCMC extends Runnable {
         }
     } // init
 
+    public void log_particle(final long particleNr) {
+    	for (final Logger log : loggers) {
+            log.log(particleNr);
+        }
+    } // log
+
     public void log(final long sampleNr) {
         if(blockLogging==false)
     	for (final Logger log : loggers) {
@@ -306,6 +312,10 @@ public class MCMC extends Runnable {
 
     protected List<Logger> loggers;
     
+    public  List<Logger> getLoggers()
+    {
+    	return loggers;
+    }
     
     public void setSimulatedAnnhealingExponent(double exponent)
     {
@@ -532,6 +542,7 @@ public class MCMC extends Runnable {
         
 
         doLoop();
+        // log(1);
 
         Log.info.println();
         operatorSchedule.showOperatorRates(System.out);

@@ -25,7 +25,9 @@
 package beast.core;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -34,10 +36,20 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
+
+import beast.app.BeastMCMC;
 import beast.core.util.CompoundDistribution;
 import beast.core.util.Evaluator;
 import beast.core.util.Log;
 import beast.util.Randomizer;
+
+
 
 @Description("MCMC chain. This is the main element that controls which posterior " +
         "to calculate, how long to run the chain and all other properties, " +
@@ -119,6 +131,10 @@ public class MCMC extends Runnable {
      * calls to the appropriate BEASTObjects.
      */
     protected State state;
+    
+    // the following is an array of 1 element containing the state, useful for copies using
+    // Array.copyof
+    //protected State[] stateArray;
     
     public State getState()
     {
@@ -527,9 +543,9 @@ public class MCMC extends Runnable {
         if (!hasStdOutLogger) {
         	Log.warning.println("WARNING: If nothing seems to be happening on screen this is because none of the loggers give feedback to screen.");
         	if (hasScreenLog) {
+        		Log.warning.println("WARNING: Otherwise, the screenlog is saved into the specified file.");
         		Log.warning.println("WARNING: This happens when a filename  is specified for the 'screenlog' logger.");
         		Log.warning.println("WARNING: To get feedback to screen, leave the filename for screenlog blank.");
-        		Log.warning.println("WARNING: Otherwise, the screenlog is saved into the specified file.");
         	}
         }
 
@@ -542,8 +558,10 @@ public class MCMC extends Runnable {
         
 
         doLoop();
-        // log(1);
+        
+        // .stateNode[2].  .values[0]=3;
 
+        
         Log.info.println();
         operatorSchedule.showOperatorRates(System.out);
 
@@ -561,7 +579,131 @@ public class MCMC extends Runnable {
         //Randomizer.storeToFile(stateFileName);
     } // run;
 
+/*    public boolean setStateArray()
+    {
+    	boolean retval;
+    	if(state != null)
+    	{
+    	  stateArray = new State[] {state};
+    	  retval = true;
+    	}
+    	else
+    	{
+    		retval = false;
+    	}
+ 
+    	return retval;
+    }
+*/    
+    // statecopy returns a deep copy of the current state
+/*    public State stateCopy()
+    {
+    	State statetoreturn[] = Arrays.copyOf(stateArray, 1);
+    	
+    	for(int i=0; i< statetoreturn[0].stateNode.length;i++)
+    	{
+    		//statetoreturn[0].stateNode[i].assignFrom(state.stateNode[i]);
+    		statetoreturn[0].stateNode[i]=state.stateNode[i].copy();
+    		statetoreturn[0].stateNode[i].initAndValidate();
+    	}
+    	return statetoreturn[0];
+    }
+*/
+    
+// the gson method does not work
+    public static MCMC gsonDeepCopy(MCMC source)
+    {
+        //Gson gson = new Gson();
+       // MCMC newObject = gson.fromJson(gson.toJson(source), MCMC.class);
+    	       Gson gson = new GsonBuilder().create();
+         String text = gson.toJson(source);
+         MCMC newObject = gson.fromJson(text, MCMC.class);
+        return newObject;
+    }
+    
+    public MCMC copyMethods(MCMC source)
+    {
+    	MCMC copied=new MCMC();
+    	
+    	Field[] sourceFields=MCMC.class.getDeclaredFields();
+    	Object value;// = fieldsOfFieldClass[i] 
+                //.get(field); 
 
+/*    	try {
+    		    Field fieldfield = MCMC.class.getDeclaredField("blockLogging");
+	    		Field field = MCMC.class.getDeclaredField("operatorSchedule");
+	    		try {
+	        		int modifier=field.getModifiers();
+	    			value=field.get(source);
+	        		if((modifier & (Modifier.FINAL | Modifier.STATIC)) == 0)
+	        		{
+	        			int elco;
+	        			elco=1;
+	        		}
+					field.set(copied, value);
+				} catch (IllegalArgumentException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IllegalAccessException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		} catch (NoSuchFieldException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (SecurityException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}    	
+*/    	
+    	
+    	for(Field fld : sourceFields)
+    	{
+    		try 
+    		{
+        		value=fld.get(source);
+        		//System.out.println(fld.getName());
+        		int modifier=fld.getModifiers();
+        		if((modifier & (Modifier.FINAL | Modifier.STATIC)) == 0)
+        		{
+            		int i;
+            		i=33;
+        		    fld.set(copied, value);
+            		i=33;
+        		}
+        		int i;
+        		i=33;
+    		}
+    		catch(IllegalAccessException e) 
+    		{
+    			  //  Block of code to handle errors
+    			e.printStackTrace();
+    		}    		
+    	}
+    	
+    	State newstate=new State();
+    	int statenodeslength = source.state.stateNode.length;
+    	newstate.stateNode=new StateNode[statenodeslength];
+
+    	for(int i=0; i< statenodeslength;i++)
+    	{
+    		//statetoreturn[0].stateNode[i].assignFrom(state.stateNode[i]);
+    		newstate.stateNode[i]=state.stateNode[i].copy();
+    		newstate.stateNode[i].initAndValidate();
+    	}
+    	
+    	copied.state = newstate;
+    	
+    	// copied.chainLengthInput. .set((long)BeastMCMC.NR_OF_MCMC_MOVES);
+    	
+    	return copied;
+    }
+
+    public void setState(State newState)
+    {
+    	state=newState;
+    }
+    
     /**
      * main MCMC loop 
      * @throws IOException *

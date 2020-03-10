@@ -79,7 +79,7 @@ public class BeastMCMC {
     final public static String VERSION = "2.0 Release candidate";
     final public static String DEVELOPERS = "Beast 2 development team";
     final public static String COPYRIGHT = "Beast 2 development team 2011";
-    public static final long NR_OF_PARTICLES = 5;
+    public static final long NR_OF_PARTICLES = 2;
     public static final int NR_OF_MCMC_MOVES = 100;
     public BEASTInterface m_treeobj=null;
     public double m_initPopSize;
@@ -737,6 +737,25 @@ public class BeastMCMC {
     	return -logSumOfExponentials(weightsSquared);
     }
 
+    // returns a deep copy of a particle, useful for smc
+    protected Sequential deepCopy(MCMC[] mc)
+    {
+/*   		Sequential bmc= new Sequential();	
+   		MCMC mctocopy[] = Arrays.copyOf(mc, 1);
+   		mctocopy[0].setState(mc[0].stateCopy());
+   		// here sample from prior
+   		bmc.m_runnable=mctocopy[0];
+*/        
+    	return null;
+    }
+
+    protected Sequential deepCopyNonArray(MCMC mcToCopy)
+    {
+    	MCMC[] mc= {mcToCopy};
+        
+    	return deepCopy(mc);
+    }
+    
     public static void main(String[] args) {
         try {
             System.setProperty("beast.debug", "true");
@@ -803,19 +822,29 @@ public class BeastMCMC {
 	                mc[0].SetDistributionsFromInput();
 	                // initialise the state of the posterior
 	                mc[0].initStateAndPosterior();
-	           		Sequential bmc2= new Sequential();	
+	                // here we prepare the statearray useful for making copies of the state
+	                // mc[0].setStateArray();
+               		MCMC mc1=mc[0].copyMethods(mc[0]);
+               		int alla;
+               		alla=1;
 	
 	
 	                Arrays.parallelSetAll(beastMClist, e ->
-				               	{
+				               	{ // here probably better not to call the deepcopy method we created
+				               		// because we need to sample from prior
 				               		Sequential bmc= new Sequential();	
-				               		MCMC mctocopy[] = Arrays.copyOf(mc, 1);
+				               		
+				               		MCMC mctocopy = mc[0].copyMethods(mc[0]);//{MCMC.gsonDeepCopy(mc[0])};
+				               		//mctocopy.setState(mc[0].stateCopy());
+				               		// mctocopy.initAndValidate();
+				               		
+				               		//MCMC mctocopy[] = Arrays.copyOf(mc, 1);
 				               		// here sample from prior
-				               		bmc.m_runnable=mctocopy[0];
+				               		bmc.m_runnable=mctocopy;
+				                   
 				                    return bmc;
-				               	}
-				               	);
-                }
+				               	});
+                			}
 //               	for (BeastMCMC bmc : beastMClist ) {
 //               	    bmc.SetDlg(dlg);
 //               	    bmc.parseArgs(args);
@@ -868,24 +897,55 @@ public class BeastMCMC {
                    	double log1, log2;
                    	BeastMCMC bmc;
 
-    				
-                   	if(exponentCnt<maxvalcnt-1) // in the last step no mcmc move
-                   	{ // use Markov kernel to make the move, sequentially one for each
-	                   	for (int position=0; position<N_int;position++) { // BeastMCMC bmc : beastMClist ) {
-	                   	    //int position=beastMClist.indexOf(bmc);
-	    					bmc=beastMClist[position];
-	                   	    // here update the weights
-	                   	    MCMC mc=(MCMC)bmc.m_runnable;
-	
-	                   	    // the mcmc run is done with the previous exponent
-	                    	bmc.run();
-	
-	                    	// setting the exponent sets the target distribution
-	                    	mc.setSimulatedAnnhealingExponent(currentExponent);
-	                    	
-	                    	// end of mcmc, get state here
+    				if(true)
+    				{
+    					final double currentExponentLocal=currentExponent;
+    					
+	                   	if(exponentCnt<maxvalcnt-1) // in the last step no mcmc move
+	                   	{ // use Markov kernel to make the move, sequentially one for each
+	                       	// set the exponent to all, at this stage
+	                       	Arrays.parallelSetAll(beastMClist, e->{
+	        					//BeastMCMC bmc=beastMClist[e];
+	                       		BeastMCMC bmcc=beastMClist[e];
+		                   	    // here update the weights
+		                   	    MCMC mc=(MCMC)bmcc.m_runnable;
+		
+		                   	    // the mcmc run is done with the previous exponent
+		                    	try {
+									bmcc.run();
+								} catch (Exception e1) {
+									// TODO Auto-generated catch block
+									e1.printStackTrace();
+								}
+		
+		                    	// setting the exponent sets the target distribution
+		                    	mc.setSimulatedAnnhealingExponent(currentExponentLocal);
+	                       		
+	                       		return beastMClist[e];
+	        					});
+	                   			                   		
 	                   	}
-                   	}
+    				}
+    				else
+    				{
+	                   	if(exponentCnt<maxvalcnt-1) // in the last step no mcmc move
+	                   	{ // use Markov kernel to make the move, sequentially one for each
+		                   	for (int position=0; position<N_int;position++) { // BeastMCMC bmc : beastMClist ) {
+		                   	    //int position=beastMClist.indexOf(bmc);
+		    					bmc=beastMClist[position];
+		                   	    // here update the weights
+		                   	    MCMC mc=(MCMC)bmc.m_runnable;
+		
+		                   	    // the mcmc run is done with the previous exponent
+		                    	bmc.run();
+		
+		                    	// setting the exponent sets the target distribution
+		                    	mc.setSimulatedAnnhealingExponent(currentExponent);
+		                    	
+		                    	// end of mcmc, get state here
+		                   	}
+	                   	}
+    				}
                    	
                     normalizingConstant=logSumOfExponentials(logWeights);
                     final double normalizingConstant_cnst=normalizingConstant;

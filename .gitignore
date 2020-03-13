@@ -1,4 +1,5 @@
 # IntelliJ ignores
+*.log
 /.idea
 /beast2.iml
 /META-INF

@@ -814,9 +814,22 @@ public class BeastMCMC {
                	// in this we sample from the prior
                 // BeastMCMC[] beastMClist_array1=beastMClist.toArray(new BeastMCMC[N_int]);
                 BeastMCMC appbmcmc = new BeastMCMC();
+                BeastMCMC[] appbmcmcList = new BeastMCMC[N_int];
+
                 appbmcmc.SetDlg(dlg);
                 appbmcmc.parseArgs(args);
 
+if(false)
+{ // added now before making changes to 
+                Arrays.parallelSetAll(beastMClist, e ->
+               	{ // here probably better not to call the deepcopy method we created
+               		// because we need to sample from prior
+               		Sequential bmc= new Sequential();	               		
+                    bmc.SetDlg(dlg);
+                    return bmc;
+               	});
+}               
+                
                 {
 	                MCMC mc[]= {(MCMC)appbmcmc.m_runnable};
 	                mc[0].SetDistributionsFromInput();

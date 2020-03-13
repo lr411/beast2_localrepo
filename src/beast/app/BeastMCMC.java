@@ -79,7 +79,7 @@ public class BeastMCMC {
     final public static String VERSION = "2.0 Release candidate";
     final public static String DEVELOPERS = "Beast 2 development team";
     final public static String COPYRIGHT = "Beast 2 development team 2011";
-    public static final long NR_OF_PARTICLES = 2;
+    public static final long NR_OF_PARTICLES = 100;
     public static final int NR_OF_MCMC_MOVES = 100;
     public BEASTInterface m_treeobj=null;
     public double m_initPopSize;
@@ -819,63 +819,25 @@ public class BeastMCMC {
                 appbmcmc.SetDlg(dlg);
                 appbmcmc.parseArgs(args);
 
-if(false)
-{ // added now before making changes to 
                 Arrays.parallelSetAll(beastMClist, e ->
                	{ // here probably better not to call the deepcopy method we created
                		// because we need to sample from prior
                		Sequential bmc= new Sequential();	               		
                     bmc.SetDlg(dlg);
+               	    // the mcmc run is done with the previous exponent
+                	try {
+                        bmc.parseArgs(args);
+					} catch (Exception e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+	                MCMC mc= (MCMC)bmc.m_runnable;
+	                mc.SetDistributionsFromInput();
+	                // initialise the state of the posterior
+	                mc.initStateAndPosterior();
                     return bmc;
                	});
-}               
                 
-                {
-	                MCMC mc[]= {(MCMC)appbmcmc.m_runnable};
-	                mc[0].SetDistributionsFromInput();
-	                // initialise the state of the posterior
-	                mc[0].initStateAndPosterior();
-	                // here we prepare the statearray useful for making copies of the state
-	                // mc[0].setStateArray();
-               		MCMC mc1=mc[0].copyMethods(mc[0]);
-               		int alla;
-               		alla=1;
-	
-	
-	                Arrays.parallelSetAll(beastMClist, e ->
-				               	{ // here probably better not to call the deepcopy method we created
-				               		// because we need to sample from prior
-				               		Sequential bmc= new Sequential();	
-				               		
-				               		MCMC mctocopy = mc[0].copyMethods(mc[0]);//{MCMC.gsonDeepCopy(mc[0])};
-				               		//mctocopy.setState(mc[0].stateCopy());
-				               		// mctocopy.initAndValidate();
-				               		
-				               		//MCMC mctocopy[] = Arrays.copyOf(mc, 1);
-				               		// here sample from prior
-				               		bmc.m_runnable=mctocopy;
-				                   
-				                    return bmc;
-				               	});
-                			}
-//               	for (BeastMCMC bmc : beastMClist ) {
-//               	    bmc.SetDlg(dlg);
-//               	    bmc.parseArgs(args);
-//               	    //int position=beastMClist.indexOf(bmc);
-//               	    // initialize all the weights to 1/N
-//               	    //logWeights[position_counter++]= -java.lang.Math.log(N);
-//               	    
-//               	    MCMC mc=(MCMC)bmc.m_runnable; 
-//                    // the following reads the prior, likelihood and posterior from the xml
-//                    mc.SetDistributionsFromInput();
-//                    // initialise the state of the posterior
-//                    mc.initStateAndPosterior();
-//                    
-//                    // set default chain length moves
-//                    //mc.chainLengthInput.set((long)NR_OF_MCMC_MOVES);
-//                    // stateList.add(mc.getState());
-//                    // here the state is ready so we can sample                    
-//               	}
                	
                	// we have sampled from the prior in the previous for cycle
                	
@@ -934,7 +896,7 @@ if(false)
 		                    	// setting the exponent sets the target distribution
 		                    	mc.setSimulatedAnnhealingExponent(currentExponentLocal);
 	                       		
-	                       		return beastMClist[e];
+	                       		return bmcc;
 	        					});
 	                   			                   		
 	                   	}
@@ -1002,7 +964,8 @@ if(false)
             	int yul;
             	yul=3;
             	// here save log, one per particle
-            	{
+            	if(false)
+            	{// dont take logs for now
             		int cnt;
             		MCMC mcmc = (MCMC)beastMClist[0].m_runnable;
                     for (final Logger log : mcmc.getLoggers()) {
@@ -1017,7 +980,8 @@ if(false)
             	}
             	yul=4;
             }// outer parentheses 
-            
+            int ellade;
+            ellade=4;
 
 //        } catch (XMLParserException e) {
 //            System.out.println(e.getMessage());

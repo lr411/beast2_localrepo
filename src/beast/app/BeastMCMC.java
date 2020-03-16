@@ -51,10 +51,14 @@ import javax.swing.filechooser.FileFilter;
 import javax.xml.parsers.ParserConfigurationException;
 import java.awt.*;
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.net.URL;
 // Leo: used to set the random seed with milliseconds
 import java.util.*;
@@ -79,7 +83,7 @@ public class BeastMCMC {
     final public static String VERSION = "2.0 Release candidate";
     final public static String DEVELOPERS = "Beast 2 development team";
     final public static String COPYRIGHT = "Beast 2 development team 2011";
-    public static final long NR_OF_PARTICLES = 100;
+    public static final long NR_OF_PARTICLES = 3;
     public static final int NR_OF_MCMC_MOVES = 100;
     public BEASTInterface m_treeobj=null;
     public double m_initPopSize;
@@ -101,8 +105,6 @@ public class BeastMCMC {
     long m_nSeed = 127;
 
     BeastDialog m_dialog=null;
-    
-//    List<String> m_MCMCargs=null;
     
     /**
      * MCMC object to execute *
@@ -756,6 +758,43 @@ public class BeastMCMC {
     	return deepCopy(mc);
     }
     
+/*   
+     getTreePosition looks for the position of the tree
+    in a state vector array
+    return values:
+    	position (>=0) if found
+    	-1 if not found
+*/
+    public static int getTreePosition(MCMC mcmc)
+    {
+     	   int treeposition;
+    	
+    	   State curstate=mcmc.getState();
+     	   int statenodeslength = curstate.stateNode.length;
+     	   StateNode stn=null;
+	         int i;  
+     	     for(i=0; i< statenodeslength;i++)
+	           	{
+	           		stn=curstate.stateNode[i];
+	           		Class cls=stn.getClass();
+	           		if(cls.getName().endsWith(".Tree"))
+	           		{
+	           			treeposition=i;
+	           			break;
+	           		}
+	           	}
+	           
+		        if(i<statenodeslength)
+	            {
+	            	treeposition=i;
+	            }
+	            else
+	            {
+	            	treeposition=-1;
+	            }
+		return treeposition;    	
+    }
+    
     public static void main(String[] args) {
         try {
             System.setProperty("beast.debug", "true");
@@ -814,7 +853,7 @@ public class BeastMCMC {
                	// in this we sample from the prior
                 // BeastMCMC[] beastMClist_array1=beastMClist.toArray(new BeastMCMC[N_int]);
                 BeastMCMC appbmcmc = new BeastMCMC();
-                BeastMCMC[] appbmcmcList = new BeastMCMC[N_int];
+                //BeastMCMC[] appbmcmcList = new BeastMCMC[N_int];
 
                 appbmcmc.SetDlg(dlg);
                 appbmcmc.parseArgs(args);
@@ -838,7 +877,15 @@ public class BeastMCMC {
                     return bmc;
                	});
                 
-               	
+                // get the position of the tree in the state array
+                int treepositionInStateArray=getTreePosition((MCMC)beastMClist[0].m_runnable); // position of the tree in the state vector
+
+	            if(treepositionInStateArray<0)
+	            {
+	            	System.err.println("Unable to find Tree class in statenode");
+	                System.exit(0);
+	            }
+                
                	// we have sampled from the prior in the previous for cycle
                	
                	// in the following initialize the weights to 1/N
@@ -881,7 +928,7 @@ public class BeastMCMC {
 	                       	// set the exponent to all, at this stage
 	                       	Arrays.parallelSetAll(beastMClist, e->{
 	        					//BeastMCMC bmc=beastMClist[e];
-	                       		BeastMCMC bmcc=beastMClist[e];
+	                       		Sequential bmcc=beastMClist[e];
 		                   	    // here update the weights
 		                   	    MCMC mc=(MCMC)bmcc.m_runnable;
 		
@@ -982,7 +1029,30 @@ public class BeastMCMC {
             }// outer parentheses 
             int ellade;
             ellade=4;
+            
+            // save the tree particles
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            PrintStream out = new PrintStream(baos);
+            
+            // init the logger with a header
+        	MCMC mcc=(MCMC)beastMClist[0].m_runnable;
+        	mcc.getState().stateNode[treepositionInStateArray].init(out);            
+            out.println();
+        	// log all the particles
+            for(int i=0; i<N_int;i++)
+        	{
+             	MCMC mc=(MCMC)beastMClist[i].m_runnable;
+            	mc.getState().stateNode[treepositionInStateArray].log(i, out);
+            	out.println();
+            	System.out.println(mc.getState().stateNode[treepositionInStateArray].toString());
+        	}
+            
+            out.close();
 
+            try(OutputStream outputStream = new FileOutputStream("LeoFirstTree.txt")) {
+                baos.writeTo(outputStream);
+            }
+            
 //        } catch (XMLParserException e) {
 //            System.out.println(e.getMessage());
 //            //e.printStackTrace();

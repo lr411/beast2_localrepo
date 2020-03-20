@@ -40,6 +40,7 @@ import beast.core.State;
 import beast.core.StateNode;
 import beast.core.util.CompoundDistribution;
 import beast.core.util.Log;
+import beast.evolution.tree.Tree;
 import beast.util.*;
 import jam.util.IconUtils;
 import org.json.JSONException;
@@ -84,7 +85,7 @@ public class BeastMCMC {
     final public static String DEVELOPERS = "Beast 2 development team";
     final public static String COPYRIGHT = "Beast 2 development team 2011";
     public static final long NR_OF_PARTICLES = 3;
-    public static final int NR_OF_MCMC_MOVES = 100;
+    public static final int NR_OF_MCMC_MOVES = 5;
     public BEASTInterface m_treeobj=null;
     public double m_initPopSize;
     public double m_gammaShapeLog;
@@ -795,6 +796,52 @@ public class BeastMCMC {
 		return treeposition;    	
     }
     
+/*    
+ * deep copies two states from two Sequential (or BeastMCMC elements)
+ * it is assumed that both elements are not null
+*/    
+    public static void copyState(StateNode[] source, Sequential sink)
+    {    	
+    	// int statenodeslength = source.m_mcmc.getState().stateNode.length;
+    	//StateNode[] sourceStatenode=source.m_mcmc.getState().stateNode;
+    	StateNode[] sourceStatenode=source;
+    	StateNode[] sinkStatenode=sink.m_mcmc.getState().stateNode;
+ 
+        Arrays.parallelSetAll(sinkStatenode, e ->
+	       	{ 
+	       		sinkStatenode[e].assignFromFragile(sourceStatenode[e]);
+	       		return sinkStatenode[e];
+	       	}
+       	);
+    }
+    
+    public static void copyState(Sequential source, Sequential sink)
+    {    	
+    	// int statenodeslength = source.m_mcmc.getState().stateNode.length;
+    	StateNode[] sourceStatenode=source.m_mcmc.getState().stateNode;
+    	//StateNode[] sourceStatenode=source;
+    	StateNode[] sinkStatenode=sink.m_mcmc.getState().stateNode;
+ 
+        Arrays.parallelSetAll(sinkStatenode, e ->
+	       	{ 
+	       		if(e==0)
+	       		{
+	       			int ellade;
+	       			ellade=3;
+	       		}
+	       		sinkStatenode[e].assignFromFragile(sourceStatenode[e]);
+	       		return sinkStatenode[e];
+	       	}
+       	);
+    }
+
+    public static int getStateSpaceDimension(Sequential source)
+    {
+    	int statenodeslength = source.m_mcmc.getState().stateNode.length;
+    	return statenodeslength;
+
+    }
+    
     public static void main(String[] args) {
         try {
             System.setProperty("beast.debug", "true");
@@ -874,7 +921,11 @@ public class BeastMCMC {
 	                mc.SetDistributionsFromInput();
 	                // initialise the state of the posterior
 	                mc.initStateAndPosterior();
-                    return bmc;
+	                
+	                // this is to avoid repeated casting afterwards
+                    bmc.m_mcmc=(MCMC) bmc.m_runnable;
+	                
+	                return bmc;
                	});
                 
                 // get the position of the tree in the state array
@@ -886,6 +937,10 @@ public class BeastMCMC {
 	                System.exit(0);
 	            }
                 
+	        	int stateSpaceDimension = getStateSpaceDimension(beastMClist[0]);
+                // the following holds a copy of the current state space, used before the changes of the resampling
+                StateNode[][] stateSpaceCopy = new StateNode[N_int][stateSpaceDimension];
+
                	// we have sampled from the prior in the previous for cycle
                	
                	// in the following initialize the weights to 1/N
@@ -979,31 +1034,61 @@ public class BeastMCMC {
     				
                     List<Integer> stratifiedList=stratified_resample((double [])logWeightsNormalized);
                     
+                    // make a copy of the current state space
+/*                    
+ * Arrays.parallelSetAll(beastMClist, e->{
+                   		for(int cnt=0;cnt<stateSpaceDimension;cnt++)
+                   		{
+                   			stateSpaceCopy[e][cnt].assignFrom(beastMClist[e].m_mcmc.getState().stateNode[cnt]);
+                   		}
+                   		return beastMClist[e];
+                   	});
+*/                    
                    	if(exponentCnt<maxvalcnt-1) // in the last step no resample
                    	{
-	                    int localIndex;
-	
-	                	// process the resample: set particles according to the stratified list of particles who made it
-	                    for(int i=N_int-1;i>=0;i--)
-	                	{
-	                    	localIndex = stratifiedList.get(i);
-	
-	                    	if(localIndex!=i)
-	                    	{// only if the former position is different from the current
-	                		    // clone method does not work
-	                    		// beastMClist.set(i, (BeastMCMC) beastMClist.get(stratifiedList.get(i)).clone());
-	                    		// beastMClist.set(i, Arrays.copyOfRange(beastMClist_array, localIndex, localIndex+1)[0]);
-	
-	                    		///mc.close();
-	                    		//System.gc();
-	                    		//beastMClist[i] = Arrays.copyOfRange(beastMClist, localIndex, localIndex+1)[0];
-	                    		
-	                    	}
-	                	}
+	                    if(true)
+	                    {
+	                   		int localIndex;
+		
+		                	// process the resample: set particles according to the stratified list of particles who made it
+		                    for(int i=N_int-1;i>=0;i--)
+		                	{
+		                    	localIndex = stratifiedList.get(i);
+		
+		                    	if(localIndex!=i)
+		                    	{// only if the former position is different from the current
+		                		    // clone method does not work
+		                    		// beastMClist.set(i, (BeastMCMC) beastMClist.get(stratifiedList.get(i)).clone());
+		                    		// beastMClist.set(i, Arrays.copyOfRange(beastMClist_array, localIndex, localIndex+1)[0]);
+		
+		                    		///mc.close();
+		                    		//System.gc();
+		                    		//beastMClist[i] = Arrays.copyOfRange(beastMClist, localIndex, localIndex+1)[0];
+	                        		//copyState(stateSpaceCopy[localIndex], beastMClist[i]);
+		                    		copyState(beastMClist[localIndex], beastMClist[i]);
+		                    		
+		                    	}
+		                	}
+	                    }
+	                    else
+	                    {
+	                        Arrays.parallelSetAll(beastMClist, e ->
+	                       	{ // here probably better not to call the deepcopy method we created
+	                       		// because we need to sample from prior
+	                        	int localIndex = stratifiedList.get(e);
+	                        	if(localIndex!=e)
+	                        	{
+	                        		copyState(stateSpaceCopy[localIndex], beastMClist[e]);
+	                        	}
+	                        	
+	                            return beastMClist[e];
+	                       	});
+	                    }
 	                   	// in the following initialize the weights to 1/N
 	    				Arrays.parallelSetAll(logWeights, e->{return minuslogN;});
                    	}
-                                	
+                   	
+                   	
 				// here save the logs: one row per particle
             	
                	

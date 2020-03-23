@@ -84,7 +84,7 @@ public class BeastMCMC {
     final public static String VERSION = "2.0 Release candidate";
     final public static String DEVELOPERS = "Beast 2 development team";
     final public static String COPYRIGHT = "Beast 2 development team 2011";
-    public static final long NR_OF_PARTICLES = 3;
+    public static final long NR_OF_PARTICLES = 20;
     public static final int NR_OF_MCMC_MOVES = 5;
     public BEASTInterface m_treeobj=null;
     public double m_initPopSize;
@@ -693,8 +693,8 @@ public class BeastMCMC {
               List<Integer> resampleList = Arrays.asList(new Integer[N]);
               //ArrayList<Integer> resampleList = new ArrayList<Integer>(N); 
     	      // define and set the array of weights (exponential of log weights)
-    	      double weights[] = Arrays.copyOf(log_weights, P);
-    	      Arrays.parallelSetAll(weights, e->java.lang.Math.exp(weights[e]));
+    	      double weights[] = new double[P]; // Arrays.copyOf(log_weights, P);
+    	      Arrays.parallelSetAll(weights, e->java.lang.Math.exp(log_weights[e]));
     	      
     	      // create variables for cumulative sum
     	      double sumW=Arrays.stream(weights).sum();
@@ -733,11 +733,11 @@ public class BeastMCMC {
 
     public static double ESS(double[] normalized_log_weights)
     {
-    	double[] weightsSquared=Arrays.copyOf(normalized_log_weights, normalized_log_weights.length);
+    	double[] weightsSquared= new double[normalized_log_weights.length];//Arrays.copyOf(normalized_log_weights, normalized_log_weights.length);
     	// multiply by 2
     	Arrays.parallelSetAll(weightsSquared, e->2.0*normalized_log_weights[e]);
     	
-    	return -logSumOfExponentials(weightsSquared);
+    	return Math.exp(-logSumOfExponentials(weightsSquared));
     }
 
     // returns a deep copy of a particle, useful for smc
@@ -962,7 +962,7 @@ public class BeastMCMC {
                    	// set the exponent to all, at this stage
                    	Arrays.parallelSetAll(logWeights, e->{
     					//BeastMCMC bmc=beastMClist[e];
-    					MCMC mc=(MCMC)beastMClist[e].m_runnable;
+    					MCMC mc=beastMClist[e].m_mcmc;
     					// performance wise, we don't need the log1 and log 2 we could substitute the full expressions to log1 and 2
     					double log1=mc.calculateLogPSimulatedAnnhealing(nextExponent_final);
     					double log2=mc.calculateLogPSimulatedAnnhealing(previousExponent_final);

@@ -969,12 +969,10 @@ public class BeastMCMC {
 //                    	// ?? is it ok to set the exponent here????
     					return logWeights[e]+(log1-log2);
     					});
-                   	
-                   	// if we can parallelize the step below then eliminate these vars
-                   	double log1, log2;
-                   	BeastMCMC bmc;
 
-    				if(true)
+                   	
+                   	// below the mcmc step
+                   	if(true)
     				{
     					final double currentExponentLocal=currentExponent;
     					
@@ -1005,6 +1003,7 @@ public class BeastMCMC {
     				}
     				else
     				{
+                       	BeastMCMC bmc;
 	                   	if(exponentCnt<maxvalcnt-1) // in the last step no mcmc move
 	                   	{ // use Markov kernel to make the move, sequentially one for each
 		                   	for (int position=0; position<N_int;position++) { // BeastMCMC bmc : beastMClist ) {

@@ -84,7 +84,7 @@ public class BeastMCMC {
     final public static String VERSION = "2.0 Release candidate";
     final public static String DEVELOPERS = "Beast 2 development team";
     final public static String COPYRIGHT = "Beast 2 development team 2011";
-    public static final long NR_OF_PARTICLES = 3;
+    public static final long NR_OF_PARTICLES = 100;
     public static final int NR_OF_MCMC_MOVES = 5;
     public BEASTInterface m_treeobj=null;
     public double m_initPopSize;
@@ -779,13 +779,22 @@ IS_ESS = function(log_weights)
 
 */
    
-    public static double CESS(double[] normalized_log_weights)
+    public static double CESS(double[] incremental_log_weights, double[] normalized_log_weights)
     {
-    	double[] weightsSquared= new double[normalized_log_weights.length];//Arrays.copyOf(normalized_log_weights, normalized_log_weights.length);
-    	// multiply by 2
-    	Arrays.parallelSetAll(weightsSquared, e->2.0*normalized_log_weights[e]);
+    	int N= normalized_log_weights.length;
+    	// auxiliary vector used for calc
+    	double[] auxiliaryVect= new double[N];
     	
-    	return Math.exp(-logSumOfExponentials(weightsSquared));
+    	// do incremental_log_weights + normalized_log_weights
+    	Arrays.parallelSetAll(auxiliaryVect, e->incremental_log_weights[e]+normalized_log_weights[e]);
+    	// numerator in log is log(N) + 2*logsumexp(normalized_log_weights+incremental_log_weights)
+    	double logNumerator=java.lang.Math.log(N)+2*logSumOfExponentials(auxiliaryVect);
+    	
+    	// do 2*incremental_log_weights + normalized_log_weights
+    	Arrays.parallelSetAll(auxiliaryVect, e->(2*incremental_log_weights[e])+normalized_log_weights[e]);
+    	double logDenominator=logSumOfExponentials(auxiliaryVect);
+    	
+    	return Math.exp(logNumerator-logDenominator);
     }
 
     public static double ESS(double[] normalized_log_weights)
@@ -930,27 +939,31 @@ IS_ESS = function(log_weights)
 		Arrays.parallelSetAll(logNormalisedWeights, e->{return minuslogN;});
     }
     
-    // the output from this is the updated unnormalised weights, the input is the log of normalised weights from input_logNormalisedWeights
-    public static void reweightParticles(Sequential[] beastMClist, double[] output_logUpdatedUnnormalisedWeights, double[] input_logNormalisedWeights, final double previousExponent, final double nextExponent)
+    // the output is the updated incremental weights
+    public static void calculateIncrementalWeights(Sequential[] beastMClist, double[] output_logUnnormalisedIncrementalWeights, final double previousExponent, final double nextExponent)
     {
-       	Arrays.parallelSetAll(output_logUpdatedUnnormalisedWeights, e->{
+       	Arrays.parallelSetAll(output_logUnnormalisedIncrementalWeights, e->{
 			//BeastMCMC bmc=beastMClist[e];
 			MCMC mc=beastMClist[e].m_mcmc;
 			// performance wise, we don't need the log1 and log 2 we could substitute the full expressions to log1 and 2
 			double log1=mc.calculateLogPSimulatedAnnhealing(nextExponent);
 			double log2=mc.calculateLogPSimulatedAnnhealing(previousExponent);
 //        	// ?? is it ok to set the exponent here????
-			return input_logNormalisedWeights[e]+(log1-log2);
+			return (log1-log2);
 			});
     }
     
-    public static void normaliseWeights(double[] inputLogUnnormalisedWeights, double[] outputLogNormalizedWeights)
+    public static void normaliseWeights(double[] inputLogIncrementalWeights, double[] outputLogNormalizedWeights)
     {
-        // normalising below
-       	final double normalizingConstant=logSumOfExponentials(inputLogUnnormalisedWeights);
+        // multiply (i.e. add in log space) incremental part by the normalised weights to have updated unnormalised weights
+		// temporarily we have the outputLogNormalizedWeights containing the multiplication (i.e. log-sum)
+    	Arrays.parallelSetAll(outputLogNormalizedWeights, e->inputLogIncrementalWeights[e]+outputLogNormalizedWeights[e]);
+    	
+    	// normalising constant below
+       	final double normalizingConstant=logSumOfExponentials(outputLogNormalizedWeights);
        
         // we normalize the weights
-		Arrays.parallelSetAll(outputLogNormalizedWeights, e->inputLogUnnormalisedWeights[e]-normalizingConstant);
+		Arrays.parallelSetAll(outputLogNormalizedWeights, e->outputLogNormalizedWeights[e]-normalizingConstant);
     }
     
     public static void initParticlesAndSampleFromPrior(Sequential[] beastMClist, BeastDialog dlg, String[] args)
@@ -995,7 +1008,7 @@ IS_ESS = function(log_weights)
             final int maxvalcnt=100; // this is nr of steps minus 1
             
         	// variables for the weights in log space
-        	double logWeights[] = new double[N_int]; // vector of weights for the particles
+        	double logIncrementalWeights[] = new double[N_int]; // vector of weights for the particles
             double logWeightsNormalized[] = new double[N_int]; // vector of weights for the particles
             
             BeastDialog dlg=CreateAndShowDialog();
@@ -1026,7 +1039,7 @@ IS_ESS = function(log_weights)
             initNotmalisedWeights(logWeightsNormalized, minuslogN);
 			
         	currentExponent=0.0;            	
-        	double ESSval;
+        	double ESSval, CESSval;
         	for (exponentCnt=0; exponentCnt<maxvalcnt; exponentCnt++)
             {// starts from the prior and goes to target (reached when the exponent is equal to 1)
             	// smcStates[(int)i][(int)exponentCnt]=mc.getState();
@@ -1035,14 +1048,17 @@ IS_ESS = function(log_weights)
             	currentExponent=((double)exponentCnt+1)/((double)maxvalcnt);
             	// updates the weights with the ratio of future-current functions calculated at the current state
 				
-               	// reweight done below
-               	reweightParticles(beastMClist, logWeights, logWeightsNormalized, previousExponent, currentExponent);
+               	// reweight done below, calculation of the incremental part
+            	calculateIncrementalWeights(beastMClist, logIncrementalWeights, previousExponent, currentExponent);
                	
-                // normalising below, logWeightsNormalized is the output, logWeights the input
-               	normaliseWeights(logWeights, logWeightsNormalized);
+				// CESS to be calculated before renormalising
+            	CESSval=CESS(logIncrementalWeights, logWeightsNormalized);
+
+                // normalising below, logWeightsNormalized is the output, logIncrementalWeights the input
+               	normaliseWeights(logIncrementalWeights, logWeightsNormalized);
                 
 				ESSval=ESS(logWeightsNormalized);
-
+				
 				List<Integer> stratifiedList=stratified_resample((double [])logWeightsNormalized);
 
                	if(exponentCnt<maxvalcnt-1) // in the last step no resample

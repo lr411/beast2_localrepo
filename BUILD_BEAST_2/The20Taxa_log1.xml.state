@@ -1,0 +1,18 @@
+<itsabeastystatewerein version='2.0' sample='2'>
+<statenode id='Tree.t:SimTree'>(((((0:0.0025498181848508826,4:0.0025498181848508826)22:0.27613207757649927,(2:0.20391985187791212,(5:9.818311843605375E-4,12:9.818311843605375E-4)20:0.20293802069355157)21:0.07476204388343805)23:0.32495397446230867,((7:0.07185191496037166,(14:0.013696115913146848,15:0.013696115913146848)26:0.058155799047224815)27:0.24332489981204444,(9:0.11725683713112572,(16:0.08088670928146398,19:0.08088670928146398)24:0.036370127849661746)25:0.19791997764129038)28:0.28845905545124273)29:0.34933954131494815,((1:0.046643845729398246,(3:0.02359355351975622,18:0.02359355351975622)31:0.023050292209642026)32:0.09294069746122263,(6:0.0029463387282829484,11:0.0029463387282829484)30:0.13663820446233793)33:0.8133908683479861)34:0.9288236203493229,(8:0.8301500994454885,(10:0.05561464186067856,(13:0.0033820385439429636,17:0.0033820385439429636)35:0.0522326033167356)36:0.7745354575848099)37:1.0516489324424414)38:0.0</statenode>
+<statenode id='gammaShape.s:SimTree'>gammaShape.s:SimTree[1 1] (0.001,1000.0): 0.9501034727547175 </statenode>
+<statenode id='popSize.t:SimTree'>popSize.t:SimTree[1 1] (-Infinity,Infinity): 0.3 </statenode>
+</itsabeastystatewerein>
+<!--
+{"operators":[
+{"id":"gammaShapeScaler.s:SimTree","p":0.5,"accept":1,"reject":0,"acceptFC":0,"rejectFC":0,"rejectIv":0,"rejectOp":0},
+{"id":"CoalescentConstantTreeScaler.t:SimTree","p":0.5,"accept":0,"reject":0,"acceptFC":0,"rejectFC":0,"rejectIv":0,"rejectOp":0},
+{"id":"CoalescentConstantTreeRootScaler.t:SimTree","p":0.5,"accept":0,"reject":1,"acceptFC":0,"rejectFC":0,"rejectIv":0,"rejectOp":0},
+{"id":"CoalescentConstantUniformOperator.t:SimTree","p":"NaN","accept":0,"reject":0,"acceptFC":0,"rejectFC":0,"rejectIv":0,"rejectOp":0},
+{"id":"CoalescentConstantSubtreeSlide.t:SimTree","p":1,"accept":0,"reject":0,"acceptFC":0,"rejectFC":0,"rejectIv":0,"rejectOp":0},
+{"id":"CoalescentConstantNarrow.t:SimTree","p":"NaN","accept":0,"reject":1,"acceptFC":0,"rejectFC":0,"rejectIv":0,"rejectOp":0},
+{"id":"CoalescentConstantWide.t:SimTree","p":"NaN","accept":0,"reject":0,"acceptFC":0,"rejectFC":0,"rejectIv":0,"rejectOp":0},
+{"id":"CoalescentConstantWilsonBalding.t:SimTree","p":"NaN","accept":0,"reject":0,"acceptFC":0,"rejectFC":0,"rejectIv":0,"rejectOp":0},
+{"id":"PopSizeScaler.t:SimTree","p":0.75,"accept":0,"reject":0,"acceptFC":0,"rejectFC":0,"rejectIv":0,"rejectOp":0}
+]}
+-->

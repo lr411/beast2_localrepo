@@ -84,7 +84,7 @@ public class BeastMCMC {
     final public static String VERSION = "2.0 Release candidate";
     final public static String DEVELOPERS = "Beast 2 development team";
     final public static String COPYRIGHT = "Beast 2 development team 2011";
-    public static final long NR_OF_PARTICLES = 20;
+    public static final long NR_OF_PARTICLES = 3;
     public static final int NR_OF_MCMC_MOVES = 5;
     public BEASTInterface m_treeobj=null;
     public double m_initPopSize;
@@ -723,6 +723,71 @@ public class BeastMCMC {
       return resampleList;
 	}// end of stratified resample
 
+/*
+score <- function(current_log_weights,target_at_particles,IS_proposal_at_particles,current_temp,previous_temp,alpha)
+{
+  N = length(current_log_weights)
+  incremental_log_weights = (target_at_particles)*(current_temp-previous_temp)+(IS_proposal_at_particles)*(previous_temp-current_temp)
+  CESS(current_log_weights,incremental_log_weights)-alpha*N
+}
+
+bisection <- function(range,current_log_weights,target_at_particles,IS_proposal_at_particles,alpha)
+{
+  current_bisect_temp = range[1]
+  bisect_size = (range[2] - range[1])/2
+  direction = 1
+  
+  old_score = score(current_log_weights,target_at_particles,IS_proposal_at_particles,current_bisect_temp,current_bisect_temp,alpha)
+  
+  for (i in 1:100)
+  {
+    new_bisect_temp = current_bisect_temp + direction*bisect_size
+    bisect_size = bisect_size/2
+    the_score = score(current_log_weights,target_at_particles,IS_proposal_at_particles,new_bisect_temp,range[1],alpha)
+    direction = sign(the_score)
+    
+    current_bisect_temp = new_bisect_temp
+    
+    if (the_score==0)
+    {
+      break
+    }
+    
+  }
+  
+  current_bisect_temp
+}
+
+IS_ESS = function(log_weights)
+{
+  exp(-logsumexp(2*log_weights))
+}
+
+ incremental_log_weights = (target_at_particles)*(1-previous_temp)+(IS_proposal_at_particles)*(previous_temp-1)
+ log_weights = log_weights + incremental_log_weights
+ log_sum_weights = logsumexp(log_weights)
+ log_marginal_likelihood = log_marginal_likelihood + log_sum_weights
+ log_weights = log_weights - log_sum_weights # Normalise the weig
+
+    effective_number_of_particles = IS_ESS(log_weights)
+
+	CESS = function(current_log_weights,incremental_log_weights)
+			{
+			  N = length(current_log_weights)
+			  exp(log(N) + 2*logsumexp(current_log_weights+incremental_log_weights) - logsumexp(current_log_weights+2*incremental_log_weights))
+			}
+
+*/
+   
+    public static double CESS(double[] normalized_log_weights)
+    {
+    	double[] weightsSquared= new double[normalized_log_weights.length];//Arrays.copyOf(normalized_log_weights, normalized_log_weights.length);
+    	// multiply by 2
+    	Arrays.parallelSetAll(weightsSquared, e->2.0*normalized_log_weights[e]);
+    	
+    	return Math.exp(-logSumOfExponentials(weightsSquared));
+    }
+
     public static double ESS(double[] normalized_log_weights)
     {
     	double[] weightsSquared= new double[normalized_log_weights.length];//Arrays.copyOf(normalized_log_weights, normalized_log_weights.length);
@@ -865,6 +930,7 @@ public class BeastMCMC {
 		Arrays.parallelSetAll(logNormalisedWeights, e->{return minuslogN;});
     }
     
+    // the output from this is the updated unnormalised weights, the input is the log of normalised weights from input_logNormalisedWeights
     public static void reweightParticles(Sequential[] beastMClist, double[] output_logUpdatedUnnormalisedWeights, double[] input_logNormalisedWeights, final double previousExponent, final double nextExponent)
     {
        	Arrays.parallelSetAll(output_logUpdatedUnnormalisedWeights, e->{
@@ -972,12 +1038,12 @@ public class BeastMCMC {
                	// reweight done below
                	reweightParticles(beastMClist, logWeights, logWeightsNormalized, previousExponent, currentExponent);
                	
-                // normalising below
+                // normalising below, logWeightsNormalized is the output, logWeights the input
                	normaliseWeights(logWeights, logWeightsNormalized);
                 
-				ESSval=ESS(logWeightsNormalized);    				
+				ESSval=ESS(logWeightsNormalized);
 
-				List<Integer> stratifiedList=stratified_resample((double [])logWeightsNormalized);                    
+				List<Integer> stratifiedList=stratified_resample((double [])logWeightsNormalized);
 
                	if(exponentCnt<maxvalcnt-1) // in the last step no resample
                	{

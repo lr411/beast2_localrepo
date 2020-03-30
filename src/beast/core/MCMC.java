@@ -150,6 +150,9 @@ public class MCMC extends Runnable {
      * So, only after 3*NR_OF_DEBUG_SAMPLES samples checking is stopped.
      */
     final protected int NR_OF_DEBUG_SAMPLES = 2000;
+    
+    final boolean noOutputonscreen=true;
+
 
     /**
      * Interval for storing state to disk, if negative the state will not be stored periodically *
@@ -171,11 +174,11 @@ public class MCMC extends Runnable {
 
     @Override
     public void initAndValidate() {
-        Log.info.println("===============================================================================");
+/*        Log.info.println("===============================================================================");
         Log.info.println("Citations for this model:");
         Log.info.println(getCitations());
         Log.info.println("===============================================================================");
-
+*/
         operatorSchedule = operatorScheduleInput.get();
         {
         	int pro;
@@ -444,7 +447,8 @@ public class MCMC extends Runnable {
         // Leo: called already in the initialization
     	// state.initAndValidate();
         // also, initialise state with the file name to store and set-up whether to resume from file
-        state.setStateFileName(stateFileName);
+    	
+    	state.setStateFileName(stateFileName);
         operatorSchedule.setStateFileName(stateFileName);
 
         burnIn = burnInInput.get();
@@ -500,7 +504,8 @@ public class MCMC extends Runnable {
 //        System.err.println("Start state:");
 //        System.err.println(state.toString());
 
-        Log.info.println("Start likelihood: " + oldLogLikelihood + " " + (initialisationAttempts > 1 ? "after " + initialisationAttempts + " initialisation attempts" : ""));
+        if(noOutputonscreen!=true)
+           Log.info.println("Start likelihood: " + oldLogLikelihood + " " + (initialisationAttempts > 1 ? "after " + initialisationAttempts + " initialisation attempts" : ""));
         if (Double.isInfinite(oldLogLikelihood) || Double.isNaN(oldLogLikelihood)) {
             reportLogLikelihoods(posterior, "");
             throw new RuntimeException("Could not find a proper state to initialise. Perhaps try another seed.\nSee http://www.beast2.org/2018/07/04/fatal-errors.html for other possible solutions.");
@@ -562,15 +567,18 @@ public class MCMC extends Runnable {
         // .stateNode[2].  .values[0]=3;
 
         
-        Log.info.println();
-        operatorSchedule.showOperatorRates(System.out);
-
-        Log.info.println();
-        final long endTime = System.currentTimeMillis();
-        Log.info.println("Total calculation time: " + (endTime - startTime) / 1000.0 + " seconds");
+        if(noOutputonscreen!=true)
+        {
+	        Log.info.println();
+	        operatorSchedule.showOperatorRates(System.out);
+	
+	        Log.info.println();
+	        final long endTime = System.currentTimeMillis();
+	        Log.info.println("Total calculation time: " + (endTime - startTime) / 1000.0 + " seconds");
+	        Log.warning.println("End likelihood: " + oldLogLikelihood);
+        }
         close();
 
-        Log.warning.println("End likelihood: " + oldLogLikelihood);
 //        System.err.println(state);
         if(blockLogging==false)
         state.storeToFile(chainLength);

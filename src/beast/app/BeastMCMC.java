@@ -1035,11 +1035,27 @@ IS_ESS = function(log_weights)
                 System.exit(0);
             }
             
+            // save the ESS
+            ByteArrayOutputStream ess = new ByteArrayOutputStream();
+            PrintStream outEss = new PrintStream(ess);
+
+            // save the CESS
+            ByteArrayOutputStream cess = new ByteArrayOutputStream();
+            PrintStream outCEss = new PrintStream(cess);
+
+            // save the normalised weights
+            ByteArrayOutputStream weightsStream = new ByteArrayOutputStream();
+            PrintStream outWeights = new PrintStream(weightsStream);
+            
            	// in the following initialize the weights to 1/N
             initNotmalisedWeights(logWeightsNormalized, minuslogN);
 			
         	currentExponent=0.0;            	
         	double ESSval, CESSval;
+        	
+        	// string used within the files as row counter
+        	String rowCounterString;
+        	final String divider=",";
         	for (exponentCnt=0; exponentCnt<maxvalcnt; exponentCnt++)
             {// starts from the prior and goes to target (reached when the exponent is equal to 1)
             	// smcStates[(int)i][(int)exponentCnt]=mc.getState();
@@ -1048,16 +1064,23 @@ IS_ESS = function(log_weights)
             	currentExponent=((double)exponentCnt+1)/((double)maxvalcnt);
             	// updates the weights with the ratio of future-current functions calculated at the current state
 				
+            	rowCounterString=exponentCnt + divider + currentExponent + divider;
+            	
                	// reweight done below, calculation of the incremental part
             	calculateIncrementalWeights(beastMClist, logIncrementalWeights, previousExponent, currentExponent);
                	
 				// CESS to be calculated before renormalising
             	CESSval=CESS(logIncrementalWeights, logWeightsNormalized);
+				outCEss.println(rowCounterString + CESSval);
 
                 // normalising below, logWeightsNormalized is the output, logIncrementalWeights the input
                	normaliseWeights(logIncrementalWeights, logWeightsNormalized);
-                
-				ESSval=ESS(logWeightsNormalized);
+                String strng=Arrays.toString(logIncrementalWeights);
+               	outWeights.println(exponentCnt + divider + strng);
+               	
+               	ESSval=ESS(logWeightsNormalized);
+				
+				outEss.println(rowCounterString + ESSval);
 				
 				List<Integer> stratifiedList=stratified_resample((double [])logWeightsNormalized);
 
@@ -1073,7 +1096,17 @@ IS_ESS = function(log_weights)
                	}
             }// outer parentheses 
             
-
+        	// save ESS, CESS, and normalised weights array
+            try(OutputStream outputStream = new FileOutputStream("ESS.txt")) {
+            	ess.writeTo(outputStream);
+            }
+            try(OutputStream outputStream = new FileOutputStream("CESS.txt")) {
+                cess.writeTo(outputStream);
+            }
+            try(OutputStream outputStream = new FileOutputStream("NormalisedWeights.txt")) {
+            	weightsStream.writeTo(outputStream);
+            }
+        	
             // save the tree particles
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             PrintStream out = new PrintStream(baos);
@@ -1088,12 +1121,12 @@ IS_ESS = function(log_weights)
              	MCMC mc=(MCMC)beastMClist[i].m_runnable;
             	mc.getState().stateNode[treepositionInStateArray].log(i, out);
             	out.println();
-            	System.out.println(mc.getState().stateNode[treepositionInStateArray].toString());
+            	//System.out.println(mc.getState().stateNode[treepositionInStateArray].toString());
         	}
             
             out.close();
 
-            try(OutputStream outputStream = new FileOutputStream("LeoFirstTree.txt")) {
+            try(OutputStream outputStream = new FileOutputStream("Tree.trees")) {
                 baos.writeTo(outputStream);
             }
             

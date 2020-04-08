@@ -321,6 +321,7 @@ public class MCMC extends Runnable {
     protected double newLogLikelihood_simAnnhealing;
     protected int burnIn;
     protected long chainLength;
+    protected long nrOfRejections;
     protected Distribution posterior;
     protected double beta=1.0; // exponent for the simulated annhealing
 
@@ -452,6 +453,7 @@ public class MCMC extends Runnable {
         operatorSchedule.setStateFileName(stateFileName);
 
         burnIn = burnInInput.get();
+        chainLengthInput.set((long)BeastMCMC.NR_OF_MCMC_MOVES);
         chainLength = chainLengthInput.get(); //210
         int initialisationAttempts = 0;
         state.setEverythingDirty(true);
@@ -707,9 +709,20 @@ public class MCMC extends Runnable {
     	return copied;
     }
 
+    // at the moment this is not used, the number of moves is done inside the run() method
+    public void setNumberOfMCMCmoves(long nrOfMoves)
+    {
+    	chainLengthInput.set(nrOfMoves);
+    }
+    
     public void setState(State newState)
     {
     	state=newState;
+    }
+    
+    public long getNrOfMCMCrejections()
+    {
+    	return nrOfRejections;
     }
     
     /**
@@ -723,6 +736,7 @@ public class MCMC extends Runnable {
         if (burnIn > 0) {
         	Log.warning.println("Please wait while BEAST takes " + burnIn + " pre-burnin samples");
         }
+        nrOfRejections=0;
         for (long sampleNr = -burnIn; sampleNr <= chainLength; sampleNr++) {
             final Operator operator = propagateState(sampleNr);
 
@@ -895,6 +909,7 @@ public class MCMC extends Runnable {
                 if (printDebugInfo) System.err.print(" accept");
             } else {
                 // reject
+            	nrOfRejections++;
                 if (sampleNr >= 0) {
                     operator.reject(newLogLikelihood == Double.NEGATIVE_INFINITY ? -1 : 0);
                 }

@@ -54,6 +54,7 @@ import java.awt.*;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -73,8 +74,13 @@ import java.nio.file.Files;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 import static java.nio.file.StandardOpenOption.*;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * Main application for performing MCMC runs.
@@ -84,7 +90,11 @@ public class BeastMCMC {
     final public static String VERSION = "2.0 Release candidate";
     final public static String DEVELOPERS = "Beast 2 development team";
     final public static String COPYRIGHT = "Beast 2 development team 2011";
-    public static final long NR_OF_PARTICLES = 100;
+    // number of particles for the SMC
+    public static final long NR_OF_PARTICLES = 200;
+    // path to save the logs
+    final static String logsPath="/Users/lr411/Leo/Github/Genomics/logs_BEAST2/";
+    // nr of MCMC moves
     public static final int NR_OF_MCMC_MOVES = 5;
     public BEASTInterface m_treeobj=null;
     public double m_initPopSize;
@@ -909,13 +919,13 @@ IS_ESS = function(log_weights)
 	// does the mcmc move and also set the exponent for the following annealing
 	// [Leo: consider to split these two moves in the future for better readability of the code
 	// at the moment we keep them together for efficiency]
-    public static void doMCMC_andSetExponentForAnnealing(Sequential[] beastMClist, final double currentExponent)
+    public static void doMCMC_andSetExponentForAnnealing(Sequential[] beastMClist, final double currentExponent, long[] nrOfMCMCrejections)
     {
        	Arrays.parallelSetAll(beastMClist, e->{
 			//BeastMCMC bmc=beastMClist[e];
        		Sequential bmcc=beastMClist[e];
        	    // here update the weights
-       	    MCMC mc=(MCMC)bmcc.m_runnable;
+       	    MCMC mc=bmcc.m_mcmc;
 
        	    // the mcmc run is done with the previous exponent
         	try {
@@ -925,6 +935,8 @@ IS_ESS = function(log_weights)
 				e1.printStackTrace();
 			}
 
+        	// here get the nr of rejections
+        	nrOfMCMCrejections[e]=mc.getNrOfMCMCrejections();
         	// setting the exponent sets the target distribution
         	mc.setSimulatedAnnhealingExponent(currentExponent);
        		
@@ -992,6 +1004,94 @@ IS_ESS = function(log_weights)
        	});
     }
     
+    public static String getDateString()
+    {
+		Date date = Calendar.getInstance().getTime();  
+	    DateFormat dateFormat = new SimpleDateFormat("yyyymmdd_hhmmss");  
+	    String strDate = dateFormat.format(date);
+	    return strDate;
+    }
+    
+    public static String formatAppendString(int N_int, long executionTime)
+    {
+	    String appendString="_"+getDateString()+"_P"+N_int+"_E"+executionTime;
+	    
+	    return appendString;
+    }
+    
+    public static long getExecutionLength(long timeInNanoseconds)
+    {
+    	//final divider=60000000000;//1000000000*60;// 10^6 is milliseconds, 10^9 seconds, 60*10^9 minutes
+    	// ms
+    	long executionTime=timeInNanoseconds/1000000;
+    	// s
+    	executionTime=executionTime/1000; 
+    	// m
+    	//executionTime=executionTime/60; 
+
+    	return executionTime;
+    }
+    
+    public static String createAppendString(String filename,String appendString ,String fileExt)
+    {
+    	String outString=logsPath+filename+appendString+"."+fileExt;
+    	return outString;
+    }
+    
+    public static String createTxtAppendString(String filename,String appendString )
+    {
+    	return createAppendString(filename, appendString ,"txt");
+    }
+    
+    public static String createTreesAppendString(String filename,String appendString )
+    {
+    	return createAppendString(filename, appendString ,"trees");
+    }
+    
+    public static void saveLogs(String appendString, ByteArrayOutputStream ess, ByteArrayOutputStream cess, ByteArrayOutputStream weightsStream) throws IOException
+    {	    
+    	// save ESS, CESS, and normalised weights array
+    	{
+	    	  OutputStream outputStream = new FileOutputStream(createTxtAppendString("ESS",appendString));
+		    	ess.writeTo(outputStream);
+    	}
+
+    	{
+	    	OutputStream outputStream = new FileOutputStream(createTxtAppendString("CESS",appendString));
+			    	cess.writeTo(outputStream);
+    	}
+
+    	{
+		    OutputStream outputStream = new FileOutputStream(createTxtAppendString("NormalisedWeights",appendString));
+		    	weightsStream.writeTo(outputStream);
+    	}
+    }
+    
+    public static void saveTreeParticles(Sequential[] beastMClist, String appendString, int treepositionInStateArray, int N_int) throws IOException
+    {
+	    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+	    PrintStream out = new PrintStream(baos);
+	    
+	    // init the logger with a header
+		MCMC mcc=(MCMC)beastMClist[0].m_runnable;
+		mcc.getState().stateNode[treepositionInStateArray].init(out);            
+	    out.println();
+		// log all the particles
+	    for(int i=0; i<N_int;i++)
+		{
+	     	MCMC mc=(MCMC)beastMClist[i].m_runnable;
+	    	mc.getState().stateNode[treepositionInStateArray].log(i, out);
+	    	out.println();
+	    	//System.out.println(mc.getState().stateNode[treepositionInStateArray].toString());
+		}
+	    
+	    out.close();
+	    
+	    OutputStream outputStream = new FileOutputStream(createTxtAppendString("Tree",appendString));
+	        baos.writeTo(outputStream);
+	        
+    }
+    
     public static void main(String[] args) {
         
     	try {
@@ -1056,6 +1156,8 @@ IS_ESS = function(log_weights)
         	// string used within the files as row counter
         	String rowCounterString;
         	final String divider=",";
+        	long startTime=System.nanoTime();
+        	long[] nrOfMCMCrejections=new long[N_int];
         	for (exponentCnt=0; exponentCnt<maxvalcnt; exponentCnt++)
             {// starts from the prior and goes to target (reached when the exponent is equal to 1)
             	// smcStates[(int)i][(int)exponentCnt]=mc.getState();
@@ -1076,7 +1178,7 @@ IS_ESS = function(log_weights)
                 // normalising below, logWeightsNormalized is the output, logIncrementalWeights the input
                	normaliseWeights(logIncrementalWeights, logWeightsNormalized);
                 String strng=Arrays.toString(logIncrementalWeights);
-               	outWeights.println(exponentCnt + divider + strng);
+               	outWeights.println(strng);
                	
                	ESSval=ESS(logWeightsNormalized);
 				
@@ -1092,43 +1194,22 @@ IS_ESS = function(log_weights)
                     initNotmalisedWeights(logWeightsNormalized, minuslogN);
     				
                     // do the mcmc moves on the particles and set the exponent for annealing
-                    doMCMC_andSetExponentForAnnealing(beastMClist, currentExponent);
+                    doMCMC_andSetExponentForAnnealing(beastMClist, currentExponent, nrOfMCMCrejections);
                	}
             }// outer parentheses 
-            
-        	// save ESS, CESS, and normalised weights array
-            try(OutputStream outputStream = new FileOutputStream("ESS.txt")) {
-            	ess.writeTo(outputStream);
-            }
-            try(OutputStream outputStream = new FileOutputStream("CESS.txt")) {
-                cess.writeTo(outputStream);
-            }
-            try(OutputStream outputStream = new FileOutputStream("NormalisedWeights.txt")) {
-            	weightsStream.writeTo(outputStream);
-            }
         	
-            // save the tree particles
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            PrintStream out = new PrintStream(baos);
-            
-            // init the logger with a header
-        	MCMC mcc=(MCMC)beastMClist[0].m_runnable;
-        	mcc.getState().stateNode[treepositionInStateArray].init(out);            
-            out.println();
-        	// log all the particles
-            for(int i=0; i<N_int;i++)
-        	{
-             	MCMC mc=(MCMC)beastMClist[i].m_runnable;
-            	mc.getState().stateNode[treepositionInStateArray].log(i, out);
-            	out.println();
-            	//System.out.println(mc.getState().stateNode[treepositionInStateArray].toString());
-        	}
-            
-            out.close();
+        	// how much time did it take
+        	long elapsedTimeNano=System.nanoTime()-startTime;
+        	long elapsedTime=getExecutionLength(elapsedTimeNano);
+        	
+        	// put information 
+            String informativeAppendString=formatAppendString(N_int, elapsedTime);
 
-            try(OutputStream outputStream = new FileOutputStream("Tree.trees")) {
-                baos.writeTo(outputStream);
-            }
+            // save the logs with parameters
+            saveLogs(informativeAppendString, ess, cess, weightsStream);
+            
+            // save the tree particles
+            saveTreeParticles(beastMClist, informativeAppendString, treepositionInStateArray, N_int);
             
         } catch (Exception e) {
             e.printStackTrace();

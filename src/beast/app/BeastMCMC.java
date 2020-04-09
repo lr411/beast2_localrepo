@@ -91,7 +91,7 @@ public class BeastMCMC {
     final public static String DEVELOPERS = "Beast 2 development team";
     final public static String COPYRIGHT = "Beast 2 development team 2011";
     // number of particles for the SMC
-    public static final long NR_OF_PARTICLES = 500;
+    public static final long NR_OF_PARTICLES = 250;
     // path to save the logs
     final static String logsPath="/Users/lr411/Leo/Github/Genomics/logs_BEAST2/";
     // nr of MCMC moves
@@ -1121,7 +1121,7 @@ IS_ESS = function(log_weights)
             final double minuslogN=-java.lang.Math.log(N); // log(1/N) using log properties
 
             // variable for the annealing, how many steps to arrive from 0 to 1 (for ex. if 100 then steps are 0.01, 0.02...)
-            final int maxvalcnt=100; // this is nr of steps minus 1
+            final int maxvalcnt=5000; // this is nr of steps minus 1
             
         	// variables for the weights in log space
         	double logIncrementalWeights[] = new double[N_int]; // vector of weights for the particles
@@ -1184,6 +1184,10 @@ IS_ESS = function(log_weights)
             for (exponentCnt=0; exponentCnt<maxvalcnt; exponentCnt++)
             {// starts from the prior and goes to target (reached when the exponent is equal to 1)
             	// smcStates[(int)i][(int)exponentCnt]=mc.getState();
+            	if(exponentCnt>=(maxvalcnt/100))
+            		break;
+            		
+            		
             	previousExponent=currentExponent;                	
             	
             	currentExponent=((double)exponentCnt+1)/((double)maxvalcnt);
@@ -1215,8 +1219,12 @@ IS_ESS = function(log_weights)
                		// update the particles list according to the list output from the resample process
                		updateParticlesList(stratifiedList, beastMClist);
                    	// in the following initialize the weights to 1/N
-                    initNotmalisedWeights(logWeightsNormalized, minuslogN);
-    				
+                    initNotmalisedWeights(logWeightsNormalized, minuslogN);    				
+               	}
+
+               	// only do MCMC move if we are not in the last step
+               	if(exponentCnt<maxvalcnt-1) 
+               	{
                     // do the mcmc moves on the particles and set the exponent for annealing
                     doMCMC_andSetExponentForAnnealing(beastMClist, currentExponent, nrOfMCMCrejections);
                     auxDoubleVar=Arrays.stream(nrOfMCMCrejections).average().getAsDouble();

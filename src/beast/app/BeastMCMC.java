@@ -91,7 +91,7 @@ public class BeastMCMC {
     final public static String DEVELOPERS = "Beast 2 development team";
     final public static String COPYRIGHT = "Beast 2 development team 2011";
     // number of particles for the SMC
-    public static final long NR_OF_PARTICLES = 200;
+    public static final long NR_OF_PARTICLES = 100;
     // path to save the logs
     final static String logsPath="/Users/lr411/Leo/Github/Genomics/logs_BEAST2/";
     // nr of MCMC moves
@@ -1067,6 +1067,22 @@ IS_ESS = function(log_weights)
     	}
     }
     
+    public static void saveParameter(String appendString, double[] avgRejection, String paramName) throws IOException
+    {
+	    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+	    PrintStream out = new PrintStream(baos);
+	    
+	    for(int i=0; i<avgRejection.length;i++)
+		{
+	    	out.println(avgRejection[i]);
+		}
+	    
+	    out.close();
+	    
+	    OutputStream outputStream = new FileOutputStream(createTxtAppendString(paramName,appendString));
+	        baos.writeTo(outputStream);
+    }
+    
     public static void saveTreeParticles(Sequential[] beastMClist, String appendString, int treepositionInStateArray, int N_int) throws IOException
     {
 	    ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -1158,7 +1174,14 @@ IS_ESS = function(log_weights)
         	final String divider=",";
         	long startTime=System.nanoTime();
         	long[] nrOfMCMCrejections=new long[N_int];
-        	for (exponentCnt=0; exponentCnt<maxvalcnt; exponentCnt++)
+        	double[] avgRejection=new double[maxvalcnt];
+        	
+        	// init all the avgRejection elements to "not done"
+        	final long MCMC_NotDone=-1;
+            Arrays.parallelSetAll(avgRejection, e->MCMC_NotDone);
+        	double auxDoubleVar;
+            
+            for (exponentCnt=0; exponentCnt<maxvalcnt; exponentCnt++)
             {// starts from the prior and goes to target (reached when the exponent is equal to 1)
             	// smcStates[(int)i][(int)exponentCnt]=mc.getState();
             	previousExponent=currentExponent;                	
@@ -1184,10 +1207,11 @@ IS_ESS = function(log_weights)
 				
 				outEss.println(rowCounterString + ESSval);
 				
-				List<Integer> stratifiedList=stratified_resample((double [])logWeightsNormalized);
-
-               	if(exponentCnt<maxvalcnt-1) // in the last step no resample
+				// only resample if ESS<half particles and if we are not in the last step
+               	if(ESSval<(N_int/2.0) && exponentCnt<maxvalcnt-1) 
                	{
+    				List<Integer> stratifiedList=stratified_resample((double [])logWeightsNormalized);
+
                		// update the particles list according to the list output from the resample process
                		updateParticlesList(stratifiedList, beastMClist);
                    	// in the following initialize the weights to 1/N
@@ -1195,6 +1219,8 @@ IS_ESS = function(log_weights)
     				
                     // do the mcmc moves on the particles and set the exponent for annealing
                     doMCMC_andSetExponentForAnnealing(beastMClist, currentExponent, nrOfMCMCrejections);
+                    auxDoubleVar=Arrays.stream(nrOfMCMCrejections).average().getAsDouble();
+                    avgRejection[(int) exponentCnt]=auxDoubleVar;
                	}
             }// outer parentheses 
         	
@@ -1207,6 +1233,9 @@ IS_ESS = function(log_weights)
 
             // save the logs with parameters
             saveLogs(informativeAppendString, ess, cess, weightsStream);
+            
+            // save average rejections
+            saveParameter(informativeAppendString, avgRejection, "AvgRejection");
             
             // save the tree particles
             saveTreeParticles(beastMClist, informativeAppendString, treepositionInStateArray, N_int);

@@ -91,7 +91,7 @@ public class BeastMCMC {
     final public static String DEVELOPERS = "Beast 2 development team";
     final public static String COPYRIGHT = "Beast 2 development team 2011";
     // number of particles for the SMC
-    public static final long NR_OF_PARTICLES = 100;
+    public static final long NR_OF_PARTICLES = 500;
     // path to save the logs
     final static String logsPath="/Users/lr411/Leo/Github/Genomics/logs_BEAST2/";
     // nr of MCMC moves
@@ -1012,9 +1012,9 @@ IS_ESS = function(log_weights)
 	    return strDate;
     }
     
-    public static String formatAppendString(int N_int, long executionTime)
+    public static String formatAppendString(int N_int, long executionTime, int nrOfSteps)
     {
-	    String appendString="_"+getDateString()+"_P"+N_int+"_E"+executionTime;
+	    String appendString="_"+getDateString()+"_P"+N_int+"_E"+executionTime+"_S"+nrOfSteps;
 	    
 	    return appendString;
     }
@@ -1103,7 +1103,7 @@ IS_ESS = function(log_weights)
 	    
 	    out.close();
 	    
-	    OutputStream outputStream = new FileOutputStream(createTxtAppendString("Tree",appendString));
+	    OutputStream outputStream = new FileOutputStream(createTreesAppendString("Tree",appendString));
 	        baos.writeTo(outputStream);
 	        
     }
@@ -1229,7 +1229,7 @@ IS_ESS = function(log_weights)
         	long elapsedTime=getExecutionLength(elapsedTimeNano);
         	
         	// put information 
-            String informativeAppendString=formatAppendString(N_int, elapsedTime);
+            String informativeAppendString=formatAppendString(N_int, elapsedTime, maxvalcnt);
 
             // save the logs with parameters
             saveLogs(informativeAppendString, ess, cess, weightsStream);

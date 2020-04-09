@@ -1121,7 +1121,7 @@ IS_ESS = function(log_weights)
             final double minuslogN=-java.lang.Math.log(N); // log(1/N) using log properties
 
             // variable for the annealing, how many steps to arrive from 0 to 1 (for ex. if 100 then steps are 0.01, 0.02...)
-            final int maxvalcnt=5000; // this is nr of steps minus 1
+            final int maxvalcnt=100; // this is nr of steps minus 1
             
         	// variables for the weights in log space
         	double logIncrementalWeights[] = new double[N_int]; // vector of weights for the particles
@@ -1184,8 +1184,8 @@ IS_ESS = function(log_weights)
             for (exponentCnt=0; exponentCnt<maxvalcnt; exponentCnt++)
             {// starts from the prior and goes to target (reached when the exponent is equal to 1)
             	// smcStates[(int)i][(int)exponentCnt]=mc.getState();
-            	if(exponentCnt>=(maxvalcnt/100))
-            		break;
+            	//if(exponentCnt>=(maxvalcnt/100))
+            	//	break;
             		
             		
             	previousExponent=currentExponent;                	

@@ -1108,6 +1108,35 @@ IS_ESS = function(log_weights)
 	        
     }
     
+    int lookForCESSexponent(double desiredPercentage, Sequential[] beastMClist, double [] input_logWeightsNormalized , double[] output_logUnnormalisedIncrementalWeights, final double input_previousExponent, final double stepSize, final int currentStep, final int maxSteps)
+    {
+    	// initialize to -1 meaning error
+    	int nextStep=-1;
+    	
+    	double currentExponent;
+    	// this variable will store the CESS value
+    	double cess;
+    	// make a local copy
+    	int localCurrentStep=currentStep;
+
+    	do
+       	{
+	    		currentExponent=stepSize*localCurrentStep; 
+	    	// reweight done below, calculation of the incremental part
+	    	 calculateIncrementalWeights(beastMClist, output_logUnnormalisedIncrementalWeights, input_previousExponent, currentExponent);
+			 // CESS to be calculated before renormalising
+	         cess=CESS(output_logUnnormalisedIncrementalWeights, input_logWeightsNormalized);
+	         // update localCurrentStep
+	         if(cess < desiredPercentage)
+	         {
+	        	 localCurrentStep=localCurrentStep+((maxSteps-localCurrentStep)/2);
+	         }
+       	}
+       	while (localCurrentStep<=maxSteps);
+    	
+    	return nextStep;
+    }
+    
     public static void main(String[] args) {
         
     	try {
@@ -1181,16 +1210,22 @@ IS_ESS = function(log_weights)
             Arrays.parallelSetAll(avgRejection, e->MCMC_NotDone);
         	double auxDoubleVar;
             
+        	final double stepSize=1/((double)maxvalcnt);
+        	exponentCnt=0;
+        	currentExponent=((double)exponentCnt+1)*stepSize;
+        	
             for (exponentCnt=0; exponentCnt<maxvalcnt; exponentCnt++)
             {// starts from the prior and goes to target (reached when the exponent is equal to 1)
             	// smcStates[(int)i][(int)exponentCnt]=mc.getState();
             	//if(exponentCnt>=(maxvalcnt/100))
             	//	break;
-            		
-            		
+            		            		
             	previousExponent=currentExponent;                	
             	
-            	currentExponent=((double)exponentCnt+1)/((double)maxvalcnt);
+// here look for cess exponent
+//     int lookForCESSexponent(double desiredPercentage, Sequential[] beastMClist, double [] input_logWeightsNormalized , double[] output_logUnnormalisedIncrementalWeights, final double input_previousExponent, final double stepSize, final int currentStep, final int maxSteps)
+
+            	currentExponent=currentExponent+stepSize;
             	// updates the weights with the ratio of future-current functions calculated at the current state
 				
             	rowCounterString=exponentCnt + divider + currentExponent + divider;

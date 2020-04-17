@@ -789,6 +789,14 @@ IS_ESS = function(log_weights)
 
 */
    
+    // the following are normalised and unnormalised versions of ESS calculations
+    public static double CESS_Normalised(double[] incremental_log_weights, double[] normalized_log_weights)
+    {
+    	int N= normalized_log_weights.length;
+    	
+    	return CESS(incremental_log_weights, normalized_log_weights)/N;
+    }
+
     public static double CESS(double[] incremental_log_weights, double[] normalized_log_weights)
     {
     	int N= normalized_log_weights.length;
@@ -807,6 +815,14 @@ IS_ESS = function(log_weights)
     	return Math.exp(logNumerator-logDenominator);
     }
 
+    // the following are normalised and unnormalised versions of ESS calculations
+    public static double ESS_Normalised(double[] normalized_log_weights)
+    {
+    	int N= normalized_log_weights.length;
+    	
+    	return ESS(normalized_log_weights)/N;
+    }
+    
     public static double ESS(double[] normalized_log_weights)
     {
     	int N= normalized_log_weights.length;
@@ -1110,39 +1126,6 @@ IS_ESS = function(log_weights)
 	        
     }
     
-    static int lookForCESSexponent(double desiredPercentage, Sequential[] beastMClist, double [] input_logWeightsNormalized , double[] output_logUnnormalisedIncrementalWeights, final double input_previousExponent, final double input_currentExponent, final double stepSize, final int currentStep, final int maxSteps)
-    {
-    	// initialize to -1 meaning error
-    	int nextStep=-1;
-    	double currentExponentLocal=input_currentExponent;
-    	int currentStepLocal=currentStep;
-    	int previousCurrentStepLocal;
-    	double cess;
-
-    	do
-       	{
-       	     previousCurrentStepLocal=currentStepLocal;
-	    	 // reweight done below, calculation of the incremental part
-	    	 calculateIncrementalWeights(beastMClist, output_logUnnormalisedIncrementalWeights, input_previousExponent, currentExponentLocal);
-			 // CESS to be calculated before renormalising
-	         cess=CESS(output_logUnnormalisedIncrementalWeights, input_logWeightsNormalized);
-	         // update localCurrentStep
-	         if(cess < desiredPercentage)
-	         {// find next step
-	        	 currentStepLocal=currentStepLocal+((maxSteps-currentStepLocal)/2);
-	        	 currentExponentLocal=currentStepLocal*stepSize;
-	         }
-	         else
-	         {
-	        	 nextStep=currentStepLocal;
-	        	 break;
-	         }
-       	}
-       	while ((currentStepLocal<=maxSteps) && (currentStepLocal != previousCurrentStepLocal));
-
-    	return nextStep;
-    }
-    
     public static void main(String[] args) {
         
     	try {
@@ -1156,7 +1139,7 @@ IS_ESS = function(log_weights)
             final double minuslogN=-java.lang.Math.log(N); // log(1/N) using log properties
 
             // variable for the annealing, how many steps to arrive from 0 to 1 (for ex. if 100 then steps are 0.01, 0.02...)
-            final int maxvalcnt=100; // this is nr of steps minus 1
+            final int maxvalcnt=10000; // this is nr of steps minus 1
             
         	// variables for the weights in log space
         	double logIncrementalWeights[] = new double[N_int]; // vector of weights for the particles
@@ -1216,82 +1199,28 @@ IS_ESS = function(log_weights)
             Arrays.parallelSetAll(avgRejection, e->MCMC_NotDone);
         	double auxDoubleVar;
             
-        	final double stepSize=1/((double)maxvalcnt);
-        	exponentCnt=0;
-        	boolean useCESS=true;
-        	int cessExponentFound;
-        	previousExponent=0.0;                	
-	    	currentExponent=stepSize;
-        	
             for (exponentCnt=0; exponentCnt<maxvalcnt; exponentCnt++)
             {// starts from the prior and goes to target (reached when the exponent is equal to 1)
             	// smcStates[(int)i][(int)exponentCnt]=mc.getState();
-            	//if(exponentCnt>=(maxvalcnt/100))
-            	//	break;
-            		            		
+            	if(exponentCnt>=(maxvalcnt/100))
+            		break;
+            		
+            		
             	previousExponent=currentExponent;                	
             	
             	currentExponent=((double)exponentCnt+1)/((double)maxvalcnt);
-
-/*              
- *              static int lookForCESSexponent(double desiredPercentage, Sequential[] beastMClist, double [] input_logWeightsNormalized , double[] output_logUnnormalisedIncrementalWeights, final double input_previousExponent, final double input_currentExponent, final double stepSize, final int currentStep, final int maxSteps)
-                {
-                	// initialize to -1 meaning error
-                	int nextStep=-1;
-                	double currentExponentLocal=input_currentExponent;
-                	int currentStepLocal=currentStep;
-                	int previousCurrentStepLocal;
-
-                	do
-                   	{
-                   	     previousCurrentStepLocal=currentStepLocal;
-            	    	 // reweight done below, calculation of the incremental part
-            	    	 calculateIncrementalWeights(beastMClist, output_logUnnormalisedIncrementalWeights, input_previousExponent, currentExponentLocal);
-            			 // CESS to be calculated before renormalising
-            	         cess=CESS(output_logUnnormalisedIncrementalWeights, input_logWeightsNormalized);
-            	         // update localCurrentStep
-            	         if(cess < desiredPercentage)
-            	         {
-            	        	 currentStepLocal=currentStepLocal+((maxSteps-currentStepLocal)/2);
-            	         }
-            	         else
-            	         {
-            	        	 nextStep=currentStepLocal;
-            	        	 break;
-            	         }
-                   	}
-                   	while ((currentStepLocal<=maxSteps) && (currentStepLocal != previousCurrentStepLocal));
-*/            	
-            	
-            	if(useCESS)
-            	{
-	            	// here look for cess exponent
-            		cessExponentFound=lookForCESSexponent(0.9, beastMClist, logWeightsNormalized , logIncrementalWeights, previousExponent, currentExponent, stepSize, (int) (exponentCnt+1), maxvalcnt);
-            	    if(cessExponentFound > -1)
-            	    {
-            	    	exponentCnt=cessExponentFound;
-            	    	currentExponent=exponentCnt*stepSize;
-            	    }
-            	    else
-            	    { // just say that we don't use CESS anymore but use ESS
-            	    	useCESS=false;
-            	    }
-            	}
-            	
-            	if(!useCESS)
-            	{
-                   	// reweight done below, calculation of the incremental part
-                	calculateIncrementalWeights(beastMClist, logIncrementalWeights, previousExponent, currentExponent);
-            	}
-            	
             	// updates the weights with the ratio of future-current functions calculated at the current state
 				
             	rowCounterString=exponentCnt + divider + currentExponent + divider;
-            	               	
+            	
+               	// reweight done below, calculation of the incremental part
+            	calculateIncrementalWeights(beastMClist, logIncrementalWeights, previousExponent, currentExponent);
+               	
 				// CESS to be calculated before renormalising
             	CESSval=CESS(logIncrementalWeights, logWeightsNormalized);
 				outCEss.println(rowCounterString + CESSval);
 
+				double cessNorm=CESS_Normalised(logIncrementalWeights, logWeightsNormalized);
                 // normalising below, logWeightsNormalized is the output, logIncrementalWeights the input
                	normaliseWeights(logIncrementalWeights, logWeightsNormalized);
                 String strng=Arrays.toString(logIncrementalWeights);
@@ -1320,7 +1249,6 @@ IS_ESS = function(log_weights)
                     auxDoubleVar=Arrays.stream(nrOfMCMCrejections).average().getAsDouble();
                     avgRejection[(int) exponentCnt]=auxDoubleVar;
                	}
-               	
             }// outer parentheses 
         	
         	// how much time did it take

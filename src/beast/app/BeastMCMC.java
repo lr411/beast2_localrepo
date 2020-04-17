@@ -1126,6 +1126,47 @@ IS_ESS = function(log_weights)
 	        
     }
     
+ static int getCESSexponent(Sequential[] beastMClist, double[] logIncrementalWeights, double[] logWeightsNormalized, double stepSize, double previousExponent, int exponentCnt, int maxvalcnt, double outNextExponent)
+ {
+	  int next_exponentCnt=exponentCnt+1;
+	  int upperRange=maxvalcnt;
+	  int lowerRange=next_exponentCnt;
+	  double oldCESSval=0.0, CESSval;
+	  double nextExponent;
+
+	  int maxcNt=20;
+	  do
+	  {
+		   nextExponent=next_exponentCnt*stepSize;
+		    //reweight done below, calculation of the incremental part
+	       calculateIncrementalWeights(beastMClist, logIncrementalWeights, previousExponent, nextExponent);
+		   CESSval=CESS_Normalised(logIncrementalWeights, logWeightsNormalized);
+		   if(CESSval<0.9)
+		   { // not good, look for another value
+		      if(CESSval>oldCESSval)
+		      {
+		        lowerRange=next_exponentCnt;
+		      }
+		      else
+		      {
+		         upperRange=next_exponentCnt;
+		      }
+		      next_exponentCnt=lowerRange+(upperRange-lowerRange)/2;
+		   }
+		   else
+		   {
+		     exponentCnt=next_exponentCnt-1;
+		     outNextExponent=nextExponent;
+		     break;
+		   }
+		   oldCESSval=CESSval;
+		   maxcNt--;
+	  } while(maxcNt>0); // avoid infinite loops
+	  
+	 return exponentCnt;
+}
+	
+ 
     public static void main(String[] args) {
         
     	try {
@@ -1139,7 +1180,7 @@ IS_ESS = function(log_weights)
             final double minuslogN=-java.lang.Math.log(N); // log(1/N) using log properties
 
             // variable for the annealing, how many steps to arrive from 0 to 1 (for ex. if 100 then steps are 0.01, 0.02...)
-            final int maxvalcnt=10000; // this is nr of steps minus 1
+            final int maxvalcnt=1000; // this is nr of steps minus 1
             
         	// variables for the weights in log space
         	double logIncrementalWeights[] = new double[N_int]; // vector of weights for the particles
@@ -1199,28 +1240,39 @@ IS_ESS = function(log_weights)
             Arrays.parallelSetAll(avgRejection, e->MCMC_NotDone);
         	double auxDoubleVar;
             
+        	// size of the step for the exponent
+        	double stepSize=1/((double)maxvalcnt);
+        	
+        	/*
+        	 static int getCESSexponent(Sequential[] beastMClist, double[] logIncrementalWeights, double[] logWeightsNormalized, double stepSize, double previousExponent, int exponentCnt, int maxvalcnt, double outNextExponent)
+ 
+        	*/
+        	 
+        	
             for (exponentCnt=0; exponentCnt<maxvalcnt; exponentCnt++)
             {// starts from the prior and goes to target (reached when the exponent is equal to 1)
             	// smcStates[(int)i][(int)exponentCnt]=mc.getState();
-            	if(exponentCnt>=(maxvalcnt/100))
-            		break;
+            	//if(exponentCnt>=(maxvalcnt/100))
+            	//	break;
             		
             		
             	previousExponent=currentExponent;                	
             	
             	currentExponent=((double)exponentCnt+1)/((double)maxvalcnt);
             	// updates the weights with the ratio of future-current functions calculated at the current state
-				
-            	rowCounterString=exponentCnt + divider + currentExponent + divider;
-            	
+				double outNextExponent=0.0;
+           	    int nextCESS=getCESSexponent(beastMClist, logIncrementalWeights, logWeightsNormalized, stepSize, previousExponent, (int) exponentCnt, maxvalcnt, outNextExponent);
                	// reweight done below, calculation of the incremental part
             	calculateIncrementalWeights(beastMClist, logIncrementalWeights, previousExponent, currentExponent);
                	
 				// CESS to be calculated before renormalising
             	CESSval=CESS(logIncrementalWeights, logWeightsNormalized);
+
+            	rowCounterString=exponentCnt + divider + currentExponent + divider;
+            	
 				outCEss.println(rowCounterString + CESSval);
 
-				double cessNorm=CESS_Normalised(logIncrementalWeights, logWeightsNormalized);
+				// double cessNorm=CESS_Normalised(logIncrementalWeights, logWeightsNormalized);
                 // normalising below, logWeightsNormalized is the output, logIncrementalWeights the input
                	normaliseWeights(logIncrementalWeights, logWeightsNormalized);
                 String strng=Arrays.toString(logIncrementalWeights);

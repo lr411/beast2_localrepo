@@ -43,7 +43,9 @@ import beast.core.util.Log;
 import beast.evolution.tree.Tree;
 import beast.util.*;
 import jam.util.IconUtils;
+
 import org.json.JSONException;
+import org.w3c.dom.ranges.Range;
 import org.xml.sax.SAXException;
 
 import javax.swing.*;
@@ -1126,14 +1128,124 @@ IS_ESS = function(log_weights)
 	        
     }
     
- static int getCESSexponent(Sequential[] beastMClist, double[] logIncrementalWeights, double[] logWeightsNormalized, double stepSize, double previousExponent, int exponentCnt, int maxvalcnt, double outNextExponent)
+    static int getCESSexponent_revised( Sequential[] beastMClist, double[] logIncrementalWeights, double[] logWeightsNormalized, int previousExponent, int maxExponent, double stepSize, double normalisedTargetCESS)
+    {
+    	int nextExponent=maxExponent;
+     	int maxcNt=100;
+     	double CESSval;
+	    double range;
+	    double previousExponentDouble=previousExponent*stepSize;
+		range=(maxExponent-previousExponent);
+     	// here calculate nextExponent
+		boolean success=false;
+		int oldNextExponent;
+		int upperVal=maxExponent, lowerVal=previousExponent;
+		do
+		{
+			oldNextExponent=nextExponent;
+	     	// calculate weights
+	     	calculateIncrementalWeights(beastMClist, logIncrementalWeights, previousExponent, (double)(nextExponent*stepSize));
+	     	// calculate CESS
+			CESSval=CESS_Normalised(logIncrementalWeights, logWeightsNormalized);
+	     	// if CESS val == normalisedTargetCESS
+
+			if(CESSval == normalisedTargetCESS)
+			{
+				success=true;
+			}
+			else
+			{
+				range=range/2.0;
+				if(CESSval > normalisedTargetCESS)
+				{
+					// bisection: if CESS val is greater than target, go further
+					//upperVal=
+					nextExponent=nextExponent+(int)range;
+				}
+				else
+				{
+					// if CESSval less than target, then get closer if possible
+					nextExponent=nextExponent-(int)range;
+				}
+			}
+			
+			if(oldNextExponent==nextExponent && (nextExponent>(previousExponent+1)))
+			{
+				nextExponent=nextExponent-1;
+				range=(nextExponent-previousExponent);
+			}
+			
+			maxcNt--;
+		}while((success!=true) && (maxcNt>0) && (oldNextExponent!=nextExponent) && (nextExponent>previousExponent) && (nextExponent<maxExponent));
+		
+		// stop either reached 1 or we came back to previousExponent and still not found or maxCnt expired (should never happen)
+
+		if(!success)
+			return -1;
+		else
+    	return nextExponent;
+    }
+    
+    static int getCESSexponent( Sequential[] beastMClist, double[] logIncrementalWeights, double[] logWeightsNormalized, double stepSize, double previousExponent, int exponentCnt, int maxvalcnt, double outNextExponent)
+    {
+   	  int next_exponentCnt=exponentCnt+1;
+   	  int upperRange=maxvalcnt;
+   	  int lowerRange=next_exponentCnt;
+   	  double rangeSize=(upperRange-lowerRange)/2;
+   	  double oldCESSval=0.0, CESSval;
+   	  double nextExponent;
+   	  int direction = 1;
+   	  double halfRange=0.001;
+
+   	  
+   	  int maxcNt=100;
+   	  do
+   	  {
+   		   nextExponent=next_exponentCnt*stepSize;
+   		    //reweight done below, calculation of the incremental part
+   	       calculateIncrementalWeights(beastMClist, logIncrementalWeights, previousExponent, nextExponent);
+   		   CESSval=CESS_Normalised(logIncrementalWeights, logWeightsNormalized);
+   		   
+   		   double difference=CESSval-0.9;
+   		   
+   		   if(difference >=-halfRange && difference <=halfRange)
+   		   {// we found it
+   		      outNextExponent=nextExponent;
+   			   break;
+   		   }
+   		   
+   	       //lowerRange=next_exponentCnt;
+   		   if(difference>0)
+   		   { 
+   			   direction=1;
+   		   }
+   		   else
+   		   {
+   		     direction=-1;
+   		   }
+   	       rangeSize/=2; //=(upperRange-next_exponentCnt)/2;
+   		   next_exponentCnt=next_exponentCnt+(int)(direction*rangeSize);
+   		   
+   		   oldCESSval=CESSval;
+   		   maxcNt--;
+   	  } while(maxcNt>0 && next_exponentCnt>1); // avoid infinite loops
+   	  
+	 exponentCnt=next_exponentCnt-1;
+   	 return exponentCnt;
+   }
+    
+/* static int getCESSexponent( Sequential[] beastMClist, double[] logIncrementalWeights, double[] logWeightsNormalized, double stepSize, double previousExponent, int exponentCnt, int maxvalcnt, double outNextExponent)
  {
 	  int next_exponentCnt=exponentCnt+1;
 	  int upperRange=maxvalcnt;
 	  int lowerRange=next_exponentCnt;
+	  double rangeSize=(upperRange-lowerRange)/2;
 	  double oldCESSval=0.0, CESSval;
 	  double nextExponent;
+	  int direction = 1;
+	  double halfRange=0.001;
 
+	  
 	  int maxcNt=20;
 	  do
 	  {
@@ -1141,31 +1253,35 @@ IS_ESS = function(log_weights)
 		    //reweight done below, calculation of the incremental part
 	       calculateIncrementalWeights(beastMClist, logIncrementalWeights, previousExponent, nextExponent);
 		   CESSval=CESS_Normalised(logIncrementalWeights, logWeightsNormalized);
-		   if(CESSval<0.9)
-		   { // not good, look for another value
-		      if(CESSval>oldCESSval)
-		      {
-		        lowerRange=next_exponentCnt;
-		      }
-		      else
-		      {
-		         upperRange=next_exponentCnt;
-		      }
-		      next_exponentCnt=lowerRange+(upperRange-lowerRange)/2;
+		   
+		   double difference=CESSval-0.9;
+		   
+		   if(difference >=-halfRange && difference <=halfRange)
+		   {// we found it
+		      exponentCnt=next_exponentCnt-1;
+		      outNextExponent=nextExponent;
+			   break;
+		   }
+		   
+	       lowerRange=next_exponentCnt;
+	       rangeSize/=2;
+		   if(difference>0)
+		   { 
+			   direction=1;
 		   }
 		   else
 		   {
-		     exponentCnt=next_exponentCnt-1;
-		     outNextExponent=nextExponent;
-		     break;
+		     direction=-1;
 		   }
+		   next_exponentCnt=lowerRange+(int)(direction*rangeSize);
+		   
 		   oldCESSval=CESSval;
 		   maxcNt--;
-	  } while(maxcNt>0); // avoid infinite loops
+	  } while(maxcNt>0 && ); // avoid infinite loops
 	  
 	 return exponentCnt;
 }
-	
+*/	
  
     public static void main(String[] args) {
         
@@ -1180,7 +1296,7 @@ IS_ESS = function(log_weights)
             final double minuslogN=-java.lang.Math.log(N); // log(1/N) using log properties
 
             // variable for the annealing, how many steps to arrive from 0 to 1 (for ex. if 100 then steps are 0.01, 0.02...)
-            final int maxvalcnt=1000; // this is nr of steps minus 1
+            final int maxvalcnt=10000; // this is nr of steps minus 1
             
         	// variables for the weights in log space
         	double logIncrementalWeights[] = new double[N_int]; // vector of weights for the particles
@@ -1261,8 +1377,10 @@ IS_ESS = function(log_weights)
             	currentExponent=((double)exponentCnt+1)/((double)maxvalcnt);
             	// updates the weights with the ratio of future-current functions calculated at the current state
 				double outNextExponent=0.0;
-           	    int nextCESS=getCESSexponent(beastMClist, logIncrementalWeights, logWeightsNormalized, stepSize, previousExponent, (int) exponentCnt, maxvalcnt, outNextExponent);
-               	// reweight done below, calculation of the incremental part
+//           	    int nextCESS=getCESSexponent(beastMClist, logIncrementalWeights, logWeightsNormalized, stepSize, previousExponent, (int) exponentCnt, maxvalcnt+1, outNextExponent);
+				int nextCESS=getCESSexponent_revised(beastMClist, logIncrementalWeights, logWeightsNormalized, (int)exponentCnt, maxvalcnt, stepSize, 0.9);
+				   
+				// reweight done below, calculation of the incremental part
             	calculateIncrementalWeights(beastMClist, logIncrementalWeights, previousExponent, currentExponent);
                	
 				// CESS to be calculated before renormalising

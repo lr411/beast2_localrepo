@@ -707,7 +707,7 @@ public class BeastMCMC {
       // define and set the array of weights (exponential of log weights)
       double weights[] = new double[P]; // Arrays.copyOf(log_weights, P);
       Arrays.parallelSetAll(weights, e->java.lang.Math.exp(log_weights[e]));
-      
+   
       // create variables for cumulative sum
       double sumW=Arrays.stream(weights).sum();
       double cw[] = Arrays.copyOf(weights, P);
@@ -1131,7 +1131,8 @@ IS_ESS = function(log_weights)
     static int getCESSexponent_revised( Sequential[] beastMClist, double[] logIncrementalWeights, double[] logWeightsNormalized, int previousExponent, int maxExponent, double stepSize, double normalisedTargetCESS)
     {
     	int nextExponent=maxExponent;
-     	int maxcNt=100;
+    	double acceptableRange=0.01;
+     	int maxcNt=20;
      	double CESSval;
 	    double range;
 	    double previousExponentDouble=previousExponent*stepSize;
@@ -1140,22 +1141,27 @@ IS_ESS = function(log_weights)
 		boolean success=false;
 		int oldNextExponent;
 		int upperVal=maxExponent, lowerVal=previousExponent;
+		//if(previousExponent==0)
+		//	previousExponent=1;
 		do
 		{
 			oldNextExponent=nextExponent;
 	     	// calculate weights
-	     	calculateIncrementalWeights(beastMClist, logIncrementalWeights, previousExponent, (double)(nextExponent*stepSize));
+	     	calculateIncrementalWeights(beastMClist, logIncrementalWeights, previousExponentDouble, (double)(nextExponent*stepSize));
 	     	// calculate CESS
 			CESSval=CESS_Normalised(logIncrementalWeights, logWeightsNormalized);
 	     	// if CESS val == normalisedTargetCESS
 
-			if(CESSval == normalisedTargetCESS)
+			if((CESSval >= (normalisedTargetCESS-acceptableRange)) && (CESSval <= (normalisedTargetCESS+acceptableRange)))
 			{
 				success=true;
 			}
 			else
 			{
 				range=range/2.0;
+				if((range<1) && (nextExponent>(previousExponent+1)))
+					range=1;
+					
 				if(CESSval > normalisedTargetCESS)
 				{
 					// bisection: if CESS val is greater than target, go further
@@ -1168,21 +1174,18 @@ IS_ESS = function(log_weights)
 					nextExponent=nextExponent-(int)range;
 				}
 			}
-			
-			if(oldNextExponent==nextExponent && (nextExponent>(previousExponent+1)))
-			{
-				nextExponent=nextExponent-1;
-				range=(nextExponent-previousExponent);
-			}
-			
+						
 			maxcNt--;
 		}while((success!=true) && (maxcNt>0) && (oldNextExponent!=nextExponent) && (nextExponent>previousExponent) && (nextExponent<maxExponent));
 		
 		// stop either reached 1 or we came back to previousExponent and still not found or maxCnt expired (should never happen)
 
+		
 		if(!success)
-			return -1;
-		else
+		{
+			return previousExponent+1;
+		}
+		else		
     	return nextExponent;
     }
     
@@ -1364,7 +1367,8 @@ IS_ESS = function(log_weights)
  
         	*/
         	 
-        	
+        	boolean useCESS=true;
+        	int nextCESS;
             for (exponentCnt=0; exponentCnt<maxvalcnt; exponentCnt++)
             {// starts from the prior and goes to target (reached when the exponent is equal to 1)
             	// smcStates[(int)i][(int)exponentCnt]=mc.getState();
@@ -1378,11 +1382,15 @@ IS_ESS = function(log_weights)
             	// updates the weights with the ratio of future-current functions calculated at the current state
 				double outNextExponent=0.0;
 //           	    int nextCESS=getCESSexponent(beastMClist, logIncrementalWeights, logWeightsNormalized, stepSize, previousExponent, (int) exponentCnt, maxvalcnt+1, outNextExponent);
-				int nextCESS=getCESSexponent_revised(beastMClist, logIncrementalWeights, logWeightsNormalized, (int)exponentCnt, maxvalcnt, stepSize, 0.9);
-				   
+				if(useCESS)
+				{
+				   nextCESS=getCESSexponent_revised(beastMClist, logIncrementalWeights, logWeightsNormalized, (int)exponentCnt, maxvalcnt, stepSize, 0.9);
+				   exponentCnt=nextCESS;
+	               currentExponent=((double)exponentCnt)/((double)maxvalcnt);
+				}				
+
 				// reweight done below, calculation of the incremental part
             	calculateIncrementalWeights(beastMClist, logIncrementalWeights, previousExponent, currentExponent);
-               	
 				// CESS to be calculated before renormalising
             	CESSval=CESS(logIncrementalWeights, logWeightsNormalized);
 

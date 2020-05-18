@@ -981,6 +981,11 @@ IS_ESS = function(log_weights)
 			double log1=mc.calculateLogPSimulatedAnnhealing(nextExponent);
 			double log2=mc.calculateLogPSimulatedAnnhealing(previousExponent);
 //        	// ?? is it ok to set the exponent here????
+			if(Double.isNaN(log1-log2))
+			{
+				int i;
+				i=3;
+			}
 			return (log1-log2);
 			});
     }
@@ -1087,6 +1092,22 @@ IS_ESS = function(log_weights)
     	}
     }
     
+    private static void saveAvgRej(String appendString, List<Double> avgRejectionList, String paramName) throws IOException {
+    	// TODO Auto-generated method stub
+	    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+	    PrintStream out = new PrintStream(baos);
+	    
+	    for(int i=0; i<avgRejectionList.size();i++)
+		{
+	    	out.println(avgRejectionList.get(i));
+		}
+	    
+	    out.close();
+	    
+	    OutputStream outputStream = new FileOutputStream(createTxtAppendString(paramName,appendString));
+	        baos.writeTo(outputStream);
+    }
+
     public static void saveParameter(String appendString, double[] avgRejection, String paramName) throws IOException
     {
 	    ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -1187,6 +1208,51 @@ IS_ESS = function(log_weights)
 		}
 		else		
     	return nextExponent;
+    }
+
+    static double getCESSexponent_double( Sequential[] beastMClist, double[] logIncrementalWeights, double[] logWeightsNormalized, double prevExponent, double normalisedTargetCESS)
+    {
+    	final double acceptableRange=0.1;
+     	int maxcNt=40;
+     	double CESSval;
+	    double range=(1.0-prevExponent);
+	    double nextExp=1.0;
+     	// here calculate nextExponent
+		boolean success=false;
+		do
+		{
+	     	// calculate weights
+	     	calculateIncrementalWeights(beastMClist, logIncrementalWeights, prevExponent, nextExp);
+	     	// calculate CESS
+			CESSval=CESS_Normalised(logIncrementalWeights, logWeightsNormalized);
+	     	// if CESS val == normalisedTargetCESS
+
+			if((CESSval >= (normalisedTargetCESS-acceptableRange)) && (CESSval <= (normalisedTargetCESS+acceptableRange)))
+			{
+				success=true;
+			}
+			else
+			{
+				range=range/2.0;
+					
+				if(CESSval > normalisedTargetCESS)
+				{
+					// bisection: if CESS val is greater than target, go further
+					//upperVal=
+					nextExp=nextExp+range;
+				}
+				else
+				{
+					// if CESSval less than target, then get closer if possible
+					nextExp=nextExp-range;
+				}
+			}
+						
+			maxcNt--;
+		}while((success!=true) && (maxcNt>0));
+		
+		
+		return nextExp;
     }
     
     static int getCESSexponent( Sequential[] beastMClist, double[] logIncrementalWeights, double[] logWeightsNormalized, double stepSize, double previousExponent, int exponentCnt, int maxvalcnt, double outNextExponent)
@@ -1306,7 +1372,7 @@ IS_ESS = function(log_weights)
             double logWeightsNormalized[] = new double[N_int]; // vector of weights for the particles
             
             BeastDialog dlg=CreateAndShowDialog();
-            double currentExponent, previousExponent; //exponent to be used for simulated annhealing
+            //double currentExponent, previousExponent; //exponent to be used for simulated annhealing
             long exponentCnt;
             Path currentRelativePath = Paths.get("");
             String s = currentRelativePath.toAbsolutePath().toString();
@@ -1344,7 +1410,7 @@ IS_ESS = function(log_weights)
            	// in the following initialize the weights to 1/N
             initNotmalisedWeights(logWeightsNormalized, minuslogN);
 			
-        	currentExponent=0.0;            	
+        	//currentExponent=0.0;            	
         	double ESSval, CESSval;
         	
         	// string used within the files as row counter
@@ -1352,6 +1418,8 @@ IS_ESS = function(log_weights)
         	final String divider=",";
         	long startTime=System.nanoTime();
         	long[] nrOfMCMCrejections=new long[N_int];
+        	//List<Integer> nrOfMCMCrej=new ArrayList<>();
+        	List<Double> avgRejectionList=new ArrayList<>();
         	double[] avgRejection=new double[maxvalcnt];
         	
         	// init all the avgRejection elements to "not done"
@@ -1369,33 +1437,33 @@ IS_ESS = function(log_weights)
         	 
         	boolean useCESS=true;
         	int nextCESS;
-            for (exponentCnt=0; exponentCnt<maxvalcnt; exponentCnt++)
+            
+        	double nextExponentDouble=0.0,currentExponentDouble=0.0;
+        	
+            while(nextExponentDouble<0.05)//for (exponentCnt=0; exponentCnt<maxvalcnt; exponentCnt++)
             {// starts from the prior and goes to target (reached when the exponent is equal to 1)
             	// smcStates[(int)i][(int)exponentCnt]=mc.getState();
             	//if(exponentCnt>=(maxvalcnt/100))
             	//	break;
-            		
-            		
-            	previousExponent=currentExponent;                	
-            	
-            	currentExponent=((double)exponentCnt+1)/((double)maxvalcnt);
-            	// updates the weights with the ratio of future-current functions calculated at the current state
+            		            		
 				double outNextExponent=0.0;
 //           	    int nextCESS=getCESSexponent(beastMClist, logIncrementalWeights, logWeightsNormalized, stepSize, previousExponent, (int) exponentCnt, maxvalcnt+1, outNextExponent);
 				if(useCESS)
 				{
-				   nextCESS=getCESSexponent_revised(beastMClist, logIncrementalWeights, logWeightsNormalized, (int)exponentCnt, maxvalcnt, stepSize, 0.9);
-				   exponentCnt=nextCESS;
-	               currentExponent=((double)exponentCnt)/((double)maxvalcnt);
+				   nextExponentDouble=getCESSexponent_double(beastMClist, logIncrementalWeights, logWeightsNormalized, currentExponentDouble, 0.7);
+				   if(nextExponentDouble>1.0)
+					   nextExponentDouble=1.0;
 				}
-				System.out.println(exponentCnt);
 
 				// reweight done below, calculation of the incremental part
-            	calculateIncrementalWeights(beastMClist, logIncrementalWeights, previousExponent, currentExponent);
+            	calculateIncrementalWeights(beastMClist, logIncrementalWeights, currentExponentDouble, nextExponentDouble);
 				// CESS to be calculated before renormalising
+            	
+            	currentExponentDouble= nextExponentDouble;
+            	System.out.println(nextExponentDouble);
             	CESSval=CESS(logIncrementalWeights, logWeightsNormalized);
 
-            	rowCounterString=exponentCnt + divider + currentExponent + divider;
+            	rowCounterString=currentExponentDouble + divider;
             	
 				outCEss.println(rowCounterString + CESSval);
 
@@ -1410,23 +1478,27 @@ IS_ESS = function(log_weights)
 				outEss.println(rowCounterString + ESSval);
 				
 				// only resample if ESS<half particles and if we are not in the last step
-               	if(ESSval<(N_int/2.0) && exponentCnt<maxvalcnt-1) 
+               	if(nextExponentDouble<1.0)
                	{
-    				List<Integer> stratifiedList=stratified_resample((double [])logWeightsNormalized);
+    				if(ESSval<(N_int/2.0)) 
+                   	{
+        				List<Integer> stratifiedList=stratified_resample((double [])logWeightsNormalized);
 
-               		// update the particles list according to the list output from the resample process
-               		updateParticlesList(stratifiedList, beastMClist);
-                   	// in the following initialize the weights to 1/N
-                    initNotmalisedWeights(logWeightsNormalized, minuslogN);    				
-               	}
+                   		// update the particles list according to the list output from the resample process
+                   		updateParticlesList(stratifiedList, beastMClist);
+                       	// in the following initialize the weights to 1/N
+                        initNotmalisedWeights(logWeightsNormalized, minuslogN);    				
+                   	}
 
-               	// only do MCMC move if we are not in the last step
-               	if(exponentCnt<maxvalcnt-1) 
-               	{
-                    // do the mcmc moves on the particles and set the exponent for annealing
-                    doMCMC_andSetExponentForAnnealing(beastMClist, currentExponent, nrOfMCMCrejections);
-                    auxDoubleVar=Arrays.stream(nrOfMCMCrejections).average().getAsDouble();
-                    avgRejection[(int) exponentCnt]=auxDoubleVar;
+                   	// only do MCMC move if we are not in the last step
+                   	//if(exponentCnt<maxvalcnt-1) 
+                   	{
+                        // do the mcmc moves on the particles and set the exponent for annealing
+                        doMCMC_andSetExponentForAnnealing(beastMClist, currentExponentDouble, nrOfMCMCrejections);
+                        auxDoubleVar=Arrays.stream(nrOfMCMCrejections).average().getAsDouble();
+                        avgRejectionList.add(auxDoubleVar);
+                        //avgRejection[(int) exponentCnt]=auxDoubleVar;
+                   	}
                	}
             }// outer parentheses 
         	
@@ -1441,7 +1513,7 @@ IS_ESS = function(log_weights)
             saveLogs(informativeAppendString, ess, cess, weightsStream);
             
             // save average rejections
-            saveParameter(informativeAppendString, avgRejection, "AvgRejection");
+            saveAvgRej(informativeAppendString, avgRejectionList, "AvgRejection");
             
             // save the tree particles
             saveTreeParticles(beastMClist, informativeAppendString, treepositionInStateArray, N_int);
@@ -1458,5 +1530,6 @@ IS_ESS = function(log_weights)
             System.exit(0);
         }
     } // main
+
 
 } // BeastMCMC

@@ -1131,8 +1131,8 @@ IS_ESS = function(log_weights)
     static int getCESSexponent_revised( Sequential[] beastMClist, double[] logIncrementalWeights, double[] logWeightsNormalized, int previousExponent, int maxExponent, double stepSize, double normalisedTargetCESS)
     {
     	int nextExponent=maxExponent;
-    	double acceptableRange=0.01;
-     	int maxcNt=20;
+    	double acceptableRange=0.4;
+     	int maxcNt=40;
      	double CESSval;
 	    double range;
 	    double previousExponentDouble=previousExponent*stepSize;
@@ -1299,7 +1299,7 @@ IS_ESS = function(log_weights)
             final double minuslogN=-java.lang.Math.log(N); // log(1/N) using log properties
 
             // variable for the annealing, how many steps to arrive from 0 to 1 (for ex. if 100 then steps are 0.01, 0.02...)
-            final int maxvalcnt=10000; // this is nr of steps minus 1
+            final int maxvalcnt=100000; // this is nr of steps minus 1
             
         	// variables for the weights in log space
         	double logIncrementalWeights[] = new double[N_int]; // vector of weights for the particles
@@ -1387,7 +1387,8 @@ IS_ESS = function(log_weights)
 				   nextCESS=getCESSexponent_revised(beastMClist, logIncrementalWeights, logWeightsNormalized, (int)exponentCnt, maxvalcnt, stepSize, 0.9);
 				   exponentCnt=nextCESS;
 	               currentExponent=((double)exponentCnt)/((double)maxvalcnt);
-				}				
+				}
+				System.out.println(exponentCnt);
 
 				// reweight done below, calculation of the incremental part
             	calculateIncrementalWeights(beastMClist, logIncrementalWeights, previousExponent, currentExponent);

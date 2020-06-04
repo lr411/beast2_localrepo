@@ -40,6 +40,7 @@ import beast.core.State;
 import beast.core.StateNode;
 import beast.core.util.CompoundDistribution;
 import beast.core.util.Log;
+import beast.evolution.tree.Node;
 import beast.evolution.tree.Tree;
 import beast.util.*;
 import jam.util.IconUtils;
@@ -93,7 +94,7 @@ public class BeastMCMC {
     final public static String DEVELOPERS = "Beast 2 development team";
     final public static String COPYRIGHT = "Beast 2 development team 2011";
     // number of particles for the SMC
-    public static final long NR_OF_PARTICLES = 250;
+    public static final long NR_OF_PARTICLES = 1;//250;
     // path to save the logs
     final static String logsPath="/Users/lr411/Leo/Github/Genomics/logs_BEAST2/";
     // nr of MCMC moves
@@ -1434,19 +1435,78 @@ IS_ESS = function(log_weights)
         	 static int getCESSexponent(Sequential[] beastMClist, double[] logIncrementalWeights, double[] logWeightsNormalized, double stepSize, double previousExponent, int exponentCnt, int maxvalcnt, double outNextExponent)
  
         	*/
-        	 
+        	
+        	// here add the new sequence
+        	
         	boolean useCESS=true;
         	int nextCESS;
             
         	double nextExponentDouble=0.0,currentExponentDouble=0.0;
         	
-            while(nextExponentDouble<0.05)//for (exponentCnt=0; exponentCnt<maxvalcnt; exponentCnt++)
+        	// add taxon here
+	     	// MCMC mc=(MCMC)beastMClist[i].m_runnable;
+	    	// mc.getState().stateNode[treepositionInStateArray].log(i, out);
+        	Tree tre=(Tree)beastMClist[0].m_mcmc.getState().stateNode[treepositionInStateArray];
+        	List<BEASTInterface> predecessors=new ArrayList<>();
+        	tre.getPredecessors(predecessors);
+        	
+        	
+        	Node[] ndArr=tre.getNodesAsArray();
+        	
+        	ArrayList<Double> heights=new ArrayList<>();
+        	ArrayList<Double> lengths=new ArrayList<>();
+        	for(Node el:ndArr) {
+        		heights.add(el.getHeight());
+        		lengths.add(el.getLength());
+        	}
+        	
+        	double my_height=0.3;
+        	// heights are the absolute heights, whereas lengths are relative heights
+        	while(heights.contains(my_height))
+        	{// draw another height
+        		my_height=my_height+0.001;
+        	}
+        	/*
+        	Node nd=new Node("t4");
+        	nd.setNr(4);
+        	nd.setHeight(my_height);
+        	tre.addNodeAndDirty(nd, my_height);
+        	*/
+        	
+        	//TreeNode trn;
+        	//for(Node nd:tre) {
+        		
+        	//}
+        	
+        	Node[] ndArrafter=tre.getNodesAsArray();
+        	
+        	ArrayList<Double> heightsafter=new ArrayList<>();
+        	ArrayList<Double> lengthsafter=new ArrayList<>();
+        	double addendum=0.1;
+        	for(Node el:ndArr) {
+        		my_height=my_height+addendum;
+        		el.setHeight(my_height);
+        		heightsafter.add(el.getHeight());
+        		lengthsafter.add(el.getLength());
+        	}
+        	tre.setEverythingDirty(true);
+
+        	ndArr=tre.getNodesAsArray();
+        	
+        	for(Node el:ndArr) {
+        		heights.add(el.getHeight());
+        		lengths.add(el.getLength());
+        	}
+        	
+        	while(nextExponentDouble<0.05)//for (exponentCnt=0; exponentCnt<maxvalcnt; exponentCnt++)
             {// starts from the prior and goes to target (reached when the exponent is equal to 1)
             	// smcStates[(int)i][(int)exponentCnt]=mc.getState();
             	//if(exponentCnt>=(maxvalcnt/100))
             	//	break;
             		            		
-				double outNextExponent=0.0;
+				
+            	
+            	double outNextExponent=0.0;
 //           	    int nextCESS=getCESSexponent(beastMClist, logIncrementalWeights, logWeightsNormalized, stepSize, previousExponent, (int) exponentCnt, maxvalcnt+1, outNextExponent);
 				if(useCESS)
 				{

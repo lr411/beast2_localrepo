@@ -41,6 +41,9 @@ import beast.core.StateNode;
 import beast.core.util.CompoundDistribution;
 import beast.core.util.Log;
 import beast.evolution.tree.Node;
+import beast.evolution.tree.RandomTree;
+//import beast.evolution.tree.RandomTree.ConstraintViolatedException;
+//import //beast.evolution.tree.RandomTree.ConstraintViolatedException;
 import beast.evolution.tree.Tree;
 import beast.util.*;
 import jam.util.IconUtils;
@@ -1447,6 +1450,35 @@ IS_ESS = function(log_weights)
 	     	// MCMC mc=(MCMC)beastMClist[i].m_runnable;
 	    	// mc.getState().stateNode[treepositionInStateArray].log(i, out);
         	Tree tre=(Tree)beastMClist[0].m_mcmc.getState().stateNode[treepositionInStateArray];
+        	Node root=tre.getRoot();
+
+        	final double my_height=0.17;
+            
+        	if(true)
+        	Arrays.parallelSetAll(beastMClist, e ->
+		       	{ 
+		        	Tree tretre=(Tree)beastMClist[e].m_mcmc.getState().stateNode[treepositionInStateArray];
+		        	try {
+						RandomTree.insertSequenceCoalescent(tretre, my_height);
+					} catch (InstantiationException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (IllegalAccessException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (ClassNotFoundException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} 	       		
+		        	return beastMClist[e];
+		       	}
+            );
+            
+
+        	
+        	tre=(Tree)beastMClist[0].m_mcmc.getState().stateNode[treepositionInStateArray];
+        	Node rootafter=tre.getRoot();
+/*
         	List<BEASTInterface> predecessors=new ArrayList<>();
         	tre.getPredecessors(predecessors);
         	
@@ -1460,45 +1492,31 @@ IS_ESS = function(log_weights)
         		lengths.add(el.getLength());
         	}
         	
-        	double my_height=0.3;
         	// heights are the absolute heights, whereas lengths are relative heights
         	while(heights.contains(my_height))
         	{// draw another height
         		my_height=my_height+0.001;
         	}
-        	/*
-        	Node nd=new Node("t4");
-        	nd.setNr(4);
-        	nd.setHeight(my_height);
-        	tre.addNodeAndDirty(nd, my_height);
-        	*/
-        	
-        	//TreeNode trn;
-        	//for(Node nd:tre) {
-        		
-        	//}
+        	RandomTree.insertSequenceCoalescent(tre, my_height);
+        	tre.setEverythingDirty(true);
+*/        	
         	
         	Node[] ndArrafter=tre.getNodesAsArray();
-        	
         	ArrayList<Double> heightsafter=new ArrayList<>();
         	ArrayList<Double> lengthsafter=new ArrayList<>();
-        	double addendum=0.1;
-        	for(Node el:ndArr) {
-        		my_height=my_height+addendum;
-        		el.setHeight(my_height);
+        	for(Node el:ndArrafter) {
         		heightsafter.add(el.getHeight());
         		lengthsafter.add(el.getLength());
         	}
+        	int posn=0;
+        	tre.setRootOnly(ndArrafter[posn]);
         	tre.setEverythingDirty(true);
+        	
+            
+        	// save the tree particles
+            saveTreeParticles(beastMClist, "Leo_prova_N", treepositionInStateArray, N_int);
 
-        	ndArr=tre.getNodesAsArray();
-        	
-        	for(Node el:ndArr) {
-        		heights.add(el.getHeight());
-        		lengths.add(el.getLength());
-        	}
-        	
-        	while(nextExponentDouble<0.05)//for (exponentCnt=0; exponentCnt<maxvalcnt; exponentCnt++)
+            while(nextExponentDouble<0.1)//for (exponentCnt=0; exponentCnt<maxvalcnt; exponentCnt++)
             {// starts from the prior and goes to target (reached when the exponent is equal to 1)
             	// smcStates[(int)i][(int)exponentCnt]=mc.getState();
             	//if(exponentCnt>=(maxvalcnt/100))
@@ -1510,10 +1528,21 @@ IS_ESS = function(log_weights)
 //           	    int nextCESS=getCESSexponent(beastMClist, logIncrementalWeights, logWeightsNormalized, stepSize, previousExponent, (int) exponentCnt, maxvalcnt+1, outNextExponent);
 				if(useCESS)
 				{
-				   nextExponentDouble=getCESSexponent_double(beastMClist, logIncrementalWeights, logWeightsNormalized, currentExponentDouble, 0.7);
+				   nextExponentDouble=getCESSexponent_double(beastMClist, logIncrementalWeights, logWeightsNormalized, currentExponentDouble, 0.9);
 				   if(nextExponentDouble>1.0)
 					   nextExponentDouble=1.0;
 				}
+				else
+				{
+					nextExponentDouble=nextExponentDouble+0.01;
+				}
+				
+				if(currentExponentDouble==0)
+				{
+					int dbgvar=0;
+				}
+				
+				System.out.println(nextExponentDouble);
 
 				// reweight done below, calculation of the incremental part
             	calculateIncrementalWeights(beastMClist, logIncrementalWeights, currentExponentDouble, nextExponentDouble);

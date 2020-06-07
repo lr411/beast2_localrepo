@@ -57,7 +57,11 @@ public class Tree extends StateNode implements TreeInterface {
      * such that m_sTaxaNames[node.getNr()] == node.getID()*
      */
     protected String[] m_sTaxaNames = null;
-
+    
+    public Node[] getStoredNodes() {
+    	return m_storedNodes;
+    }
+ 
     /**
      * Trait set which specifies leaf node times.
      */
@@ -976,6 +980,27 @@ public class Tree extends StateNode implements TreeInterface {
             leafNodeCount--;
         else
             internalNodeCount--;
+    }
+
+    /**
+     * Adds a node to the end of the node array. nodeCount and leafNodeCount are recalculated.
+     * Use with care!
+     */
+    public void addNodeAndDirty(final Node newNode, double newHeight) {
+        final Node[] tmp = new Node[nodeCount + 1];
+        System.arraycopy(m_nodes, 0, tmp, 0, nodeCount);
+        tmp[nodeCount] = newNode;
+        newNode.setNr(nodeCount);
+        newNode.setHeight(newHeight);
+        //this.m_sTaxaNames.
+        m_nodes = tmp;
+        nodeCount++;
+        if (newNode.getChildCount() > 0)
+            internalNodeCount++;
+        else
+            leafNodeCount++;
+
+        this.setEverythingDirty(true);
     }
 
     /**

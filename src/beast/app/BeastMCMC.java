@@ -1451,6 +1451,13 @@ IS_ESS = function(log_weights)
 	    	// mc.getState().stateNode[treepositionInStateArray].log(i, out);
         	Tree tre=(Tree)beastMClist[0].m_mcmc.getState().stateNode[treepositionInStateArray];
         	Node root=tre.getRoot();
+        	Node[] ndBefore=tre.getNodesAsArray();
+        	ArrayList<Double> heightbefore=new ArrayList<>();
+        	ArrayList<Double> lengthbefore=new ArrayList<>();
+        	for(Node el:ndBefore) {
+        		heightbefore.add(el.getHeight());
+        		lengthbefore.add(el.getLength());
+        	}
 
         	final double my_height=0.17;
             

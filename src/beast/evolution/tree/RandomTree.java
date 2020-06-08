@@ -760,6 +760,7 @@ public class RandomTree extends Tree implements StateNodeInitialiser {
         newLeaf.setID("t"+ndArr.length);
         newLeaf.m_tree=closest.getTree();
 
+        Node formerParent=closest.getParent();
         
     	final Node newNode = (Node) Class.forName(Node.class.getName()).newInstance(); //newNode();
         newNode.setNr(ndArr.length+1);   // multiple tries may generate an excess of nodes assert(nextNodeNr <= nrOfTaxa*2-1);
@@ -768,9 +769,19 @@ public class RandomTree extends Tree implements StateNodeInitialiser {
         newNode.setRight(newLeaf);// setleft automatically sets child at posn 1
     	newNode.setParent(closest.getParent());
     	newNode.m_tree=closest.getTree();
-        
-        newLeaf.setParent(newNode);
+            	
+    	newLeaf.setParent(newNode);
         closest.setParent(newNode);
+        
+        // now complete the moves, the former parent points to the new node
+        if(formerParent.getLeft()==closest)
+        {
+        	formerParent.setLeft(newNode);
+        }
+        else
+        {
+        	formerParent.setRight(newNode);
+        }
         
         tree.addNode(newLeaf);
         tree.addNode(newNode);

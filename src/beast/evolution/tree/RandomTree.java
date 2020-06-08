@@ -785,8 +785,61 @@ public class RandomTree extends Tree implements StateNodeInitialiser {
         
         tree.addNode(newLeaf);
         tree.addNode(newNode);
+        
+        // we have to copy to the stored nodes too
+        // only change the nodes that have been modified in the future
+        // for now we change all
+        tree.hasStartedEditing=false;
+        updateStoredNodes(tree.getNodeCount(), tree);
+        tree.hasStartedEditing=false;
 
         return true;
+    }
+ 
+    
+    private static void listNodesUpgraded(final Node node, final Node[] nodes, Tree tree) 
+    {
+        nodes[node.getNr()] = node;
+        node.m_tree = tree;  //(JH) I don't understand this code
+
+        // (JH) why not  node.children, we don't keep it around??
+        for (final Node child : node.getChildren()) {
+        	listNodesUpgraded(child, nodes, tree);
+        }
+	}
+     
+    
+	/*
+     * used when we add sequences to the existing tree
+     * the original tree has been modified
+     * now we need to update the stored tree
+     * otherwise at the first restore operation
+     * the tree will revert back to previous
+     */
+    public static void updateStoredNodes(int newLength, Tree tree) {
+        // initialise tree-as-array representation + its stored variant
+        if(newLength != tree.getStoredNodes().length)
+        {// upgrade length
+        	tree.m_storedNodes=Arrays.copyOf(tree.m_storedNodes, newLength);
+        }
+    	
+    	final Node copy = tree.getRoot().copy();
+    	tree.storedRoot=copy;
+        listNodesUpgraded(copy, tree.m_storedNodes, tree);
+        // invalidate cache
+        tree.postCache = null;
+    }
+
+    /*
+     * used when we add sequences to the existing tree
+     * the original tree has been modified
+     * now we need to update the stored tree
+     * otherwise at the first restore operation
+     * the tree will revert back to previous
+     */
+    public void updateStoredNodes( Tree tree) {
+        // initialise tree-as-array representation + its stored variant
+    	updateStoredNodes(m_storedNodes.length, tree);
     }
     
     /**

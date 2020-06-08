@@ -187,7 +187,7 @@ public abstract class StateNode extends CalculationNode implements Loggable, Clo
      * For multidimensional parameters, there is an internal flag to indicate which
      * dimension is dirty
      */
-    protected boolean hasStartedEditing = false;
+    public boolean hasStartedEditing = false;
 
     /**
      * The index of the parameter for identifying this StateNode

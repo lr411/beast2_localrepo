@@ -97,7 +97,7 @@ public class BeastMCMC {
     final public static String DEVELOPERS = "Beast 2 development team";
     final public static String COPYRIGHT = "Beast 2 development team 2011";
     // number of particles for the SMC
-    public static final long NR_OF_PARTICLES = 1;//250;
+    public static final long NR_OF_PARTICLES = 10;
     // path to save the logs
     final static String logsPath="/Users/lr411/Leo/Github/Genomics/logs_BEAST2/";
     // nr of MCMC moves
@@ -951,6 +951,8 @@ IS_ESS = function(log_weights)
        	    // here update the weights
        	    MCMC mc=bmcc.m_mcmc;
 
+			System.out.println("nr of nodes before mcmc: "+e+ ", "+((Tree) beastMClist[0].m_mcmc.getState().stateNode[0]).getNodeCount());
+			System.out.println("nr of stored nodes before mcmc: "+e+ ", "+((Tree) beastMClist[0].m_mcmc.getState().stateNode[0]).getStoredNodes().length);
        	    // the mcmc run is done with the previous exponent
         	try {
 				bmcc.run();
@@ -959,6 +961,8 @@ IS_ESS = function(log_weights)
 				e1.printStackTrace();
 			}
 
+			System.out.println("nr of nodes after first mcmc: "+e+ ", "+((Tree) beastMClist[0].m_mcmc.getState().stateNode[0]).getNodeCount());
+			System.out.println("nr of stored nodes after first mcmc: "+e+ ", "+((Tree) beastMClist[0].m_mcmc.getState().stateNode[0]).getStoredNodes().length);
         	// here get the nr of rejections
         	nrOfMCMCrejections[e]=mc.getNrOfMCMCrejections();
         	// setting the exponent sets the target distribution
@@ -1449,7 +1453,8 @@ IS_ESS = function(log_weights)
         	// add taxon here
 	     	// MCMC mc=(MCMC)beastMClist[i].m_runnable;
 	    	// mc.getState().stateNode[treepositionInStateArray].log(i, out);
-        	Tree tre=(Tree)beastMClist[0].m_mcmc.getState().stateNode[treepositionInStateArray];
+
+/*        	Tree tre=(Tree)beastMClist[0].m_mcmc.getState().stateNode[treepositionInStateArray];
         	Node root=tre.getRoot();
         	Node[] ndBefore=tre.getNodesAsArray();
         	ArrayList<Double> heightbefore=new ArrayList<>();
@@ -1458,13 +1463,15 @@ IS_ESS = function(log_weights)
         		heightbefore.add(el.getHeight());
         		lengthbefore.add(el.getLength());
         	}
-
-        	final double my_height=0.17;
+*/
             
         	if(true)
         	Arrays.parallelSetAll(beastMClist, e ->
 		       	{ 
 		        	Tree tretre=(Tree)beastMClist[e].m_mcmc.getState().stateNode[treepositionInStateArray];
+
+		        	final double my_height=tretre.getRoot().getHeight()/2.0;
+		        	
 		        	try {
 						RandomTree.insertSequenceCoalescent(tretre, my_height);
 					} catch (InstantiationException e1) {
@@ -1482,31 +1489,9 @@ IS_ESS = function(log_weights)
             );
             
 
-        	
+        	/*
         	tre=(Tree)beastMClist[0].m_mcmc.getState().stateNode[treepositionInStateArray];
         	Node rootafter=tre.getRoot();
-/*
-        	List<BEASTInterface> predecessors=new ArrayList<>();
-        	tre.getPredecessors(predecessors);
-        	
-        	
-        	Node[] ndArr=tre.getNodesAsArray();
-        	
-        	ArrayList<Double> heights=new ArrayList<>();
-        	ArrayList<Double> lengths=new ArrayList<>();
-        	for(Node el:ndArr) {
-        		heights.add(el.getHeight());
-        		lengths.add(el.getLength());
-        	}
-        	
-        	// heights are the absolute heights, whereas lengths are relative heights
-        	while(heights.contains(my_height))
-        	{// draw another height
-        		my_height=my_height+0.001;
-        	}
-        	RandomTree.insertSequenceCoalescent(tre, my_height);
-        	tre.setEverythingDirty(true);
-*/        	
         	
         	Node[] ndArrafter=tre.getNodesAsArray();
         	ArrayList<Double> heightsafter=new ArrayList<>();
@@ -1518,11 +1503,14 @@ IS_ESS = function(log_weights)
         	int posn=0;
         	tre.setRootOnly(ndArrafter[posn]);
         	tre.setEverythingDirty(true);
-        	
+        	*/
             
         	// save the tree particles
             saveTreeParticles(beastMClist, "Leo_prova_N", treepositionInStateArray, N_int);
 
+            {
+            	int waithere=0;
+            }
             while(nextExponentDouble<0.1)//for (exponentCnt=0; exponentCnt<maxvalcnt; exponentCnt++)
             {// starts from the prior and goes to target (reached when the exponent is equal to 1)
             	// smcStates[(int)i][(int)exponentCnt]=mc.getState();
@@ -1541,7 +1529,7 @@ IS_ESS = function(log_weights)
 				}
 				else
 				{
-					nextExponentDouble=nextExponentDouble+0.01;
+					nextExponentDouble=nextExponentDouble+stepSize;
 				}
 				
 				if(currentExponentDouble==0)
@@ -1572,7 +1560,9 @@ IS_ESS = function(log_weights)
                	ESSval=ESS(logWeightsNormalized);
 				
 				outEss.println(rowCounterString + ESSval);
-				
+				System.out.println("cycle");
+				System.out.println("nr of nodes before mcmc: "+((Tree) beastMClist[0].m_mcmc.getState().stateNode[treepositionInStateArray]).getNodeCount());
+				System.out.println("nr of stored nodes before mcmc: "+((Tree) beastMClist[0].m_mcmc.getState().stateNode[treepositionInStateArray]).getStoredNodes().length);
 				// only resample if ESS<half particles and if we are not in the last step
                	if(nextExponentDouble<1.0)
                	{
@@ -1595,6 +1585,9 @@ IS_ESS = function(log_weights)
                         avgRejectionList.add(auxDoubleVar);
                         //avgRejection[(int) exponentCnt]=auxDoubleVar;
                    	}
+    				System.out.println("nr of nodes after mcmc: "+((Tree) beastMClist[0].m_mcmc.getState().stateNode[treepositionInStateArray]).getNodeCount());
+    				System.out.println("nr of stored nodes after mcmc: "+((Tree) beastMClist[0].m_mcmc.getState().stateNode[treepositionInStateArray]).getStoredNodes().length);
+
                	}
             }// outer parentheses 
         	

@@ -1483,7 +1483,7 @@ IS_ESS = function(log_weights)
 				        	{
 				        		if (st instanceof RandomTree)
 				        		{
-				        			RandomTree.updateRandomTree((RandomTree)st, tretre);
+				        			RandomTree.copyTree((RandomTree)st, tretre);
 				        		}
 				        	}
 						

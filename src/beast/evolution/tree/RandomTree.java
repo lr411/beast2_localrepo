@@ -107,6 +107,9 @@ public class RandomTree extends Tree implements StateNodeInitialiser {
     List<Integer>[] children;
 
     Set<String> taxa;
+    
+    // Leo: used to protect the state space values in SMC
+    protected boolean treeIsInitialised=false;
 
     // number of the next internal node, used when creating new internal nodes
     int nextNodeNr;
@@ -320,6 +323,15 @@ public class RandomTree extends Tree implements StateNodeInitialiser {
             }
         }
 
+        if(treeIsInitialised)
+        {
+        	return;
+        }
+        
+        // we need to preserve the state space values,
+        // the following part samples again from the coalescent,
+        // we just need to sample once from it
+        treeIsInitialised=true;
 
         final PopulationFunction popFunction = populationFunctionInput.get();
 
@@ -712,7 +724,7 @@ public class RandomTree extends Tree implements StateNodeInitialiser {
      * @throws IllegalAccessException 
      * @throws InstantiationException 
      */
-    public static boolean insertSequenceCoalescent(Tree tree, double height) throws InstantiationException, IllegalAccessException, ClassNotFoundException
+    public static void insertSequenceCoalescent(Tree tree, double height) throws InstantiationException, IllegalAccessException, ClassNotFoundException
     {
         // get the closest height lower than height and pick that node and insert the new node so that it is bound to that
     	Node[] ndArr=tree.getNodesAsArray();
@@ -796,11 +808,10 @@ public class RandomTree extends Tree implements StateNodeInitialiser {
         // we also need to update the initialisersInput, both value and default value
     	//Input<List<StateNodeInitialiser>> initi=beastMClist[e].m_mcmc.initialisersInput;
 
-
-        return true;
     }
  
-    public static void updateRandomTree(Tree outputTree, Tree sourceTree)
+    // it updates outputTree to replicate the structure of sourceTree
+    public static void copyTree(Tree outputTree, Tree sourceTree)
     {
     	{
 	    	int newLength = sourceTree.getNodeCount();

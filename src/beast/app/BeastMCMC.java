@@ -28,6 +28,7 @@ package beast.app;
 import beagle.BeagleFlag;
 import beast.core.BEASTInterface;
 import beast.core.Distribution;
+import beast.core.Input;
 import beast.app.beastapp.BeastDialog;
 import beast.app.beastapp.BeastMain;
 import beast.app.beauti.Beauti;
@@ -38,6 +39,7 @@ import beast.core.MCMC;
 import beast.core.Runnable;
 import beast.core.State;
 import beast.core.StateNode;
+import beast.core.StateNodeInitialiser;
 import beast.core.util.CompoundDistribution;
 import beast.core.util.Log;
 import beast.evolution.tree.Node;
@@ -97,7 +99,7 @@ public class BeastMCMC {
     final public static String DEVELOPERS = "Beast 2 development team";
     final public static String COPYRIGHT = "Beast 2 development team 2011";
     // number of particles for the SMC
-    public static final long NR_OF_PARTICLES = 10;
+    public static final long NR_OF_PARTICLES = 1;
     // path to save the logs
     final static String logsPath="/Users/lr411/Leo/Github/Genomics/logs_BEAST2/";
     // nr of MCMC moves
@@ -949,20 +951,22 @@ IS_ESS = function(log_weights)
 			//BeastMCMC bmc=beastMClist[e];
        		Sequential bmcc=beastMClist[e];
        	    // here update the weights
+        	Tree tretre=(Tree)beastMClist[e].m_mcmc.getState().stateNode[0];
+
+			System.out.println("Before particle "+e+", nodes: "+tretre.getNodeCount()+", stored: "+tretre.getStoredNodes().length);
+			
        	    MCMC mc=bmcc.m_mcmc;
 
-			System.out.println("nr of nodes before mcmc: "+e+ ", "+((Tree) beastMClist[0].m_mcmc.getState().stateNode[0]).getNodeCount());
-			System.out.println("nr of stored nodes before mcmc: "+e+ ", "+((Tree) beastMClist[0].m_mcmc.getState().stateNode[0]).getStoredNodes().length);
        	    // the mcmc run is done with the previous exponent
         	try {
+        		mc.setInitState(false);
 				bmcc.run();
 			} catch (Exception e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 
-			System.out.println("nr of nodes after first mcmc: "+e+ ", "+((Tree) beastMClist[0].m_mcmc.getState().stateNode[0]).getNodeCount());
-			System.out.println("nr of stored nodes after first mcmc: "+e+ ", "+((Tree) beastMClist[0].m_mcmc.getState().stateNode[0]).getStoredNodes().length);
+			System.out.println("After particle "+e+", nodes: "+tretre.getNodeCount()+", stored: "+tretre.getStoredNodes().length);
         	// here get the nr of rejections
         	nrOfMCMCrejections[e]=mc.getNrOfMCMCrejections();
         	// setting the exponent sets the target distribution
@@ -1454,7 +1458,7 @@ IS_ESS = function(log_weights)
 	     	// MCMC mc=(MCMC)beastMClist[i].m_runnable;
 	    	// mc.getState().stateNode[treepositionInStateArray].log(i, out);
 
-/*        	Tree tre=(Tree)beastMClist[0].m_mcmc.getState().stateNode[treepositionInStateArray];
+        	Tree tre=(Tree)beastMClist[0].m_mcmc.getState().stateNode[treepositionInStateArray];
         	Node root=tre.getRoot();
         	Node[] ndBefore=tre.getNodesAsArray();
         	ArrayList<Double> heightbefore=new ArrayList<>();
@@ -1463,17 +1467,26 @@ IS_ESS = function(log_weights)
         		heightbefore.add(el.getHeight());
         		lengthbefore.add(el.getLength());
         	}
-*/
+
             
         	if(true)
         	Arrays.parallelSetAll(beastMClist, e ->
 		       	{ 
-		        	Tree tretre=(Tree)beastMClist[e].m_mcmc.getState().stateNode[treepositionInStateArray];
+		       		Tree tretre=(Tree)beastMClist[e].m_mcmc.getState().stateNode[treepositionInStateArray];
 
 		        	final double my_height=tretre.getRoot().getHeight()/2.0;
 		        	
 		        	try {
-						RandomTree.insertSequenceCoalescent(tretre, my_height);
+							RandomTree.insertSequenceCoalescent(tretre, my_height);
+				        	List<StateNodeInitialiser> inits=beastMClist[e].m_mcmc.initialisersInput.get();
+				        	for(StateNodeInitialiser st:inits)
+				        	{
+				        		if (st instanceof RandomTree)
+				        		{
+				        			RandomTree.updateRandomTree((RandomTree)st, tretre);
+				        		}
+				        	}
+						
 					} catch (InstantiationException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
@@ -1561,10 +1574,15 @@ IS_ESS = function(log_weights)
 				
 				outEss.println(rowCounterString + ESSval);
 				System.out.println("cycle");
-				System.out.println("nr of nodes before mcmc: "+((Tree) beastMClist[0].m_mcmc.getState().stateNode[treepositionInStateArray]).getNodeCount());
-				System.out.println("nr of stored nodes before mcmc: "+((Tree) beastMClist[0].m_mcmc.getState().stateNode[treepositionInStateArray]).getStoredNodes().length);
-				// only resample if ESS<half particles and if we are not in the last step
-               	if(nextExponentDouble<1.0)
+				System.out.println("Before");
+				
+/*				for(int i=0; i<beastMClist.length; i++)
+				{
+					Tree tr=((Tree) beastMClist[0].m_mcmc.getState().stateNode[treepositionInStateArray]);
+					System.out.println("particle "+i+", nodes: "+tr.getNodeCount()+", stored: "+tr.getStoredNodes().length);
+				}
+*/				// only resample if ESS<half particles and if we are not in the last step
+               	//if(nextExponentDouble<1.0)
                	{
     				if(ESSval<(N_int/2.0)) 
                    	{
@@ -1585,9 +1603,13 @@ IS_ESS = function(log_weights)
                         avgRejectionList.add(auxDoubleVar);
                         //avgRejection[(int) exponentCnt]=auxDoubleVar;
                    	}
-    				System.out.println("nr of nodes after mcmc: "+((Tree) beastMClist[0].m_mcmc.getState().stateNode[treepositionInStateArray]).getNodeCount());
-    				System.out.println("nr of stored nodes after mcmc: "+((Tree) beastMClist[0].m_mcmc.getState().stateNode[treepositionInStateArray]).getStoredNodes().length);
-
+/*    				System.out.println("After");
+    				for(int i=0; i<beastMClist.length; i++)
+    				{
+    					Tree tr=((Tree) beastMClist[0].m_mcmc.getState().stateNode[treepositionInStateArray]);
+    					System.out.println("particle "+i+", nodes: "+tr.getNodeCount()+", stored: "+tr.getStoredNodes().length);
+    				}
+*/
                	}
             }// outer parentheses 
         	

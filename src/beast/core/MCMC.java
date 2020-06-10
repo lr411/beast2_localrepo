@@ -112,6 +112,10 @@ public class MCMC extends Runnable {
 
     protected boolean m_loggerNameInitialised=false;
     
+    // Leo, indicates whether to initialise the state variables (to be set to false if we
+    // add genetic sequences
+    protected boolean m_initState=true;
+    
     // this is used  by algorithms like SMC which rely on particle numbering
     protected long m_particleNr;
     
@@ -441,12 +445,17 @@ public class MCMC extends Runnable {
     }
 
 
+    public void setInitState(boolean initState)
+    {
+    	this.m_initState=initState;
+    }
+    
     @Override
     public void run() throws IOException, SAXException, ParserConfigurationException {
         // set up state (again). Other beastObjects may have manipulated the
         // StateNodes, e.g. set up bounds or dimensions
         // Leo: called already in the initialization
-    	// state.initAndValidate();
+        state.initAndValidate();
         // also, initialise state with the file name to store and set-up whether to resume from file
     	
     	state.setStateFileName(stateFileName);
@@ -474,8 +483,11 @@ public class MCMC extends Runnable {
             }
         } else {
             do {
-                for (final StateNodeInitialiser initialiser : initialisersInput.get()) {
-                    initialiser.initStateNodes();
+	                //if(m_initState)
+	                {
+	                	for (final StateNodeInitialiser initialiser : initialisersInput.get()) {
+	                        initialiser.initStateNodes();
+	                }
                 }
                 if(useOldMcmcCode)
                 {

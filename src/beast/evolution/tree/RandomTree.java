@@ -792,10 +792,51 @@ public class RandomTree extends Tree implements StateNodeInitialiser {
         tree.hasStartedEditing=false;
         updateStoredNodes(tree.getNodeCount(), tree);
         tree.hasStartedEditing=false;
+        
+        // we also need to update the initialisersInput, both value and default value
+    	//Input<List<StateNodeInitialiser>> initi=beastMClist[e].m_mcmc.initialisersInput;
+
 
         return true;
     }
  
+    public static void updateRandomTree(Tree outputTree, Tree sourceTree)
+    {
+    	{
+	    	int newLength = sourceTree.getNodeCount();
+	    	if(outputTree.getNodeCount() != newLength)
+	        {// upgrade length
+	    		outputTree.m_nodes=Arrays.copyOf(outputTree.m_nodes, newLength);
+	        }
+	    	
+	    	final Node copyRoot = sourceTree.getRoot().copy();
+	    	outputTree.root=copyRoot;
+	        
+	    	listNodesUpgraded(copyRoot, outputTree.m_nodes, (Tree)outputTree);
+    	}
+    	
+    	// same for stored nodes
+    	{
+	    	int newLength = sourceTree.getNodeCount();
+	    	if(outputTree.getStoredNodes().length != newLength)
+	        {// upgrade length
+	    		outputTree.m_storedNodes=Arrays.copyOf(outputTree.m_storedNodes, newLength);
+	        }
+	    	
+	    	final Node copyRoot = sourceTree.getRoot().copy();
+	    	outputTree.storedRoot=copyRoot;
+	        
+	    	listNodesUpgraded(copyRoot, outputTree.m_storedNodes, (Tree)outputTree);
+    	}
+    	outputTree.nodeCount=sourceTree.getNodeCount();
+    	outputTree.internalNodeCount=sourceTree.getInternalNodeCount();
+    	outputTree.leafNodeCount=sourceTree.getLeafNodeCount();
+        outputTree.m_sTaxaNames=Arrays.copyOf(sourceTree.getTaxaNames(),sourceTree.getTaxaNames().length);
+
+    	// invalidate cache
+    	outputTree.postCache = null;
+    }
+    
     
     private static void listNodesUpgraded(final Node node, final Node[] nodes, Tree tree) 
     {

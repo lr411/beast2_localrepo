@@ -102,7 +102,7 @@ public class BeastMCMC {
     final public static String DEVELOPERS = "Beast 2 development team";
     final public static String COPYRIGHT = "Beast 2 development team 2011";
     // number of particles for the SMC
-    public static final long NR_OF_PARTICLES = 1;
+    public static final long NR_OF_PARTICLES = 2;
     // path to save the logs
     final static String logsPath="/Users/lr411/Leo/Github/Genomics/logs_BEAST2/";
     // nr of MCMC moves
@@ -1471,59 +1471,75 @@ IS_ESS = function(log_weights)
         		lengthbefore.add(el.getLength());
         	}
         	
+        	if(true)
         	{
         		// add the new sequence first to first element of the list, then use the same shared input for all
         		Tree tret=(Tree)beastMClist[0].m_mcmc.getState().stateNode[treepositionInStateArray];
         		String taxonID="t"+tret.getNodeCount();
         		String seqstr="GTCGTCCAAGGAGAAGGACTGATTGCAAACCTGACAGCGCTGAATTCGGTGTCGAATGATCCAAAATGCATTTACCAGCATAAGCAACGAATGGTCACATCGTAAATTCAACAACTCATAGTCAATTCCCGGCGTACAGTTACTGCGACGTTTTTCATGCACGCGTAGAAGATCCATAGCCGCTTGACGTGATATCGACTCGCTACGTGATAATTAGTGTGGGCGAACAAACAACTCGTTGCACGTGGACCCCCCGGCCTCGGGCTGAGAGTGACTAGAGTATCTGACACGCGGCCCTGCGATCATCTTGCGCTGGACCGCACGGAGAGTAAGCTACCTCAACTTTTTTCATAATCCTTCTTCCGGCGGGCGACGGTAGTCTGCCGCGGGTACTACTTCGGGAGAGTCCATACATTGAAATCACTCATGTTGATCAACAAACCGGAGGTACACGGCACCGTACCCGCCCGGCTAACACTTAGTTACTTAACTTAATGCTCATGCCTAGTTGTAGGGGAACGGAGAGACGGGTGGGCTATTAGGCGTCATCATGTCTGGAGTTGATGCCCGTGCAAGAGACTTACAGCTAATGTAACGCCGCGGTATACCTCCAGGGTTAGAACGGCTGAACGTGCCTTCTCACCTCTGCTACCCTGACTAGAAGACGTTCAATCCTGGAGGCTCACATGGTTCGAAGTTCTATACTCGCGACCGAGTCTGCCCTTCTGGCCTAATGAGAGCATACATTGTTGAAATAGCAACACAGAGGTCGGTACATTCCCATACTGCAGGACGCCAGAACCACCTAGGCTTAGGCATGTGGACAGATTTACACTCACGGACCCACGGCGCTACCTAAGATTCGCATCCTTTGAACATCTGTGGGTCCCCATTAGACTAGCAATCCCGATATCTGCGTGTACACTTTGGCCTCGACTATCGTGCTCACTGCTGACAAATTCTAGTCGCTTCAAGTAGTGTAAAACACCTCGGAGGTAAC";
         		Sequence seq=new Sequence(taxonID, seqstr);
-        		TaxonSet txs=tret.m_taxonset.get();
-        		
+        		final TaxonSet txs=tret.m_taxonset.get();
+        		final Input<TaxonSet> txset=tret.m_taxonset;
         		Alignment ali=txs.alignmentInput.get();
         		//List<Sequence> 
         		ali.initializeWithAddedSequenceList(Arrays.asList(seq), false);
         		txs.addTaxaName(taxonID);
+        		final Input<Alignment> aliinput=txs.alignmentInput;
+        		/*
+        		Tree tret1=(Tree)beastMClist[1].m_mcmc.getState().stateNode[treepositionInStateArray];
+        		// add alignment and taxon set
+        		TaxonSet txs1=tret1.m_taxonset.get();
+        		
+        		//Alignment ali1=txs1.alignmentInput.get();
+        		//ali1=ali;
+        		txs1=txs;
+        		int kkl=0;
+        		*/
         		
         		// after having updated the tree we need to update all obj that hv the tree as input?
         		// probably not needed as the initialisation is done anyway in the mcmc init
         		
-        	}
-            
-        	if(true)
-        	Arrays.parallelSetAll(beastMClist, e ->
-		       	{ 
-		       		// add sequence here to all
-		       		// would be good to have a shared taxa, taxonset, alignment for all particles
-		       		
-		       		
-		       		Tree tretre=(Tree)beastMClist[e].m_mcmc.getState().stateNode[treepositionInStateArray];
 
-		        	final double my_height=tretre.getRoot().getHeight()/2.0;
-		        	
-		        	try {
-							RandomTree.insertSequenceCoalescent(tretre, my_height);
-				        	List<StateNodeInitialiser> inits=beastMClist[e].m_mcmc.initialisersInput.get();
-				        	for(StateNodeInitialiser st:inits)
-				        	{
-				        		if (st instanceof RandomTree)
-				        		{
-				        			RandomTree.copyTree((RandomTree)st, tretre);
-				        		}
-				        	}
-						
-					} catch (InstantiationException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					} catch (IllegalAccessException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					} catch (ClassNotFoundException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					} 	       		
-		        	return beastMClist[e];
-		       	}
-            );
+        		Arrays.parallelSetAll(beastMClist, e ->
+			       	{ 
+			       		// add sequence here to all
+			       		// would be good to have a shared taxa, taxonset, alignment for all particles
+			       		
+			       		
+			       		Tree tretre=(Tree)beastMClist[e].m_mcmc.getState().stateNode[treepositionInStateArray];
+			       		TaxonSet txs_x=tretre.m_taxonset.get();
+			       		
+			       		// set same alignment and taxonset to all
+			       		txs_x=txs;
+	
+			        	final double my_height=tretre.getRoot().getHeight()/2.0;
+			        	
+			        	try {
+								RandomTree.insertSequenceCoalescent(tretre, my_height);
+					        	List<StateNodeInitialiser> inits=beastMClist[e].m_mcmc.initialisersInput.get();
+					        	for(StateNodeInitialiser st:inits)
+					        	{
+					        		if (st instanceof RandomTree)
+					        		{
+					        			((RandomTree)st).taxaInput=aliinput;
+					        			RandomTree.copyTree((RandomTree)st, tretre);
+					        		}
+					        	}
+							
+						} catch (InstantiationException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						} catch (IllegalAccessException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						} catch (ClassNotFoundException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						} 	       		
+			        	return beastMClist[e];
+	        	}
+	        	);
+        	}
             
 
         	/*

@@ -64,7 +64,7 @@ import beast.util.Randomizer;
 
 @Description("This class provides the basic engine for coalescent simulation of a given demographic model over a given time period. ")
 public class RandomTree extends Tree implements StateNodeInitialiser {
-    final public Input<Alignment> taxaInput = new Input<>("taxa", "set of taxa to initialise tree specified by alignment");
+    public Input<Alignment> taxaInput = new Input<>("taxa", "set of taxa to initialise tree specified by alignment");
 
     final public Input<PopulationFunction> populationFunctionInput = new Input<>("populationModel", "population function for generating coalescent???", Validate.REQUIRED);
     final public Input<List<MRCAPrior>> calibrationsInput = new Input<>("constraint", "specifies (monophyletic or height distribution) constraints on internal nodes", new ArrayList<>());

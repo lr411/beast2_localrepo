@@ -77,6 +77,13 @@ public class TaxonSet extends Taxon {
         return Collections.unmodifiableList(taxaNames);
     }
 
+    // Leo: we need the lista of taxa names to be updated from outside
+    // this assumes that the sequence has already been added in the alignment
+    public void addTaxaName(String taxaname)
+    {
+    	taxaNames.add(taxaname);
+    }
+    
     /**
      * @return the taxa names as a set of strings.
      */

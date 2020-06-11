@@ -42,6 +42,9 @@ import beast.core.StateNode;
 import beast.core.StateNodeInitialiser;
 import beast.core.util.CompoundDistribution;
 import beast.core.util.Log;
+import beast.evolution.alignment.Alignment;
+import beast.evolution.alignment.Sequence;
+import beast.evolution.alignment.TaxonSet;
 import beast.evolution.tree.Node;
 import beast.evolution.tree.RandomTree;
 //import beast.evolution.tree.RandomTree.ConstraintViolatedException;
@@ -1467,11 +1470,32 @@ IS_ESS = function(log_weights)
         		heightbefore.add(el.getHeight());
         		lengthbefore.add(el.getLength());
         	}
-
+        	
+        	{
+        		// add the new sequence first to first element of the list, then use the same shared input for all
+        		Tree tret=(Tree)beastMClist[0].m_mcmc.getState().stateNode[treepositionInStateArray];
+        		String taxonID="t"+tret.getNodeCount();
+        		String seqstr="GTCGTCCAAGGAGAAGGACTGATTGCAAACCTGACAGCGCTGAATTCGGTGTCGAATGATCCAAAATGCATTTACCAGCATAAGCAACGAATGGTCACATCGTAAATTCAACAACTCATAGTCAATTCCCGGCGTACAGTTACTGCGACGTTTTTCATGCACGCGTAGAAGATCCATAGCCGCTTGACGTGATATCGACTCGCTACGTGATAATTAGTGTGGGCGAACAAACAACTCGTTGCACGTGGACCCCCCGGCCTCGGGCTGAGAGTGACTAGAGTATCTGACACGCGGCCCTGCGATCATCTTGCGCTGGACCGCACGGAGAGTAAGCTACCTCAACTTTTTTCATAATCCTTCTTCCGGCGGGCGACGGTAGTCTGCCGCGGGTACTACTTCGGGAGAGTCCATACATTGAAATCACTCATGTTGATCAACAAACCGGAGGTACACGGCACCGTACCCGCCCGGCTAACACTTAGTTACTTAACTTAATGCTCATGCCTAGTTGTAGGGGAACGGAGAGACGGGTGGGCTATTAGGCGTCATCATGTCTGGAGTTGATGCCCGTGCAAGAGACTTACAGCTAATGTAACGCCGCGGTATACCTCCAGGGTTAGAACGGCTGAACGTGCCTTCTCACCTCTGCTACCCTGACTAGAAGACGTTCAATCCTGGAGGCTCACATGGTTCGAAGTTCTATACTCGCGACCGAGTCTGCCCTTCTGGCCTAATGAGAGCATACATTGTTGAAATAGCAACACAGAGGTCGGTACATTCCCATACTGCAGGACGCCAGAACCACCTAGGCTTAGGCATGTGGACAGATTTACACTCACGGACCCACGGCGCTACCTAAGATTCGCATCCTTTGAACATCTGTGGGTCCCCATTAGACTAGCAATCCCGATATCTGCGTGTACACTTTGGCCTCGACTATCGTGCTCACTGCTGACAAATTCTAGTCGCTTCAAGTAGTGTAAAACACCTCGGAGGTAAC";
+        		Sequence seq=new Sequence(taxonID, seqstr);
+        		TaxonSet txs=tret.m_taxonset.get();
+        		
+        		Alignment ali=txs.alignmentInput.get();
+        		//List<Sequence> 
+        		ali.initializeWithAddedSequenceList(Arrays.asList(seq), false);
+        		txs.addTaxaName(taxonID);
+        		
+        		// after having updated the tree we need to update all obj that hv the tree as input?
+        		// probably not needed as the initialisation is done anyway in the mcmc init
+        		
+        	}
             
         	if(true)
         	Arrays.parallelSetAll(beastMClist, e ->
 		       	{ 
+		       		// add sequence here to all
+		       		// would be good to have a shared taxa, taxonset, alignment for all particles
+		       		
+		       		
 		       		Tree tretre=(Tree)beastMClist[e].m_mcmc.getState().stateNode[treepositionInStateArray];
 
 		        	final double my_height=tretre.getRoot().getHeight()/2.0;

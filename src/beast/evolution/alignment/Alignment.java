@@ -279,6 +279,50 @@ public class Alignment extends Map<String> {
     }
 
     /**
+     * Initializes the alignment given the provided list of sequences (to be added to the existing ones) and no other information.
+     * It site weights and/or data type have been previously set up with initAndValidate then they
+     * remain in place. This method is used mainly to re-order the sequences to a new taxon order
+     * when an analysis of multiple alignments on the same taxa are undertaken.
+     *
+     * @param sequences
+     */
+    public void initializeWithAddedSequenceList(List<Sequence> sequences, boolean log) {
+        //this.sequences = sequences;
+        //taxaNames.clear();
+        //stateCounts.clear();
+        //counts.clear();
+        try {
+            for (Sequence seq : sequences) {
+            	this.sequences.add(seq);
+
+                counts.add(seq.getSequence(m_dataType));
+                if (taxaNames.contains(seq.getTaxon())) {
+                    throw new RuntimeException("Duplicate taxon found in alignment: " + seq.getTaxon());
+                }
+                taxaNames.add(seq.getTaxon());
+                tipLikelihoods.add(seq.getLikelihoods());
+                // if seq.isUncertain() == false then the above line adds 'null'
+	            // to the list, indicating that this particular sequence has no tip likelihood information
+                usingTipLikelihoods |= (seq.getLikelihoods() != null);	            
+
+                if (seq.totalCountInput.get() != null) {
+                    stateCounts.add(seq.totalCountInput.get());
+                } else {
+                    stateCounts.add(m_dataType.getStateCount());
+                }
+            }
+            if (counts.size() == 0) {
+                // no sequence data
+                throw new RuntimeException("Sequence data expected, but none found");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        sanityCheckCalcPatternsSetUpAscertainment(log);
+    }
+
+    /**
      * Initializes the alignment given the provided list of sequences and no other information.
      * It site weights and/or data type have been previously set up with initAndValidate then they
      * remain in place. This method is used mainly to re-order the sequences to a new taxon order

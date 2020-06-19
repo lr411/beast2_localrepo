@@ -66,7 +66,7 @@ public class MCMC extends Runnable {
             new Input<>("chainLength", "Length of the MCMC chain i.e. number of samples taken in main loop",
                     Input.Validate.REQUIRED);
 
-    final public Input<State> startStateInput =
+    public Input<State> startStateInput =
             new Input<>("state", "elements of the state space");
 
     final public Input<List<StateNodeInitialiser>> initialisersInput =

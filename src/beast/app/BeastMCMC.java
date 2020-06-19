@@ -45,6 +45,7 @@ import beast.core.util.Log;
 import beast.evolution.alignment.Alignment;
 import beast.evolution.alignment.Sequence;
 import beast.evolution.alignment.TaxonSet;
+import beast.evolution.likelihood.ThreadedTreeLikelihood;
 import beast.evolution.tree.Node;
 import beast.evolution.tree.RandomTree;
 //import beast.evolution.tree.RandomTree.ConstraintViolatedException;
@@ -52,10 +53,13 @@ import beast.evolution.tree.RandomTree;
 import beast.evolution.tree.Tree;
 import beast.util.*;
 import jam.util.IconUtils;
+import beast.evolution.likelihood.*;
 
 import org.json.JSONException;
 import org.w3c.dom.ranges.Range;
 import org.xml.sax.SAXException;
+
+import java.lang.reflect.Field;
 
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
@@ -1483,7 +1487,7 @@ IS_ESS = function(log_weights)
         		Alignment ali=txs.alignmentInput.get();
         		//List<Sequence> 
         		ali.initializeWithAddedSequenceList(Arrays.asList(seq), false);
-        		txs.addTaxaName(taxonID);
+        		//txs.addTaxaName(taxonID);
         		final Input<Alignment> aliinput=txs.alignmentInput;
         		/*
         		Tree tret1=(Tree)beastMClist[1].m_mcmc.getState().stateNode[treepositionInStateArray];
@@ -1505,12 +1509,13 @@ IS_ESS = function(log_weights)
 			       		// add sequence here to all
 			       		// would be good to have a shared taxa, taxonset, alignment for all particles
 			       		
-			       		
-			       		Tree tretre=(Tree)beastMClist[e].m_mcmc.getState().stateNode[treepositionInStateArray];
+			       		MCMC mc=beastMClist[e].m_mcmc;
+			       		State stt=mc.getState();
+			       		Tree tretre=(Tree) stt.stateNode[treepositionInStateArray];
 			       		TaxonSet txs_x=tretre.m_taxonset.get();
 			       		
 			       		// set same alignment and taxonset to all
-			       		txs_x=txs;
+			       		// also set startstate for the mcmc
 	
 			        	final double my_height=tretre.getRoot().getHeight()/2.0;
 			        	
@@ -1525,7 +1530,26 @@ IS_ESS = function(log_weights)
 					        			RandomTree.copyTree((RandomTree)st, tretre);
 					        		}
 					        	}
-							
+					       		txs_x=txs;
+					       		tretre.m_traitList=tret.m_traitList;
+					       		tretre.m_taxonset=tret.m_taxonset;
+					       		tretre.nodeTypeInput=tret.nodeTypeInput;
+					       		mc.startStateInput.setValue(stt, null);
+					       		CompoundDistribution dst=(CompoundDistribution) mc.GetLikelihoodFromInput();
+					       		Map<String, Input<?>> mp=dst.getInputs();
+					       		mp.get("Alignment");
+					       		List<Distribution> trdt=dst.pDistributions.get();
+					       		for(Distribution distrib:trdt)
+					       		{
+					       			if(distrib instanceof ThreadedTreeLikelihood)
+					       			{
+						       			ThreadedTreeLikelihood trd=(ThreadedTreeLikelihood)distrib;
+						       			trd.dataInput=aliinput;
+						       			trd.treeInput.setValue(tretre, null);
+					       			}
+					       			distrib.initAndValidate();
+					       		}
+					       		
 						} catch (InstantiationException e1) {
 							// TODO Auto-generated catch block
 							e1.printStackTrace();

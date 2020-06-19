@@ -402,6 +402,10 @@ public class XMLParser {
         					
         					rtree.setBmcMc(this.m_bmcmc);
         		}
+         		if(beastObject.getID().toLowerCase().contains("treelikelihood"))
+         		{
+         			int iiii=0;
+         		}
         	    node = nodesWaitingToInit.get(i);
         		beastObject.initAndValidate();
         		

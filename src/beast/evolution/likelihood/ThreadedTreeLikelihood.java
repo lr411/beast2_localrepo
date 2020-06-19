@@ -114,6 +114,8 @@ public class ThreadedTreeLikelihood extends GenericTreeLikelihood {
         }
         
         logPByThread = new double[threadCount];
+        int tax=dataInput.get().getTaxonCount();
+        int lef=treeInput.get().getLeafNodeCount();
 
     	// sanity check: alignment should have same #taxa as tree
     	if (dataInput.get().getTaxonCount() != treeInput.get().getLeafNodeCount()) {

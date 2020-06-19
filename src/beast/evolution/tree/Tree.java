@@ -16,12 +16,12 @@ import java.util.List;
         + " relationships among sequence data.")
 public class Tree extends StateNode implements TreeInterface {
     final public Input<Tree> m_initial = new Input<>("initial", "tree to start with");
-    final public Input<List<TraitSet>> m_traitList = new Input<>("trait",
+     public Input<List<TraitSet>> m_traitList = new Input<>("trait",
             "trait information for initializing traits (like node dates) in the tree",
             new ArrayList<>());
-    final public Input<TaxonSet> m_taxonset = new Input<>("taxonset",
+     public Input<TaxonSet> m_taxonset = new Input<>("taxonset",
             "set of taxa that correspond to the leafs in the tree");
-    final public Input<String> nodeTypeInput = new Input<>("nodetype",
+     public Input<String> nodeTypeInput = new Input<>("nodetype",
             "type of the nodes in the beast.tree", Node.class.getName());
 
     /**

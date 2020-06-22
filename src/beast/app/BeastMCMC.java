@@ -106,7 +106,7 @@ public class BeastMCMC {
     final public static String DEVELOPERS = "Beast 2 development team";
     final public static String COPYRIGHT = "Beast 2 development team 2011";
     // number of particles for the SMC
-    public static final long NR_OF_PARTICLES = 2;
+    public static final long NR_OF_PARTICLES = 10;
     // path to save the logs
     final static String logsPath="/Users/lr411/Leo/Github/Genomics/logs_BEAST2/";
     // nr of MCMC moves
@@ -960,7 +960,7 @@ IS_ESS = function(log_weights)
        	    // here update the weights
         	Tree tretre=(Tree)beastMClist[e].m_mcmc.getState().stateNode[0];
 
-			System.out.println("Before particle "+e+", nodes: "+tretre.getNodeCount()+", stored: "+tretre.getStoredNodes().length);
+		//	System.out.println("Before particle "+e+", nodes: "+tretre.getNodeCount()+", stored: "+tretre.getStoredNodes().length);
 			
        	    MCMC mc=bmcc.m_mcmc;
 
@@ -973,7 +973,7 @@ IS_ESS = function(log_weights)
 				e1.printStackTrace();
 			}
 
-			System.out.println("After particle "+e+", nodes: "+tretre.getNodeCount()+", stored: "+tretre.getStoredNodes().length);
+		//	System.out.println("After particle "+e+", nodes: "+tretre.getNodeCount()+", stored: "+tretre.getStoredNodes().length);
         	// here get the nr of rejections
         	nrOfMCMCrejections[e]=mc.getNrOfMCMCrejections();
         	// setting the exponent sets the target distribution
@@ -1371,6 +1371,96 @@ IS_ESS = function(log_weights)
 }
 */	
  
+    private void addSequence(Sequential[] beastMClist, int treepositionInStateArray)
+	{
+		// add the new sequence first to first element of the list, then use the same shared input for all
+		Tree tret=(Tree)beastMClist[0].m_mcmc.getState().stateNode[treepositionInStateArray];
+		String taxonID="t"+(tret.getLeafNodeCount()+1);
+		String seqstr="GTTGGCACAGTCGAATGACTGGTATACTGTTCGTCAACGATTACATAGGACTCGACTGAGCGGGACGAACTTAGGCATAATGGGGAAAGTAGCCTCCCTTCCATACCGCAAGATTTGGTATACTCTCCCCGTCTGGCAGAATCGTCCCCCTATTTTGTCCACTAGTTTACACGTGGCAGAAGCCGGACGGGGTATTGCCTCGTCTCGCTATGCGAAGTGGAGGCCAAACGATAACTAAATAAACAAGGACCACTACAGATGTGAATGGGCACCACTTAAGCATCTGCATCGAACACATGGGAAAACCTTTCGTTCAAGCAAATCTAAACTTAGACCACCGACCTCTTGTGATGCTCATTCGGACGGAGAGTGATCCAAGGGAGTCTGGGTTACGGGTCTTGTGTAGACCTTTCAGTCAATGCCTCCATTTTGATCCAAACACTGGATGTTCAATCACTCGTTAGTAGCCCACTGTTATGAGAGGACACCAGTTGACCAGGATGCCGACGCCTATGGTAACGGCGAGTGTAGAGTCCGAATAGTTGGCAAACTATCGAGACTGTTTGCACGTAAAACCGGCATTCAGCAACTGTTGACCGGTGGTAATCCTCGAGGGGTCAAATCACTGATCCATTAGAGTACCCTGTACTAGCCTATACAACCGAAGGTAAATCGATACCTAACAGGGGTTATGCGCTCCTAAACGCTTCCCAGAGTGTGCGCTGCTCGGCTAAGGCGTTCCAAACTTGTAAAAATCTTTACGCGGATTACTTGATGGGACGATTTACCACACCCACAGGCTCATCTGTACGTTGATCGGAGCTGCGATTAACACACGGTAAGGCACGGTGGTATCAAAACTTTACATTCATGAAGTATGAGGGTGTCACAATCAAAGTACCAGGCATAAAAATTGCCTGTAACCTTGGGATTCGTAAATCCAGCCGAAGGCTGACAAATTCGGGCGGAAGACCCTAATTTACAAAACCTCGGAGGTAAG";
+		Sequence seq=new Sequence(taxonID, seqstr);
+		final TaxonSet txs=tret.m_taxonset.get();
+		final Input<TaxonSet> txset=tret.m_taxonset;
+		Alignment ali=txs.alignmentInput.get();
+		//List<Sequence> 
+		ali.initializeWithAddedSequenceList(Arrays.asList(seq), false);
+		//txs.addTaxaName(taxonID);
+		final Input<Alignment> aliinput=txs.alignmentInput;
+		/*
+		Tree tret1=(Tree)beastMClist[1].m_mcmc.getState().stateNode[treepositionInStateArray];
+		// add alignment and taxon set
+		TaxonSet txs1=tret1.m_taxonset.get();
+		
+		//Alignment ali1=txs1.alignmentInput.get();
+		//ali1=ali;
+		txs1=txs;
+		int kkl=0;
+		*/
+		
+		// after having updated the tree we need to update all obj that hv the tree as input?
+		// probably not needed as the initialisation is done anyway in the mcmc init
+		
+
+		Arrays.parallelSetAll(beastMClist, e ->
+	       	{ 
+	       		// add sequence here to all
+	       		// would be good to have a shared taxa, taxonset, alignment for all particles
+	       		
+	       		MCMC mc=beastMClist[e].m_mcmc;
+	       		State stt=mc.getState();
+	       		Tree tretre=(Tree) stt.stateNode[treepositionInStateArray];
+	       		TaxonSet txs_x=tretre.m_taxonset.get();
+	       		
+	       		// set same alignment and taxonset to all
+	       		// also set startstate for the mcmc
+
+	        	final double my_height=tretre.getRoot().getHeight()/2.0;
+	        	
+	        	try {
+						RandomTree.insertSequenceCoalescent(tretre, my_height);
+			        	List<StateNodeInitialiser> inits=beastMClist[e].m_mcmc.initialisersInput.get();
+			        	for(StateNodeInitialiser st:inits)
+			        	{
+			        		if (st instanceof RandomTree)
+			        		{
+			        			((RandomTree)st).taxaInput=aliinput;
+			        			RandomTree.copyTree((RandomTree)st, tretre);
+			        		}
+			        	}
+			       		txs_x=txs;
+			       		tretre.m_traitList=tret.m_traitList;
+			       		tretre.m_taxonset=tret.m_taxonset;
+			       		tretre.nodeTypeInput=tret.nodeTypeInput;
+			       		mc.startStateInput.setValue(stt, null);
+			       		CompoundDistribution dst=(CompoundDistribution) mc.GetLikelihoodFromInput();
+			       		Map<String, Input<?>> mp=dst.getInputs();
+			       		mp.get("Alignment");
+			       		List<Distribution> trdt=dst.pDistributions.get();
+			       		for(Distribution distrib:trdt)
+			       		{
+			       			if(distrib instanceof ThreadedTreeLikelihood)
+			       			{
+				       			ThreadedTreeLikelihood trd=(ThreadedTreeLikelihood)distrib;
+				       			trd.dataInput=aliinput;
+				       			trd.treeInput.setValue(tretre, null);
+			       			}
+			       			distrib.initAndValidate();
+			       		}
+			       		
+				} catch (InstantiationException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (IllegalAccessException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (ClassNotFoundException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} 	       		
+	        	return beastMClist[e];
+    	}
+    	);
+	}
+    
     public static void main(String[] args) {
         
     	try {
@@ -1465,6 +1555,7 @@ IS_ESS = function(log_weights)
 	     	// MCMC mc=(MCMC)beastMClist[i].m_runnable;
 	    	// mc.getState().stateNode[treepositionInStateArray].log(i, out);
 
+/*
         	Tree tre=(Tree)beastMClist[0].m_mcmc.getState().stateNode[treepositionInStateArray];
         	Node root=tre.getRoot();
         	Node[] ndBefore=tre.getNodesAsArray();
@@ -1474,12 +1565,12 @@ IS_ESS = function(log_weights)
         		heightbefore.add(el.getHeight());
         		lengthbefore.add(el.getLength());
         	}
-        	
+*/        	
         	if(true)
         	{
         		// add the new sequence first to first element of the list, then use the same shared input for all
         		Tree tret=(Tree)beastMClist[0].m_mcmc.getState().stateNode[treepositionInStateArray];
-        		String taxonID="t"+tret.getNodeCount();
+        		String taxonID="t"+(tret.getLeafNodeCount()+1);
         		String seqstr="GTCGTCCAAGGAGAAGGACTGATTGCAAACCTGACAGCGCTGAATTCGGTGTCGAATGATCCAAAATGCATTTACCAGCATAAGCAACGAATGGTCACATCGTAAATTCAACAACTCATAGTCAATTCCCGGCGTACAGTTACTGCGACGTTTTTCATGCACGCGTAGAAGATCCATAGCCGCTTGACGTGATATCGACTCGCTACGTGATAATTAGTGTGGGCGAACAAACAACTCGTTGCACGTGGACCCCCCGGCCTCGGGCTGAGAGTGACTAGAGTATCTGACACGCGGCCCTGCGATCATCTTGCGCTGGACCGCACGGAGAGTAAGCTACCTCAACTTTTTTCATAATCCTTCTTCCGGCGGGCGACGGTAGTCTGCCGCGGGTACTACTTCGGGAGAGTCCATACATTGAAATCACTCATGTTGATCAACAAACCGGAGGTACACGGCACCGTACCCGCCCGGCTAACACTTAGTTACTTAACTTAATGCTCATGCCTAGTTGTAGGGGAACGGAGAGACGGGTGGGCTATTAGGCGTCATCATGTCTGGAGTTGATGCCCGTGCAAGAGACTTACAGCTAATGTAACGCCGCGGTATACCTCCAGGGTTAGAACGGCTGAACGTGCCTTCTCACCTCTGCTACCCTGACTAGAAGACGTTCAATCCTGGAGGCTCACATGGTTCGAAGTTCTATACTCGCGACCGAGTCTGCCCTTCTGGCCTAATGAGAGCATACATTGTTGAAATAGCAACACAGAGGTCGGTACATTCCCATACTGCAGGACGCCAGAACCACCTAGGCTTAGGCATGTGGACAGATTTACACTCACGGACCCACGGCGCTACCTAAGATTCGCATCCTTTGAACATCTGTGGGTCCCCATTAGACTAGCAATCCCGATATCTGCGTGTACACTTTGGCCTCGACTATCGTGCTCACTGCTGACAAATTCTAGTCGCTTCAAGTAGTGTAAAACACCTCGGAGGTAAC";
         		Sequence seq=new Sequence(taxonID, seqstr);
         		final TaxonSet txs=tret.m_taxonset.get();
@@ -1614,14 +1705,14 @@ IS_ESS = function(log_weights)
 					int dbgvar=0;
 				}
 				
-				System.out.println(nextExponentDouble);
+				System.out.println("Exponent: "+nextExponentDouble);
 
 				// reweight done below, calculation of the incremental part
             	calculateIncrementalWeights(beastMClist, logIncrementalWeights, currentExponentDouble, nextExponentDouble);
 				// CESS to be calculated before renormalising
             	
             	currentExponentDouble= nextExponentDouble;
-            	System.out.println(nextExponentDouble);
+
             	CESSval=CESS(logIncrementalWeights, logWeightsNormalized);
 
             	rowCounterString=currentExponentDouble + divider;
@@ -1637,8 +1728,6 @@ IS_ESS = function(log_weights)
                	ESSval=ESS(logWeightsNormalized);
 				
 				outEss.println(rowCounterString + ESSval);
-				System.out.println("cycle");
-				System.out.println("Before");
 				
 /*				for(int i=0; i<beastMClist.length; i++)
 				{

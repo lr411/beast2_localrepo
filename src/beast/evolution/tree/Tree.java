@@ -1004,6 +1004,33 @@ public class Tree extends StateNode implements TreeInterface {
     }
 
     /**
+     * Adds a node to the the node array at a specified position,
+     * all other nodes from position upwards are assigned new idS
+     *  nodeCount and leafNodeCount are recalculated.
+     */
+    public void addNodeAtPosition(final Node newNode, int position) {
+        final Node[] tmp = new Node[nodeCount + 1];
+        System.arraycopy(m_nodes, 0, tmp, 0, position);        
+        tmp[position] = newNode;
+        newNode.setNr(position);
+
+        // copy the rest of the elements
+        System.arraycopy(m_nodes, position, tmp, position+1, nodeCount-position);
+        
+        for(int i=position+1;i<=nodeCount;i++)
+        {
+        	tmp[i].setNr(i);
+        }
+
+        m_nodes = tmp;
+        nodeCount++;
+        if (newNode.getChildCount() > 0)
+            internalNodeCount++;
+        else
+            leafNodeCount++;
+    }
+
+    /**
      * Adds a node to the end of the node array. nodeCount and leafNodeCount are recalculated.
      * Use with care!
      */

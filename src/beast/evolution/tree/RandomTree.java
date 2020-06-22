@@ -763,19 +763,25 @@ public class RandomTree extends Tree implements StateNodeInitialiser {
     	Node closest=ndArr[closestIndex.getAsInt()];
     	
 
-    	 
+    	Tree tr=closest.getTree();
+    	int nextLeafPosition=tr.getLeafNodeCount();
+    	// the Nr of the node is the position in the array, zero based
+    	// the id of the leaves is t_ and is 1 based
+    	// all nodes from 
+    	
     	// now add the new leaf
         // newLeaf has no children
         final Node newLeaf = (Node) Class.forName(Node.class.getName()).newInstance();
-        newLeaf.setNr(ndArr.length);   // multiple tries may generate an excess of nodes assert(nextNodeNr <= nrOfTaxa*2-1);
+        //newLeaf.setNr(nextLeafPosition);//ndArr.length);   // multiple tries may generate an excess of nodes assert(nextNodeNr <= nrOfTaxa*2-1);
         newLeaf.setHeight(0.0); // leaves have zero height
-        newLeaf.setID("t"+ndArr.length);
+        newLeaf.setID("t"+(nextLeafPosition+1));//ndArr.length);
         newLeaf.m_tree=closest.getTree();
+                
 
         Node formerParent=closest.getParent();
         
     	final Node newNode = (Node) Class.forName(Node.class.getName()).newInstance(); //newNode();
-        newNode.setNr(ndArr.length+1);   // multiple tries may generate an excess of nodes assert(nextNodeNr <= nrOfTaxa*2-1);
+        //newNode.setNr(ndArr.length+1);   // multiple tries may generate an excess of nodes assert(nextNodeNr <= nrOfTaxa*2-1);
         newNode.setHeight(height);
         newNode.setLeft(closest);// setleft automatically sets child at posn 0
         newNode.setRight(newLeaf);// setleft automatically sets child at posn 1
@@ -795,7 +801,7 @@ public class RandomTree extends Tree implements StateNodeInitialiser {
         	formerParent.setRight(newNode);
         }
         
-        tree.addNode(newLeaf);
+        tree.addNodeAtPosition(newLeaf,nextLeafPosition);
         tree.addNode(newNode);
         
         // we have to copy to the stored nodes too

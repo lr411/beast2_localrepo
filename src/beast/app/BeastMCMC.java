@@ -1371,7 +1371,7 @@ IS_ESS = function(log_weights)
 }
 */	
  
-    private void addSequence(Sequential[] beastMClist, int treepositionInStateArray)
+    private static void addSequence(Sequential[] beastMClist, int treepositionInStateArray)
 	{
 		// add the new sequence first to first element of the list, then use the same shared input for all
 		Tree tret=(Tree)beastMClist[0].m_mcmc.getState().stateNode[treepositionInStateArray];
@@ -1622,6 +1622,7 @@ IS_ESS = function(log_weights)
 					        		}
 					        	}
 					       		txs_x=txs;
+					       	    
 					       		tretre.m_traitList=tret.m_traitList;
 					       		tretre.m_taxonset=tret.m_taxonset;
 					       		tretre.nodeTypeInput=tret.nodeTypeInput;
@@ -1679,6 +1680,9 @@ IS_ESS = function(log_weights)
             {
             	int waithere=0;
             }
+            
+            
+            boolean changeSeq=true;
             while(nextExponentDouble<0.1)//for (exponentCnt=0; exponentCnt<maxvalcnt; exponentCnt++)
             {// starts from the prior and goes to target (reached when the exponent is equal to 1)
             	// smcStates[(int)i][(int)exponentCnt]=mc.getState();
@@ -1706,6 +1710,15 @@ IS_ESS = function(log_weights)
 				}
 				
 				System.out.println("Exponent: "+nextExponentDouble);
+				
+				if(changeSeq)
+				{
+					if(nextExponentDouble>0.05)
+					{
+						changeSeq=false;
+						addSequence(beastMClist, treepositionInStateArray);
+					}
+				}
 
 				// reweight done below, calculation of the incremental part
             	calculateIncrementalWeights(beastMClist, logIncrementalWeights, currentExponentDouble, nextExponentDouble);

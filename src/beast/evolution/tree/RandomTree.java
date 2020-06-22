@@ -774,7 +774,8 @@ public class RandomTree extends Tree implements StateNodeInitialiser {
         final Node newLeaf = (Node) Class.forName(Node.class.getName()).newInstance();
         //newLeaf.setNr(nextLeafPosition);//ndArr.length);   // multiple tries may generate an excess of nodes assert(nextNodeNr <= nrOfTaxa*2-1);
         newLeaf.setHeight(0.0); // leaves have zero height
-        newLeaf.setID("t"+(nextLeafPosition+1));//ndArr.length);
+        String leafID="t"+(nextLeafPosition+1);
+        newLeaf.setID(leafID);//ndArr.length);
         newLeaf.m_tree=closest.getTree();
                 
 
@@ -802,6 +803,12 @@ public class RandomTree extends Tree implements StateNodeInitialiser {
         }
         
         tree.addNodeAtPosition(newLeaf,nextLeafPosition);
+        
+        // add leafId to the list of taxa names
+        int oldLen=tree.m_sTaxaNames.length;
+        tree.m_sTaxaNames=Arrays.copyOf(tree.m_sTaxaNames, oldLen+1);
+        tree.m_sTaxaNames[oldLen]=leafID;
+        
         tree.addNode(newNode);
         
         // we have to copy to the stored nodes too
@@ -847,8 +854,8 @@ public class RandomTree extends Tree implements StateNodeInitialiser {
     	}
     	outputTree.nodeCount=sourceTree.getNodeCount();
     	outputTree.internalNodeCount=sourceTree.getInternalNodeCount();
-    	outputTree.leafNodeCount=sourceTree.getLeafNodeCount();
-        outputTree.m_sTaxaNames=Arrays.copyOf(sourceTree.getTaxaNames(),sourceTree.getTaxaNames().length);
+    	outputTree.leafNodeCount=sourceTree.getLeafNodeCount();        
+    	outputTree.m_sTaxaNames=Arrays.copyOf(sourceTree.getTaxaNames(),sourceTree.getTaxaNames().length);
 
     	// invalidate cache
     	outputTree.postCache = null;

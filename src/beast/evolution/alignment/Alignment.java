@@ -109,6 +109,15 @@ public class Alignment extends Map<String> {
      * list of sequences in the alignment *
      */
     protected List<Sequence> sequences = new ArrayList<>();
+    
+    /*
+     * Leo: added to access the string as we need to calculate the distance
+     * of the newly added sequences
+     */
+    public Sequence getSequence(int index)
+    {
+    	return this.sequences.get(index);
+    }
 
     /**
      * list of taxa names defined through the sequences in the alignment *

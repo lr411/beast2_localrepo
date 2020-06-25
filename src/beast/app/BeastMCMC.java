@@ -53,8 +53,10 @@ import beast.evolution.tree.RandomTree;
 import beast.evolution.tree.Tree;
 import beast.util.*;
 import jam.util.IconUtils;
+import javafx.util.Pair;
 import beast.evolution.likelihood.*;
 
+import org.apache.commons.math3.distribution.EnumeratedDistribution;
 import org.json.JSONException;
 import org.w3c.dom.ranges.Range;
 import org.xml.sax.SAXException;
@@ -106,7 +108,7 @@ public class BeastMCMC {
     final public static String DEVELOPERS = "Beast 2 development team";
     final public static String COPYRIGHT = "Beast 2 development team 2011";
     // number of particles for the SMC
-    public static final long NR_OF_PARTICLES = 10;
+    public static final long NR_OF_PARTICLES = 1;
     // path to save the logs
     final static String logsPath="/Users/lr411/Leo/Github/Genomics/logs_BEAST2/";
     // nr of MCMC moves
@@ -1370,31 +1372,62 @@ IS_ESS = function(log_weights)
 	 return exponentCnt;
 }
 */	
- 
-    private static void addSequence(Sequential[] beastMClist, int treepositionInStateArray)
+
+    /*    
+     * the function addSequence adds a sequence of DNA to the exixting taxon set
+     * the return value is the array of the distances number of taxa
+     * the new leaf position in the array of leaves can be inferred by the length of the array
+     * i.e. distances.length=4 for example, means that the new leaf is t5, i.e. the 5th taxon
+    */    
+
+    private static int[] addSequence(Sequential[] beastMClist, int treepositionInStateArray)
 	{
 		// add the new sequence first to first element of the list, then use the same shared input for all
 		Tree tret=(Tree)beastMClist[0].m_mcmc.getState().stateNode[treepositionInStateArray];
-		String taxonID="t"+(tret.getLeafNodeCount()+1);
-		String seqstr="GTTGGCACAGTCGAATGACTGGTATACTGTTCGTCAACGATTACATAGGACTCGACTGAGCGGGACGAACTTAGGCATAATGGGGAAAGTAGCCTCCCTTCCATACCGCAAGATTTGGTATACTCTCCCCGTCTGGCAGAATCGTCCCCCTATTTTGTCCACTAGTTTACACGTGGCAGAAGCCGGACGGGGTATTGCCTCGTCTCGCTATGCGAAGTGGAGGCCAAACGATAACTAAATAAACAAGGACCACTACAGATGTGAATGGGCACCACTTAAGCATCTGCATCGAACACATGGGAAAACCTTTCGTTCAAGCAAATCTAAACTTAGACCACCGACCTCTTGTGATGCTCATTCGGACGGAGAGTGATCCAAGGGAGTCTGGGTTACGGGTCTTGTGTAGACCTTTCAGTCAATGCCTCCATTTTGATCCAAACACTGGATGTTCAATCACTCGTTAGTAGCCCACTGTTATGAGAGGACACCAGTTGACCAGGATGCCGACGCCTATGGTAACGGCGAGTGTAGAGTCCGAATAGTTGGCAAACTATCGAGACTGTTTGCACGTAAAACCGGCATTCAGCAACTGTTGACCGGTGGTAATCCTCGAGGGGTCAAATCACTGATCCATTAGAGTACCCTGTACTAGCCTATACAACCGAAGGTAAATCGATACCTAACAGGGGTTATGCGCTCCTAAACGCTTCCCAGAGTGTGCGCTGCTCGGCTAAGGCGTTCCAAACTTGTAAAAATCTTTACGCGGATTACTTGATGGGACGATTTACCACACCCACAGGCTCATCTGTACGTTGATCGGAGCTGCGATTAACACACGGTAAGGCACGGTGGTATCAAAACTTTACATTCATGAAGTATGAGGGTGTCACAATCAAAGTACCAGGCATAAAAATTGCCTGTAACCTTGGGATTCGTAAATCCAGCCGAAGGCTGACAAATTCGGGCGGAAGACCCTAATTTACAAAACCTCGGAGGTAAG";
+		// the numberOfSequencesAfterUpdate is return value: number of updated number of leaves
+		int numberOfSequencesAfterUpdate=tret.getLeafNodeCount()+1;
+		String taxonID="t"+numberOfSequencesAfterUpdate;
+		final String seqstr="GTTGGCACAGTCGAATGACTGGTATACTGTTCGTCAACGATTACATAGGACTCGACTGAGCGGGACGAACTTAGGCATAATGGGGAAAGTAGCCTCCCTTCCATACCGCAAGATTTGGTATACTCTCCCCGTCTGGCAGAATCGTCCCCCTATTTTGTCCACTAGTTTACACGTGGCAGAAGCCGGACGGGGTATTGCCTCGTCTCGCTATGCGAAGTGGAGGCCAAACGATAACTAAATAAACAAGGACCACTACAGATGTGAATGGGCACCACTTAAGCATCTGCATCGAACACATGGGAAAACCTTTCGTTCAAGCAAATCTAAACTTAGACCACCGACCTCTTGTGATGCTCATTCGGACGGAGAGTGATCCAAGGGAGTCTGGGTTACGGGTCTTGTGTAGACCTTTCAGTCAATGCCTCCATTTTGATCCAAACACTGGATGTTCAATCACTCGTTAGTAGCCCACTGTTATGAGAGGACACCAGTTGACCAGGATGCCGACGCCTATGGTAACGGCGAGTGTAGAGTCCGAATAGTTGGCAAACTATCGAGACTGTTTGCACGTAAAACCGGCATTCAGCAACTGTTGACCGGTGGTAATCCTCGAGGGGTCAAATCACTGATCCATTAGAGTACCCTGTACTAGCCTATACAACCGAAGGTAAATCGATACCTAACAGGGGTTATGCGCTCCTAAACGCTTCCCAGAGTGTGCGCTGCTCGGCTAAGGCGTTCCAAACTTGTAAAAATCTTTACGCGGATTACTTGATGGGACGATTTACCACACCCACAGGCTCATCTGTACGTTGATCGGAGCTGCGATTAACACACGGTAAGGCACGGTGGTATCAAAACTTTACATTCATGAAGTATGAGGGTGTCACAATCAAAGTACCAGGCATAAAAATTGCCTGTAACCTTGGGATTCGTAAATCCAGCCGAAGGCTGACAAATTCGGGCGGAAGACCCTAATTTACAAAACCTCGGAGGTAAG";
+
+		
 		Sequence seq=new Sequence(taxonID, seqstr);
 		final TaxonSet txs=tret.m_taxonset.get();
 		final Input<TaxonSet> txset=tret.m_taxonset;
 		Alignment ali=txs.alignmentInput.get();
+
+		int [] distances=new int[numberOfSequencesAfterUpdate-1];
+		// get the sequence of the last leaf
+		final int nrOfElements=seqstr.length();
+		
+		Arrays.parallelSetAll(distances, e ->
+       	{ 
+       		String curSeqString=ali.getSequence(e).dataInput.get();
+       		int dist=0;
+       		// calculate the distance
+       		for(int i=0;i<nrOfElements;i++)
+       		{
+       			if(seqstr.charAt(i)!=curSeqString.charAt(i))
+       			{
+       				dist++;
+       			}
+       		}
+       		return dist;
+       	});
+		
+		// check if there is any distance equal to 0 (implies that this sequence was already in)
+		boolean sequenceAlreadyPresent = Arrays.stream(distances).parallel().anyMatch(i -> i==0);
+		
+
+		if(sequenceAlreadyPresent)
+		{// signal that the sequence is already in the sequence list
+			
+			return null;
+		}
+		
 		//List<Sequence> 
 		ali.initializeWithAddedSequenceList(Arrays.asList(seq), false);
 		//txs.addTaxaName(taxonID);
 		final Input<Alignment> aliinput=txs.alignmentInput;
-		/*
-		Tree tret1=(Tree)beastMClist[1].m_mcmc.getState().stateNode[treepositionInStateArray];
-		// add alignment and taxon set
-		TaxonSet txs1=tret1.m_taxonset.get();
-		
-		//Alignment ali1=txs1.alignmentInput.get();
-		//ali1=ali;
-		txs1=txs;
-		int kkl=0;
-		*/
 		
 		// after having updated the tree we need to update all obj that hv the tree as input?
 		// probably not needed as the initialisation is done anyway in the mcmc init
@@ -1413,7 +1446,9 @@ IS_ESS = function(log_weights)
 	       		// set same alignment and taxonset to all
 	       		// also set startstate for the mcmc
 
-	        	final double my_height=tretre.getRoot().getHeight()/2.0;
+	        	final double my_height=(tretre.getRoot().getHeight()/2.5345);
+	        	
+	        	
 	        	
 	        	try {
 						RandomTree.insertSequenceCoalescent(tretre, my_height);
@@ -1459,6 +1494,8 @@ IS_ESS = function(log_weights)
 	        	return beastMClist[e];
     	}
     	);
+		
+		return distances;
 	}
     
     public static void main(String[] args) {
@@ -1683,13 +1720,13 @@ IS_ESS = function(log_weights)
             
             
             boolean changeSeq=true;
+            int time_tick=0;
             while(nextExponentDouble<0.1)//for (exponentCnt=0; exponentCnt<maxvalcnt; exponentCnt++)
             {// starts from the prior and goes to target (reached when the exponent is equal to 1)
             	// smcStates[(int)i][(int)exponentCnt]=mc.getState();
             	//if(exponentCnt>=(maxvalcnt/100))
             	//	break;
-            		            		
-				
+            	time_tick++;
             	
             	double outNextExponent=0.0;
 //           	    int nextCESS=getCESSexponent(beastMClist, logIncrementalWeights, logWeightsNormalized, stepSize, previousExponent, (int) exponentCnt, maxvalcnt+1, outNextExponent);
@@ -1716,7 +1753,29 @@ IS_ESS = function(log_weights)
 					if(nextExponentDouble>0.05)
 					{
 						changeSeq=false;
-						addSequence(beastMClist, treepositionInStateArray);
+						int [] distances=addSequence(beastMClist, treepositionInStateArray);
+						final Integer lengthOfSeq=1000;
+						final double lenSeq=lengthOfSeq.doubleValue();
+						final double qtToElevate=lenSeq/(time_tick+lenSeq);
+						// the following array will contain the distances of each sequence with the new added one
+						if(distances != null)
+						{// the new leaf has actually been added
+							double []probabilityWeight= {0.1,0.2,0.25,0.85};//new double[distances.length];
+							//Arrays.parallelSetAll(probabilityWeight, e -> {return Math.exp(distances[e]*Math.log(qtToElevate));});
+							org.apache.commons.math3.util.Pair<Integer, Double> itemToInit=new org.apache.commons.math3.util.Pair<Integer, Double>(0,0.0);
+							List<org.apache.commons.math3.util.Pair<Integer, Double>> pmfWeights=new ArrayList<org.apache.commons.math3.util.Pair<Integer, Double>>(Collections.nCopies(probabilityWeight.length, itemToInit));
+			        		
+							Arrays.parallelSetAll(probabilityWeight, e ->{
+			        			pmfWeights.set(e, new org.apache.commons.math3.util.Pair<Integer, Double>(e,probabilityWeight[e]));
+			        			return probabilityWeight[e];
+			        		});
+			        		
+							EnumeratedDistribution enDist=new EnumeratedDistribution<>(pmfWeights);
+							Integer selectedLeaf=(Integer) enDist.sample();
+							
+							
+							int gh=0;
+						}
 					}
 				}
 

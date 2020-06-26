@@ -57,6 +57,7 @@ import javafx.util.Pair;
 import beast.evolution.likelihood.*;
 
 import org.apache.commons.math3.distribution.EnumeratedDistribution;
+import org.apache.commons.math3.distribution.NormalDistribution;
 import org.json.JSONException;
 import org.w3c.dom.ranges.Range;
 import org.xml.sax.SAXException;
@@ -1759,9 +1760,11 @@ IS_ESS = function(log_weights)
 						final double qtToElevate=lenSeq/(time_tick+lenSeq);
 						// the following array will contain the distances of each sequence with the new added one
 						if(distances != null)
-						{// the new leaf has actually been added
-							double []probabilityWeight= {0.1,0.2,0.25,0.85};//new double[distances.length];
-							//Arrays.parallelSetAll(probabilityWeight, e -> {return Math.exp(distances[e]*Math.log(qtToElevate));});
+						{// the new leaf has actually been added (if distances is null then the new proposed leaf has been rejected as its sequence was already present
+							
+							// here we select the leaf drawing from distribution
+							double []probabilityWeight= new double[distances.length];//{0.1,0.2,0.25,0.85};//
+							Arrays.parallelSetAll(probabilityWeight, e -> {return Math.exp(distances[e]*Math.log(qtToElevate));});
 							org.apache.commons.math3.util.Pair<Integer, Double> itemToInit=new org.apache.commons.math3.util.Pair<Integer, Double>(0,0.0);
 							List<org.apache.commons.math3.util.Pair<Integer, Double>> pmfWeights=new ArrayList<org.apache.commons.math3.util.Pair<Integer, Double>>(Collections.nCopies(probabilityWeight.length, itemToInit));
 			        		
@@ -1771,9 +1774,24 @@ IS_ESS = function(log_weights)
 			        		});
 			        		
 							EnumeratedDistribution enDist=new EnumeratedDistribution<>(pmfWeights);
+							// the following is the draw of the leaf (position of the leaf in the array)
 							Integer selectedLeaf=(Integer) enDist.sample();
 							
+							// now we draw the height, from the paper draw first from a Gaussian
+							// with variance 1/N and mean=2 arcsin (sqrt(Ms/N)) where Ms is the distance, N is seq. length
+							final double sdOfGaussian=1.0/lenSeq;
+							// calculate the weights giving the prob of the gaussians
+							// then draw samples and calculate the height
+							final double meanOfGaussian=2*Math.asin(Math.sqrt(distances[selectedLeaf.intValue()]/lenSeq));
+							org.apache.commons.math3.distribution.NormalDistribution norm=new org.apache.commons.math3.distribution.NormalDistribution(meanOfGaussian, sdOfGaussian);
+							double beta=norm.sample();
 							
+							// from the paper on Sequential Monte Carlo transformations,
+							// calculate the height (formula 24 of paper)
+							double sinVal=Math.sin(beta/2.0);
+							double height=(-3.0/4.0)*Math.log(1.0-((4.0/3.0)*sinVal*sinVal));
+							
+							// then we use the height to calculate where to put our next coalescent event
 							int gh=0;
 						}
 					}

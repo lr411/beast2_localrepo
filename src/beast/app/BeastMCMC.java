@@ -1490,10 +1490,6 @@ IS_ESS = function(log_weights)
 	       		// set same alignment and taxonset to all
 	       		// also set startstate for the mcmc
 
-	        	//final double my_height=(tretre.getRoot().getHeight()/2.5345);
-	        	
-	        	
-	        	
 	        	try {
 						RandomTree.insertSequenceCoalescent_updated(tretre,selectedLeaf.intValue(), my_height);
 			        	List<StateNodeInitialiser> inits=beastMClist[e].m_mcmc.initialisersInput.get();
@@ -1632,139 +1628,9 @@ IS_ESS = function(log_weights)
             
         	double nextExponentDouble=0.0,currentExponentDouble=0.0;
         	
-        	// add taxon here
-	     	// MCMC mc=(MCMC)beastMClist[i].m_runnable;
-	    	// mc.getState().stateNode[treepositionInStateArray].log(i, out);
-
-/*
-        	Tree tre=(Tree)beastMClist[0].m_mcmc.getState().stateNode[treepositionInStateArray];
-        	Node root=tre.getRoot();
-        	Node[] ndBefore=tre.getNodesAsArray();
-        	ArrayList<Double> heightbefore=new ArrayList<>();
-        	ArrayList<Double> lengthbefore=new ArrayList<>();
-        	for(Node el:ndBefore) {
-        		heightbefore.add(el.getHeight());
-        		lengthbefore.add(el.getLength());
-        	}
-*/        	
-        	if(true)
-        	{
-        		// add the new sequence first to first element of the list, then use the same shared input for all
-        		Tree tret=(Tree)beastMClist[0].m_mcmc.getState().stateNode[treepositionInStateArray];
-        		String taxonID="t"+(tret.getLeafNodeCount()+1);
-        		String seqstr="GTCGTCCAAGGAGAAGGACTGATTGCAAACCTGACAGCGCTGAATTCGGTGTCGAATGATCCAAAATGCATTTACCAGCATAAGCAACGAATGGTCACATCGTAAATTCAACAACTCATAGTCAATTCCCGGCGTACAGTTACTGCGACGTTTTTCATGCACGCGTAGAAGATCCATAGCCGCTTGACGTGATATCGACTCGCTACGTGATAATTAGTGTGGGCGAACAAACAACTCGTTGCACGTGGACCCCCCGGCCTCGGGCTGAGAGTGACTAGAGTATCTGACACGCGGCCCTGCGATCATCTTGCGCTGGACCGCACGGAGAGTAAGCTACCTCAACTTTTTTCATAATCCTTCTTCCGGCGGGCGACGGTAGTCTGCCGCGGGTACTACTTCGGGAGAGTCCATACATTGAAATCACTCATGTTGATCAACAAACCGGAGGTACACGGCACCGTACCCGCCCGGCTAACACTTAGTTACTTAACTTAATGCTCATGCCTAGTTGTAGGGGAACGGAGAGACGGGTGGGCTATTAGGCGTCATCATGTCTGGAGTTGATGCCCGTGCAAGAGACTTACAGCTAATGTAACGCCGCGGTATACCTCCAGGGTTAGAACGGCTGAACGTGCCTTCTCACCTCTGCTACCCTGACTAGAAGACGTTCAATCCTGGAGGCTCACATGGTTCGAAGTTCTATACTCGCGACCGAGTCTGCCCTTCTGGCCTAATGAGAGCATACATTGTTGAAATAGCAACACAGAGGTCGGTACATTCCCATACTGCAGGACGCCAGAACCACCTAGGCTTAGGCATGTGGACAGATTTACACTCACGGACCCACGGCGCTACCTAAGATTCGCATCCTTTGAACATCTGTGGGTCCCCATTAGACTAGCAATCCCGATATCTGCGTGTACACTTTGGCCTCGACTATCGTGCTCACTGCTGACAAATTCTAGTCGCTTCAAGTAGTGTAAAACACCTCGGAGGTAAC";
-        		Sequence seq=new Sequence(taxonID, seqstr);
-        		final TaxonSet txs=tret.m_taxonset.get();
-        		final Input<TaxonSet> txset=tret.m_taxonset;
-        		Alignment ali=txs.alignmentInput.get();
-        		//List<Sequence> 
-        		ali.initializeWithAddedSequenceList(Arrays.asList(seq), false);
-        		//txs.addTaxaName(taxonID);
-        		final Input<Alignment> aliinput=txs.alignmentInput;
-        		/*
-        		Tree tret1=(Tree)beastMClist[1].m_mcmc.getState().stateNode[treepositionInStateArray];
-        		// add alignment and taxon set
-        		TaxonSet txs1=tret1.m_taxonset.get();
-        		
-        		//Alignment ali1=txs1.alignmentInput.get();
-        		//ali1=ali;
-        		txs1=txs;
-        		int kkl=0;
-        		*/
-        		
-        		// after having updated the tree we need to update all obj that hv the tree as input?
-        		// probably not needed as the initialisation is done anyway in the mcmc init
-        		
-
-        		Arrays.parallelSetAll(beastMClist, e ->
-			       	{ 
-			       		// add sequence here to all
-			       		// would be good to have a shared taxa, taxonset, alignment for all particles
-			       		
-			       		MCMC mc=beastMClist[e].m_mcmc;
-			       		State stt=mc.getState();
-			       		Tree tretre=(Tree) stt.stateNode[treepositionInStateArray];
-			       		TaxonSet txs_x=tretre.m_taxonset.get();
-			       		
-			       		// set same alignment and taxonset to all
-			       		// also set startstate for the mcmc
-	
-			        	final double my_height=tretre.getRoot().getHeight()/2.0;
-			        	
-			        	try {
-								RandomTree.insertSequenceCoalescent(tretre, my_height);
-					        	List<StateNodeInitialiser> inits=beastMClist[e].m_mcmc.initialisersInput.get();
-					        	for(StateNodeInitialiser st:inits)
-					        	{
-					        		if (st instanceof RandomTree)
-					        		{
-					        			((RandomTree)st).taxaInput=aliinput;
-					        			RandomTree.copyTree((RandomTree)st, tretre);
-					        		}
-					        	}
-					       		txs_x=txs;
-					       	    
-					       		tretre.m_traitList=tret.m_traitList;
-					       		tretre.m_taxonset=tret.m_taxonset;
-					       		tretre.nodeTypeInput=tret.nodeTypeInput;
-					       		mc.startStateInput.setValue(stt, null);
-					       		CompoundDistribution dst=(CompoundDistribution) mc.GetLikelihoodFromInput();
-					       		Map<String, Input<?>> mp=dst.getInputs();
-					       		mp.get("Alignment");
-					       		List<Distribution> trdt=dst.pDistributions.get();
-					       		for(Distribution distrib:trdt)
-					       		{
-					       			if(distrib instanceof ThreadedTreeLikelihood)
-					       			{
-						       			ThreadedTreeLikelihood trd=(ThreadedTreeLikelihood)distrib;
-						       			trd.dataInput=aliinput;
-						       			trd.treeInput.setValue(tretre, null);
-					       			}
-					       			distrib.initAndValidate();
-					       		}
-					       		
-						} catch (InstantiationException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						} catch (IllegalAccessException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						} catch (ClassNotFoundException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						} 	       		
-			        	return beastMClist[e];
-	        	}
-	        	);
-        	}
-            
-
-        	/*
-        	tre=(Tree)beastMClist[0].m_mcmc.getState().stateNode[treepositionInStateArray];
-        	Node rootafter=tre.getRoot();
-        	
-        	Node[] ndArrafter=tre.getNodesAsArray();
-        	ArrayList<Double> heightsafter=new ArrayList<>();
-        	ArrayList<Double> lengthsafter=new ArrayList<>();
-        	for(Node el:ndArrafter) {
-        		heightsafter.add(el.getHeight());
-        		lengthsafter.add(el.getLength());
-        	}
-        	int posn=0;
-        	tre.setRootOnly(ndArrafter[posn]);
-        	tre.setEverythingDirty(true);
-        	*/
-            
-        	// save the tree particles
-            saveTreeParticles(beastMClist, "Leo_prova_N", treepositionInStateArray, N_int);
-
-            {
-            	int waithere=0;
-            }
             
             
             boolean changeSeq=true;
-            int time_tick=0;
             while(nextExponentDouble<0.1)//for (exponentCnt=0; exponentCnt<maxvalcnt; exponentCnt++)
             {// starts from the prior and goes to target (reached when the exponent is equal to 1)
             	// smcStates[(int)i][(int)exponentCnt]=mc.getState();
@@ -1797,51 +1663,7 @@ IS_ESS = function(log_weights)
 					if(nextExponentDouble>0.05)
 					{
 						changeSeq=false;
-						int [] distances=addSequence(beastMClist, treepositionInStateArray);
-						final Integer lengthOfSeq=1000;
-						final double lenSeq=lengthOfSeq.doubleValue();
-						final double qtToElevate=lenSeq/(time_tick+lenSeq);
-						// the following array will contain the distances of each sequence with the new added one
-						if(distances != null)
-						{// the new leaf has actually been added (if distances is null then the new proposed leaf has been rejected as its sequence was already present
-							
-							// here we select the leaf drawing from distribution
-							double []probabilityWeight= new double[distances.length];//{0.1,0.2,0.25,0.85};//
-							Arrays.parallelSetAll(probabilityWeight, e -> {return Math.exp(distances[e]*Math.log(qtToElevate));});
-							org.apache.commons.math3.util.Pair<Integer, Double> itemToInit=new org.apache.commons.math3.util.Pair<Integer, Double>(0,0.0);
-							List<org.apache.commons.math3.util.Pair<Integer, Double>> pmfWeights=new ArrayList<org.apache.commons.math3.util.Pair<Integer, Double>>(Collections.nCopies(probabilityWeight.length, itemToInit));
-			        		
-							Arrays.parallelSetAll(probabilityWeight, e ->{
-			        			pmfWeights.set(e, new org.apache.commons.math3.util.Pair<Integer, Double>(e,probabilityWeight[e]));
-			        			return probabilityWeight[e];
-			        		});
-			        		
-							EnumeratedDistribution enDist=new EnumeratedDistribution<>(pmfWeights);
-							// the following is the draw of the leaf (position of the leaf in the array)
-							Integer selectedLeaf=(Integer) enDist.sample();
-							
-							// now we draw the height, from the paper draw first from a Gaussian
-							// with variance 1/N and mean=2 arcsin (sqrt(Ms/N)) where Ms is the distance, N is seq. length
-							final double sdOfGaussian=1.0/lenSeq;
-							// calculate the weights giving the prob of the gaussians
-							// then draw samples and calculate the height
-							final double meanOfGaussian=2*Math.asin(Math.sqrt(distances[selectedLeaf.intValue()]/lenSeq));
-							org.apache.commons.math3.distribution.NormalDistribution norm=new org.apache.commons.math3.distribution.NormalDistribution(meanOfGaussian, sdOfGaussian);
-							double beta=norm.sample();
-							
-							
-							// from the paper on Sequential Monte Carlo transformations,
-							// calculate the height (formula 24 of paper)
-							// decide if it is better to have a different height for every particle:
-							// the process of selectin height is independent of the tree
-							double sinVal=Math.sin(beta/2.0);
-							double height=(-3.0/4.0)*Math.log(1.0-((4.0/3.0)*sinVal*sinVal));
-							
-							// then we use the height to calculate where to put our next coalescent event
-			        		Tree tret=(Tree)beastMClist[0].m_mcmc.getState().stateNode[treepositionInStateArray];
-			        		// find the way up from the selected leaf to the point where the height must be inserted
-			        		
-						}
+						int [] distances=addSequence(beastMClist, treepositionInStateArray);			        		
 					}
 				}
 
@@ -1872,8 +1694,9 @@ IS_ESS = function(log_weights)
 					Tree tr=((Tree) beastMClist[0].m_mcmc.getState().stateNode[treepositionInStateArray]);
 					System.out.println("particle "+i+", nodes: "+tr.getNodeCount()+", stored: "+tr.getStoredNodes().length);
 				}
+				
 */				// only resample if ESS<half particles and if we are not in the last step
-               	//if(nextExponentDouble<1.0)
+               	//if(nextExponentDouble<1.0) // Leo: this needs be de-commented, it is currently commented for debug purp only!!!
                	{
     				if(ESSval<(N_int/2.0)) 
                    	{

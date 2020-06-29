@@ -750,16 +750,7 @@ public class RandomTree extends Tree implements StateNodeInitialiser {
         // get the closest height lower than height and pick that node and insert the new node so that it is bound to that
     	Node[] ndArr=tree.getNodesAsArray();
     	
-    	double[] heights=new double[ndArr.length];
-    	for(int i=0;i<ndArr.length;i++) {
-    		heights[i]=ndArr[i].getHeight();
-    	}
-    	int[] indices=new int[ndArr.length];
-    	double[] sortedHeights=Arrays.copyOf(heights,ndArr.length);
-    	
-    	Arrays.sort(sortedHeights);
-    	
-    	// get the closest index in the sorted array
+    	// get the node, starting from the leaf and going way up we want the closest in time smaller than the height
     	int index=getClosestFromLeaf(tree, selectedLeaf, height);
     	if(index<=0)
     	{// height is smaller than the smallest height, this should not happen
@@ -770,6 +761,8 @@ public class RandomTree extends Tree implements StateNodeInitialiser {
     	{
     		index=ndArr.length-1;
     	}
+
+    	/*
     	// the closest will coalesce with our new node
     	//OptionalDouble opt=sortedHeights[index];
     	//int closestIndex=IntStream.range(1,3);//   Arrays.stream(heights).parallel().filter(i->);
@@ -781,7 +774,8 @@ public class RandomTree extends Tree implements StateNodeInitialiser {
                     "This should never happen! to be checked!\n");
     	}
     	// here we have the node to coalesce to, we name it closest
-    	Node closest=ndArr[closestIndex.getAsInt()];
+    	*/
+    	Node closest=ndArr[index];
     	
 
     	Tree tr=closest.getTree();

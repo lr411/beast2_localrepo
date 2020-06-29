@@ -713,6 +713,137 @@ public class RandomTree extends Tree implements StateNodeInitialiser {
         return idx;
     }
 
+    public static int getClosestFromLeaf(Tree tree, int startingLeaf, double height) {
+        int idx=0;
+        if(tree.getLeafNodeCount()>=startingLeaf)
+        {
+        	Node nd=tree.getNode(startingLeaf);
+        	Node previous=null;
+        	while(nd.getHeight()<height)
+        	{
+        		previous=nd;
+        		nd=nd.getParent();
+        	}
+        	
+            idx=previous != null ? previous.getNr():-1;
+        }
+        else
+        {
+        	idx=-1;
+        }
+
+        return idx;
+    }
+    /**
+     * Coalesce two nodes in the active list. This method removes the two
+     * (randomly selected) active nodes and replaces them with the new node at
+     * the top of the active list.
+     * @param minHeight
+     * @param height
+     * @return
+     * @throws ClassNotFoundException 
+     * @throws IllegalAccessException 
+     * @throws InstantiationException 
+     */
+    public static void insertSequenceCoalescent_updated(Tree tree, int selectedLeaf, double height) throws InstantiationException, IllegalAccessException, ClassNotFoundException
+    {
+        // get the closest height lower than height and pick that node and insert the new node so that it is bound to that
+    	Node[] ndArr=tree.getNodesAsArray();
+    	
+    	double[] heights=new double[ndArr.length];
+    	for(int i=0;i<ndArr.length;i++) {
+    		heights[i]=ndArr[i].getHeight();
+    	}
+    	int[] indices=new int[ndArr.length];
+    	double[] sortedHeights=Arrays.copyOf(heights,ndArr.length);
+    	
+    	Arrays.sort(sortedHeights);
+    	
+    	// get the closest index in the sorted array
+    	int index=getClosestFromLeaf(tree, selectedLeaf, height);
+    	if(index<=0)
+    	{// height is smaller than the smallest height, this should not happen
+            throw new RuntimeException(
+                    "This should never happen! we cannot find height of a node with height smaller than our height!\n");
+    	}
+    	if(index>=ndArr.length)
+    	{
+    		index=ndArr.length-1;
+    	}
+    	// the closest will coalesce with our new node
+    	//OptionalDouble opt=sortedHeights[index];
+    	//int closestIndex=IntStream.range(1,3);//   Arrays.stream(heights).parallel().filter(i->);
+    	double closestVal=sortedHeights[index];
+    	OptionalInt closestIndex=java.util.stream.IntStream.range(0,ndArr.length).parallel().filter(k->heights[k]==closestVal).findAny();
+    	if(!closestIndex.isPresent())
+    	{
+            throw new RuntimeException(
+                    "This should never happen! to be checked!\n");
+    	}
+    	// here we have the node to coalesce to, we name it closest
+    	Node closest=ndArr[closestIndex.getAsInt()];
+    	
+
+    	Tree tr=closest.getTree();
+    	int nextLeafPosition=tr.getLeafNodeCount();
+    	// the Nr of the node is the position in the array, zero based
+    	// the id of the leaves is t_ and is 1 based
+    	// all nodes from 
+    	
+    	// now add the new leaf
+        // newLeaf has no children
+        final Node newLeaf = (Node) Class.forName(Node.class.getName()).newInstance();
+        //newLeaf.setNr(nextLeafPosition);//ndArr.length);   // multiple tries may generate an excess of nodes assert(nextNodeNr <= nrOfTaxa*2-1);
+        newLeaf.setHeight(0.0); // leaves have zero height
+        String leafID="t"+(nextLeafPosition+1);
+        newLeaf.setID(leafID);//ndArr.length);
+        newLeaf.m_tree=closest.getTree();
+                
+
+        Node formerParent=closest.getParent();
+        
+    	final Node newNode = (Node) Class.forName(Node.class.getName()).newInstance(); //newNode();
+        //newNode.setNr(ndArr.length+1);   // multiple tries may generate an excess of nodes assert(nextNodeNr <= nrOfTaxa*2-1);
+        newNode.setHeight(height);
+        newNode.setLeft(closest);// setleft automatically sets child at posn 0
+        newNode.setRight(newLeaf);// setleft automatically sets child at posn 1
+    	newNode.setParent(closest.getParent());
+    	newNode.m_tree=closest.getTree();
+            	
+    	newLeaf.setParent(newNode);
+        closest.setParent(newNode);
+        
+        // now complete the moves, the former parent points to the new node
+        if(formerParent.getLeft()==closest)
+        {
+        	formerParent.setLeft(newNode);
+        }
+        else
+        {
+        	formerParent.setRight(newNode);
+        }
+        
+        tree.addNodeAtPosition(newLeaf,nextLeafPosition);
+        
+        // add leafId to the list of taxa names
+        int oldLen=tree.m_sTaxaNames.length;
+        tree.m_sTaxaNames=Arrays.copyOf(tree.m_sTaxaNames, oldLen+1);
+        tree.m_sTaxaNames[oldLen]=leafID;
+        
+        tree.addNode(newNode);
+        
+        // we have to copy to the stored nodes too
+        // only change the nodes that have been modified in the future
+        // for now we change all
+        tree.hasStartedEditing=false;
+        updateStoredNodes(tree.getNodeCount(), tree);
+        tree.hasStartedEditing=false;
+        
+        // we also need to update the initialisersInput, both value and default value
+    	//Input<List<StateNodeInitialiser>> initi=beastMClist[e].m_mcmc.initialisersInput;
+
+    }
+
     /**
      * Coalesce two nodes in the active list. This method removes the two
      * (randomly selected) active nodes and replaces them with the new node at

@@ -1386,7 +1386,8 @@ IS_ESS = function(log_weights)
 		// add the new sequence first to first element of the list, then use the same shared input for all
 		Tree tret=(Tree)beastMClist[0].m_mcmc.getState().stateNode[treepositionInStateArray];
 		// the numberOfSequencesAfterUpdate is return value: number of updated number of leaves
-		int numberOfSequencesAfterUpdate=tret.getLeafNodeCount()+1;
+		int nrOfSequencessBeforeUpdate=tret.getLeafNodeCount();
+		int numberOfSequencesAfterUpdate=nrOfSequencessBeforeUpdate+1;
 		String taxonID="t"+numberOfSequencesAfterUpdate;
 		final String seqstr="GTTGGCACAGTCGAATGACTGGTATACTGTTCGTCAACGATTACATAGGACTCGACTGAGCGGGACGAACTTAGGCATAATGGGGAAAGTAGCCTCCCTTCCATACCGCAAGATTTGGTATACTCTCCCCGTCTGGCAGAATCGTCCCCCTATTTTGTCCACTAGTTTACACGTGGCAGAAGCCGGACGGGGTATTGCCTCGTCTCGCTATGCGAAGTGGAGGCCAAACGATAACTAAATAAACAAGGACCACTACAGATGTGAATGGGCACCACTTAAGCATCTGCATCGAACACATGGGAAAACCTTTCGTTCAAGCAAATCTAAACTTAGACCACCGACCTCTTGTGATGCTCATTCGGACGGAGAGTGATCCAAGGGAGTCTGGGTTACGGGTCTTGTGTAGACCTTTCAGTCAATGCCTCCATTTTGATCCAAACACTGGATGTTCAATCACTCGTTAGTAGCCCACTGTTATGAGAGGACACCAGTTGACCAGGATGCCGACGCCTATGGTAACGGCGAGTGTAGAGTCCGAATAGTTGGCAAACTATCGAGACTGTTTGCACGTAAAACCGGCATTCAGCAACTGTTGACCGGTGGTAATCCTCGAGGGGTCAAATCACTGATCCATTAGAGTACCCTGTACTAGCCTATACAACCGAAGGTAAATCGATACCTAACAGGGGTTATGCGCTCCTAAACGCTTCCCAGAGTGTGCGCTGCTCGGCTAAGGCGTTCCAAACTTGTAAAAATCTTTACGCGGATTACTTGATGGGACGATTTACCACACCCACAGGCTCATCTGTACGTTGATCGGAGCTGCGATTAACACACGGTAAGGCACGGTGGTATCAAAACTTTACATTCATGAAGTATGAGGGTGTCACAATCAAAGTACCAGGCATAAAAATTGCCTGTAACCTTGGGATTCGTAAATCCAGCCGAAGGCTGACAAATTCGGGCGGAAGACCCTAATTTACAAAACCTCGGAGGTAAG";
 
@@ -1396,7 +1397,7 @@ IS_ESS = function(log_weights)
 		final Input<TaxonSet> txset=tret.m_taxonset;
 		Alignment ali=txs.alignmentInput.get();
 
-		int [] distances=new int[numberOfSequencesAfterUpdate-1];
+		final int [] distances=new int[nrOfSequencessBeforeUpdate];
 		// get the sequence of the last leaf
 		final int nrOfElements=seqstr.length();
 		
@@ -1430,6 +1431,14 @@ IS_ESS = function(log_weights)
 		//txs.addTaxaName(taxonID);
 		final Input<Alignment> aliinput=txs.alignmentInput;
 		
+
+		final Integer lengthOfSeq=nrOfElements;
+		final double lenSeq=lengthOfSeq.doubleValue();
+		
+		// needed for drawing the height
+		final double sdOfGaussian=1.0/lenSeq;
+
+		
 		// after having updated the tree we need to update all obj that hv the tree as input?
 		// probably not needed as the initialisation is done anyway in the mcmc init
 		
@@ -1439,6 +1448,40 @@ IS_ESS = function(log_weights)
 	       		// add sequence here to all
 	       		// would be good to have a shared taxa, taxonset, alignment for all particles
 	       		
+	       		/* start of the part of drawing the leaf */
+				Integer selectedLeaf=0;
+				{
+					double qtToElevate=lenSeq/(nrOfSequencessBeforeUpdate+lenSeq); // this will hv to change and contain the effective pop size
+					double []probabilityWeight= new double[distances.length];//{0.1,0.2,0.25,0.85};//
+					Arrays.parallelSetAll(probabilityWeight, ee -> {return Math.exp(distances[ee]*Math.log(qtToElevate));});
+					org.apache.commons.math3.util.Pair<Integer, Double> itemToInit=new org.apache.commons.math3.util.Pair<Integer, Double>(0,0.0);
+					List<org.apache.commons.math3.util.Pair<Integer, Double>> pmfWeights=new ArrayList<org.apache.commons.math3.util.Pair<Integer, Double>>(Collections.nCopies(probabilityWeight.length, itemToInit));
+	        		
+					Arrays.parallelSetAll(probabilityWeight, ee ->{
+	        			pmfWeights.set(e, new org.apache.commons.math3.util.Pair<Integer, Double>(ee,probabilityWeight[e]));
+	        			return probabilityWeight[ee];
+	        		});
+					EnumeratedDistribution enDist=new EnumeratedDistribution<>(pmfWeights);
+					// the following is the draw of the leaf (position of the leaf in the array)
+					selectedLeaf=(Integer) enDist.sample();
+				}
+	       		/* end of draw of the leaf */
+	       		double my_height;
+	       		/* start of the part of drawing the height */
+				{
+					double meanOfGaussian=2*Math.asin(Math.sqrt(distances[selectedLeaf.intValue()]/lenSeq));
+					org.apache.commons.math3.distribution.NormalDistribution norm=new org.apache.commons.math3.distribution.NormalDistribution(meanOfGaussian, sdOfGaussian);
+					double beta=norm.sample();
+					// from the paper on Sequential Monte Carlo transformations,
+					// calculate the height (formula 24 of paper)
+					// decide if it is better to have a different height for every particle:
+					// the process of selectin height is independent of the tree
+					double sinVal=Math.sin(beta/2.0);
+					my_height=(-3.0/4.0)*Math.log(1.0-((4.0/3.0)*sinVal*sinVal));
+				}
+	       		/* end of draw of the height */
+
+				
 	       		MCMC mc=beastMClist[e].m_mcmc;
 	       		State stt=mc.getState();
 	       		Tree tretre=(Tree) stt.stateNode[treepositionInStateArray];
@@ -1447,12 +1490,12 @@ IS_ESS = function(log_weights)
 	       		// set same alignment and taxonset to all
 	       		// also set startstate for the mcmc
 
-	        	final double my_height=(tretre.getRoot().getHeight()/2.5345);
+	        	//final double my_height=(tretre.getRoot().getHeight()/2.5345);
 	        	
 	        	
 	        	
 	        	try {
-						RandomTree.insertSequenceCoalescent(tretre, my_height);
+						RandomTree.insertSequenceCoalescent_updated(tretre,selectedLeaf.intValue(), my_height);
 			        	List<StateNodeInitialiser> inits=beastMClist[e].m_mcmc.initialisersInput.get();
 			        	for(StateNodeInitialiser st:inits)
 			        	{
@@ -1786,13 +1829,18 @@ IS_ESS = function(log_weights)
 							org.apache.commons.math3.distribution.NormalDistribution norm=new org.apache.commons.math3.distribution.NormalDistribution(meanOfGaussian, sdOfGaussian);
 							double beta=norm.sample();
 							
+							
 							// from the paper on Sequential Monte Carlo transformations,
 							// calculate the height (formula 24 of paper)
+							// decide if it is better to have a different height for every particle:
+							// the process of selectin height is independent of the tree
 							double sinVal=Math.sin(beta/2.0);
 							double height=(-3.0/4.0)*Math.log(1.0-((4.0/3.0)*sinVal*sinVal));
 							
 							// then we use the height to calculate where to put our next coalescent event
-							int gh=0;
+			        		Tree tret=(Tree)beastMClist[0].m_mcmc.getState().stateNode[treepositionInStateArray];
+			        		// find the way up from the selected leaf to the point where the height must be inserted
+			        		
 						}
 					}
 				}

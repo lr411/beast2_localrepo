@@ -40,6 +40,7 @@ import beast.core.Runnable;
 import beast.core.State;
 import beast.core.StateNode;
 import beast.core.StateNodeInitialiser;
+import beast.core.parameter.RealParameter;
 import beast.core.util.CompoundDistribution;
 import beast.core.util.Log;
 import beast.evolution.alignment.Alignment;
@@ -870,8 +871,9 @@ IS_ESS = function(log_weights)
      	     for(i=0; i< statenodeslength;i++)
 	           	{
 	           		stn=curstate.stateNode[i];
-	           		Class cls=stn.getClass();
-	           		if(cls.getName().endsWith(".Tree"))
+	           		//Class cls=stn.getClass();
+	           		//if(cls.getName().endsWith(".Tree"))
+	           		if(stn instanceof Tree)
 	           		{
 	           			treeposition=i;
 	           			break;
@@ -886,9 +888,45 @@ IS_ESS = function(log_weights)
 	            {
 	            	treeposition=-1;
 	            }
-		return treeposition;    	
+		return treeposition;
     }
-    
+
+    /*   
+    getPopsizePosition looks for the position of the parameter estimating the effective population size
+   in a state vector array
+   return values:
+   	position (>=0) if found
+   	-1 if not found
+*/
+   public static int getPopsizePosition(MCMC mcmc)
+   {
+ 	   int position;
+	
+	   State curstate=mcmc.getState();
+ 	   int statenodeslength = curstate.stateNode.length;
+ 	   StateNode stn=null;
+         int i;  
+ 	     for(i=0; i< statenodeslength;i++)
+           	{
+           		stn=curstate.stateNode[i];
+           		if(stn.getID().contains("popSize"))
+           		{
+           			position=i;
+           			break;
+           		}
+           	}
+           
+	        if(i<statenodeslength)
+            {
+            	position=i;
+            }
+            else
+            {
+            	position=-1;
+            }
+	return position;    	
+}
+   
 /*    
  * deep copies two states from two Sequential (or BeastMCMC elements)
  * it is assumed that both elements are not null
@@ -1381,7 +1419,7 @@ IS_ESS = function(log_weights)
      * i.e. distances.length=4 for example, means that the new leaf is t5, i.e. the 5th taxon
     */    
 
-    private static int[] addSequence(Sequential[] beastMClist, int treepositionInStateArray)
+    private static int[] addSequence(Sequential[] beastMClist, int treepositionInStateArray, int popsizepositionInStateArray)
 	{
 		// add the new sequence first to first element of the list, then use the same shared input for all
 		Tree tret=(Tree)beastMClist[0].m_mcmc.getState().stateNode[treepositionInStateArray];
@@ -1448,8 +1486,13 @@ IS_ESS = function(log_weights)
 	       		// add sequence here to all
 	       		// would be good to have a shared taxa, taxonset, alignment for all particles
 	       		
+	       		MCMC mc=beastMClist[e].m_mcmc;
+	       		State stt=mc.getState();
+	       		double theta=stt.stateNode[popsizepositionInStateArray].getArrayValue();
+
 	       		/* start of the part of drawing the leaf */
 				Integer selectedLeaf=0;
+				//double theta=beastMClist[e];
 				{
 					double qtToElevate=lenSeq/(nrOfSequencessBeforeUpdate+lenSeq); // this will hv to change and contain the effective pop size
 					double []probabilityWeight= new double[distances.length];//{0.1,0.2,0.25,0.85};//
@@ -1482,8 +1525,6 @@ IS_ESS = function(log_weights)
 	       		/* end of draw of the height */
 
 				
-	       		MCMC mc=beastMClist[e].m_mcmc;
-	       		State stt=mc.getState();
 	       		Tree tretre=(Tree) stt.stateNode[treepositionInStateArray];
 	       		TaxonSet txs_x=tretre.m_taxonset.get();
 	       		
@@ -1580,6 +1621,15 @@ IS_ESS = function(log_weights)
             	System.err.println("Unable to find Tree class in statenode");
                 System.exit(0);
             }
+
+            // get the position of the tree in the state array
+            int populationsizePositionInStateArray=getPopsizePosition((MCMC)beastMClist[0].m_runnable); // position of the tree in the state vector
+
+            if(populationsizePositionInStateArray<0)
+            {
+            	System.err.println("Unable to find Tree class in statenode");
+                System.exit(0);
+            }
             
             // save the ESS
             ByteArrayOutputStream ess = new ByteArrayOutputStream();
@@ -1636,7 +1686,6 @@ IS_ESS = function(log_weights)
             	// smcStates[(int)i][(int)exponentCnt]=mc.getState();
             	//if(exponentCnt>=(maxvalcnt/100))
             	//	break;
-            	time_tick++;
             	
             	double outNextExponent=0.0;
 //           	    int nextCESS=getCESSexponent(beastMClist, logIncrementalWeights, logWeightsNormalized, stepSize, previousExponent, (int) exponentCnt, maxvalcnt+1, outNextExponent);
@@ -1663,7 +1712,7 @@ IS_ESS = function(log_weights)
 					if(nextExponentDouble>0.05)
 					{
 						changeSeq=false;
-						int [] distances=addSequence(beastMClist, treepositionInStateArray);			        		
+						int [] distances=addSequence(beastMClist, treepositionInStateArray, populationsizePositionInStateArray);			        		
 					}
 				}
 

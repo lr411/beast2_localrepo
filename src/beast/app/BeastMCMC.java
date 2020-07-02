@@ -1457,7 +1457,6 @@ IS_ESS = function(log_weights)
 		// check if there is any distance equal to 0 (implies that this sequence was already in)
 		boolean sequenceAlreadyPresent = Arrays.stream(distances).parallel().anyMatch(i -> i==0);
 		
-
 		if(sequenceAlreadyPresent)
 		{// signal that the sequence is already in the sequence list
 			
@@ -1494,7 +1493,7 @@ IS_ESS = function(log_weights)
 				Integer selectedLeaf=0;
 				//double theta=beastMClist[e];
 				{
-					double qtToElevate=lenSeq/(nrOfSequencessBeforeUpdate+lenSeq); // this will hv to change and contain the effective pop size
+					double qtToElevate=(lenSeq*theta)/(nrOfSequencessBeforeUpdate+(lenSeq*theta)); // this will hv to change and contain the effective pop size
 					double []probabilityWeight= new double[distances.length];//{0.1,0.2,0.25,0.85};//
 					Arrays.parallelSetAll(probabilityWeight, ee -> {return Math.exp(distances[ee]*Math.log(qtToElevate));});
 					org.apache.commons.math3.util.Pair<Integer, Double> itemToInit=new org.apache.commons.math3.util.Pair<Integer, Double>(0,0.0);
@@ -1520,7 +1519,7 @@ IS_ESS = function(log_weights)
 					// decide if it is better to have a different height for every particle:
 					// the process of selectin height is independent of the tree
 					double sinVal=Math.sin(beta/2.0);
-					my_height=(-3.0/4.0)*Math.log(1.0-((4.0/3.0)*sinVal*sinVal));
+					my_height=(-3.0/(4.0)*theta)*Math.log(1.0-((4.0/3.0)*sinVal*sinVal));
 				}
 	       		/* end of draw of the height */
 

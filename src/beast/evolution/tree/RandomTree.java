@@ -719,10 +719,15 @@ public class RandomTree extends Tree implements StateNodeInitialiser {
         {
         	Node nd=tree.getNode(startingLeaf);
         	Node previous=null;
+        	
         	while(nd.getHeight()<height)
         	{
         		previous=nd;
         		nd=nd.getParent();
+        		if(nd==null)
+        		{// the height is 
+        			break;
+        		}
         	}
         	
             idx=previous != null ? previous.getNr():-1;
@@ -808,13 +813,16 @@ public class RandomTree extends Tree implements StateNodeInitialiser {
         closest.setParent(newNode);
         
         // now complete the moves, the former parent points to the new node
-        if(formerParent.getLeft()==closest)
+        if(formerParent != null)
         {
-        	formerParent.setLeft(newNode);
-        }
-        else
-        {
-        	formerParent.setRight(newNode);
+            if(formerParent.getLeft()==closest)
+            {
+            	formerParent.setLeft(newNode);
+            }
+            else
+            {
+            	formerParent.setRight(newNode);
+            }
         }
         
         tree.addNodeAtPosition(newLeaf,nextLeafPosition);
@@ -825,6 +833,11 @@ public class RandomTree extends Tree implements StateNodeInitialiser {
         tree.m_sTaxaNames[oldLen]=leafID;
         
         tree.addNode(newNode);
+        
+        if(formerParent==null)
+        {
+        	tree.setRoot(newNode);
+        }
         
         // we have to copy to the stored nodes too
         // only change the nodes that have been modified in the future

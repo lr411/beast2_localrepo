@@ -1541,6 +1541,10 @@ IS_ESS = function(log_weights)
 				                    "Unable to draw a good sample for the Coalescent\n");
 						}
 						double beta=tn.sample();
+						if(beta > upperBoundTruncatedGaussian)
+						{
+							int sullo=0;
+						}
 						// from the paper on Sequential Monte Carlo transformations,
 						// calculate the height (formula 24 of paper)
 						// decide if it is better to have a different height for every particle:

@@ -45,6 +45,11 @@ public class TruncatedNormal extends AbstractRealDistribution {
 		cdf_b = norm.cumulativeProbability((ub - mu)/sigma);//NormalDist.cdf01((ub - mu)/sigma);
 		Z = cdf_b - cdf_a;
 		
+		if(Z==0)
+		{
+			int dbg=0;
+		}
+		
 		alpha = (lb - mu) / sigma;
 		beta = (ub - mu) / sigma;
 		this.aa = lb;
@@ -125,7 +130,11 @@ public class TruncatedNormal extends AbstractRealDistribution {
 	@Override
 	public double sample() {			
 		double val = super.random.nextDouble() * Z + cdf_a;
-		
+		double retVal = mu + sigma * norm.inverseCumulativeProbability(val);
+		if(Double.isNaN(retVal) || (!Double.isFinite(retVal)))
+		{
+			int sullo=0;
+		}
 		return mu + sigma * norm.inverseCumulativeProbability(val); //NormalDist.inverseF01(val);
 	}
 

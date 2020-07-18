@@ -714,7 +714,7 @@ public class RandomTree extends Tree implements StateNodeInitialiser {
     }
 
     public static int getClosestFromLeaf(Tree tree, int startingLeaf, double height) {
-        int idx=0;
+        int idx=-1;
         if(tree.getLeafNodeCount()>=startingLeaf)
         {
         	Node nd=tree.getNode(startingLeaf);
@@ -737,6 +737,11 @@ public class RandomTree extends Tree implements StateNodeInitialiser {
         	idx=-1;
         }
         
+        if(idx<0)
+        {
+        	int ello=0;
+        }
+        
         return idx;
     }
     /**
@@ -757,7 +762,7 @@ public class RandomTree extends Tree implements StateNodeInitialiser {
     	
     	// get the node, starting from the leaf and going way up we want the closest in time smaller than the height
     	int index=getClosestFromLeaf(tree, selectedLeaf, height);
-    	if(index<=0)
+    	if(index<0)
     	{// height is smaller than the smallest height, this should not happen
             throw new RuntimeException(
                     "This should never happen! we cannot find height of a node with height smaller than our height!\n");

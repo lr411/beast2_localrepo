@@ -1031,7 +1031,42 @@ IS_ESS = function(log_weights)
 		Arrays.parallelSetAll(logNormalisedWeights, e->{return minuslogN;});
     }
     
-    // the output is the updated incremental weights
+    // the output is the updated incremental weights after annealing
+    public static void calculateIncrementalWeightsForTransformation(Sequential[] beastMClist, double[] output_logUnnormalisedIncrementalWeights, final double annealingExponent, boolean calledBeforeTreeUpdated)
+    {
+       	Arrays.parallelSetAll(output_logUnnormalisedIncrementalWeights, e->{
+			//BeastMCMC bmc=beastMClist[e];
+			MCMC mc=beastMClist[e].m_mcmc;
+			// performance wise, we don't need the log1 and log 2 we could substitute the full expressions to log1 and 2
+			double log=mc.calculateLogPSimulatedAnnhealing(annealingExponent);
+//        	// ?? is it ok to set the exponent here????
+			if(Double.isNaN(log))
+			{
+	            throw new RuntimeException(
+	                    "Bad value in log expression of calculateIncrementalWeightsForTransformation\n");
+			}
+			
+			// in the first call it calculates the old pi with old tree (before sequence add), in second call calculates the new pi with new tree (with sequence added)
+			// so if it is the second call, the vector output_logUnnormalisedIncrementalWeights already contains the calculation of old pi with old tree (before sequence add)
+			return calledBeforeTreeUpdated?(log):log-output_logUnnormalisedIncrementalWeights[e];
+			});
+    }
+
+    public static void calculateIncrementalWeightsForTransformationAddLeafComponent(Sequential[] beastMClist, double[] output_logUnnormalisedIncrementalWeights, final int popsizepositionInStateArray, final int [] distances)
+    {
+       	Arrays.parallelSetAll(output_logUnnormalisedIncrementalWeights, e->{
+			
+       		   MCMC mc=beastMClist[e].m_mcmc;
+	       	   State stt=mc.getState();
+	       	   double theta=stt.stateNode[popsizepositionInStateArray].getArrayValue();
+       		   double Ms=distances[e];
+       		   double N=1000;
+       		   double t=5;
+			   return output_logUnnormalisedIncrementalWeights[e]-Ms*(Math.log(N*theta)-Math.log(t+N*theta));
+			});
+    }
+    
+    // the output is the updated incremental weights after annealing
     public static void calculateIncrementalWeights(Sequential[] beastMClist, double[] output_logUnnormalisedIncrementalWeights, final double previousExponent, final double nextExponent)
     {
        	Arrays.parallelSetAll(output_logUnnormalisedIncrementalWeights, e->{
@@ -1043,8 +1078,8 @@ IS_ESS = function(log_weights)
 //        	// ?? is it ok to set the exponent here????
 			if(Double.isNaN(log1-log2))
 			{
-				int i;
-				i=3;
+	            throw new RuntimeException(
+	                    "Bad value in log expression of calculateIncrementalWeights\n");
 			}
 			return (log1-log2);
 			});
@@ -1420,12 +1455,12 @@ IS_ESS = function(log_weights)
      * i.e. distances.length=4 for example, means that the new leaf is t5, i.e. the 5th taxon
     */    
 
-    private static boolean addSequence(Sequential[] beastMClist, int treepositionInStateArray, int popsizepositionInStateArray, int seqNr)
+    private static boolean addSequence(Sequential[] beastMClist, int treepositionInStateArray, int popsizepositionInStateArray, int seqNr, int nrOfSequencessBeforeUpdate, final int [] distances)
 	{
 		// add the new sequence first to first element of the list, then use the same shared input for all
 		Tree tret=(Tree)beastMClist[0].m_mcmc.getState().stateNode[treepositionInStateArray];
 		// the numberOfSequencesAfterUpdate is return value: number of updated number of leaves
-		int nrOfSequencessBeforeUpdate=tret.getLeafNodeCount();
+		// int nrOfSequencessBeforeUpdate=tret.getLeafNodeCount();
 		int numberOfSequencesAfterUpdate=nrOfSequencessBeforeUpdate+1;
 		String taxonID="t"+numberOfSequencesAfterUpdate;
 
@@ -1451,7 +1486,7 @@ IS_ESS = function(log_weights)
 		final Input<TaxonSet> txset=tret.m_taxonset;
 		Alignment ali=txs.alignmentInput.get();
 
-		final int [] distances=new int[nrOfSequencessBeforeUpdate];
+		// final int [] distances=new int[nrOfSequencessBeforeUpdate];
 		// get the sequence of the last leaf
 		final int nrOfElements=seqstr.length();
 		
@@ -1488,8 +1523,8 @@ IS_ESS = function(log_weights)
 		final Integer lengthOfSeq=nrOfElements;
 		final double lenSeq=lengthOfSeq.doubleValue();
 		
-		// needed for drawing the height
-		final double sdOfGaussian=1.0/lenSeq;
+		// needed for drawing of the height
+		final double sdOfGaussian=Math.sqrt(1.0/lenSeq);
 
 		
 		// after having updated the tree we need to update all obj that hv the tree as input?
@@ -1516,7 +1551,7 @@ IS_ESS = function(log_weights)
 					List<org.apache.commons.math3.util.Pair<Integer, Double>> pmfWeights=new ArrayList<org.apache.commons.math3.util.Pair<Integer, Double>>(Collections.nCopies(probabilityWeight.length, itemToInit));
 	        		
 					Arrays.parallelSetAll(probabilityWeight, ee ->{
-	        			pmfWeights.set(e, new org.apache.commons.math3.util.Pair<Integer, Double>(ee,probabilityWeight[e]));
+	        			pmfWeights.set(ee, new org.apache.commons.math3.util.Pair<Integer, Double>(ee,probabilityWeight[ee]));
 	        			return probabilityWeight[ee];
 	        		});
 					EnumeratedDistribution enDist=new EnumeratedDistribution<>(pmfWeights);
@@ -1530,20 +1565,14 @@ IS_ESS = function(log_weights)
 					double meanOfGaussian=2*Math.asin(Math.sqrt(distances[selectedLeaf.intValue()]/lenSeq));
 					double upperBoundTruncatedGaussian=2.094395102393195; // this is 2*Math.asin(sqrt(3)/2.0);
 					//org.apache.commons.math3.distribution.NormalDistribution norm=new org.apache.commons.math3.distribution.NormalDistribution(meanOfGaussian, sdOfGaussian);
-					TruncatedNormal tn = new TruncatedNormal(meanOfGaussian, sdOfGaussian, Double.NEGATIVE_INFINITY, upperBoundTruncatedGaussian);
+					//TruncatedNormal tn = new TruncatedNormal(meanOfGaussian, sdOfGaussian,  Double.NEGATIVE_INFINITY, upperBoundTruncatedGaussian);
 
 					double inerval;
-					int cnt=0;
-					do {
-						if(cnt++>1000)
-						{
-				            throw new RuntimeException(
-				                    "Unable to draw a good sample for the Coalescent\n");
-						}
-						double beta=tn.sample();
+						double beta=TruncatedNormal.sampleUpgraded(Double.NEGATIVE_INFINITY, upperBoundTruncatedGaussian); //tn.sample();
 						if(beta > upperBoundTruncatedGaussian)
 						{
-							int sullo=0;
+				            throw new RuntimeException(
+				                    "Unable to draw properly from the truncated Gaussian\n");
 						}
 						// from the paper on Sequential Monte Carlo transformations,
 						// calculate the height (formula 24 of paper)
@@ -1551,20 +1580,16 @@ IS_ESS = function(log_weights)
 						// the process of selectin height is independent of the tree
 						double sinVal=Math.sin(beta/2.0);
 						inerval=1.0-((4.0/3.0)*sinVal*sinVal);
-						if(cnt==900)
-						{
-				            int sullo=0;
-				        }
+
 						if(inerval > 0)
 						{
 						    my_height=(-3.0/((4.0)*theta))*Math.log(1.0-((4.0/3.0)*sinVal*sinVal));
 						}
 						else
 						{
-							int gg=0;
+				            throw new RuntimeException(
+				                    "Error in formula from the truncated Gaussian, negative log argument!!!\n");
 						}
-					}
-					while(inerval<=0);
 				}
 	       		/* end of draw of the height */
 
@@ -1751,27 +1776,6 @@ IS_ESS = function(log_weights)
 				
 				System.out.println("Exponent: "+nextExponentDouble);
 				
-				List <Integer> times = new ArrayList<>();
-				
-				if(changeSeq)
-				{
-					if(nextExponentDouble>0.05)
-					{
-						changeSeq=false;
-			        	long starttimeNano;
-						long elapsedTimeNano;
-			        	long elapsedTimeMs;
-
-						for(int loc=0;loc<10;loc++)
-						{
-							starttimeNano=System.nanoTime();
-							addSequence(beastMClist, treepositionInStateArray, populationsizePositionInStateArray, loc);			        		
-							elapsedTimeNano=System.nanoTime()-starttimeNano;
-							elapsedTimeMs=getExecutionLength(elapsedTimeNano);
-							times.add((int)elapsedTimeMs);
-						}
-					}
-				}
 
 				// reweight done below, calculation of the incremental part
             	calculateIncrementalWeights(beastMClist, logIncrementalWeights, currentExponentDouble, nextExponentDouble);
@@ -1788,20 +1792,52 @@ IS_ESS = function(log_weights)
 				// double cessNorm=CESS_Normalised(logIncrementalWeights, logWeightsNormalized);
                 // normalising below, logWeightsNormalized is the output, logIncrementalWeights the input
                	normaliseWeights(logIncrementalWeights, logWeightsNormalized);
-                String strng=Arrays.toString(logIncrementalWeights);
+
+				List <Integer> times = new ArrayList<>();
+				
+				if(changeSeq)
+				{
+					if(nextExponentDouble>0.05)
+					{
+						changeSeq=false;
+			        	long starttimeNano;
+						long elapsedTimeNano;
+			        	long elapsedTimeMs;
+			        	boolean calledBeforeTreeUpdated;
+
+						for(int loc=0;loc<10;loc++)
+						{
+							calledBeforeTreeUpdated=true;
+						    calculateIncrementalWeightsForTransformation(beastMClist, logIncrementalWeights, currentExponentDouble, calledBeforeTreeUpdated);
+							starttimeNano=System.nanoTime();
+							// add the new sequence first to first element of the list, then use the same shared input for all
+							
+							Tree tret=(Tree)beastMClist[0].m_mcmc.getState().stateNode[treepositionInStateArray];
+							// the numberOfSequencesAfterUpdate is return value: number of updated number of leaves
+							int nrOfSequencessBeforeUpdate=tret.getLeafNodeCount();
+							// the distances array will be calculated inside the routine to add the sequence
+							int [] distances=new int[nrOfSequencessBeforeUpdate];
+
+							addSequence(beastMClist, treepositionInStateArray, populationsizePositionInStateArray, loc, nrOfSequencessBeforeUpdate, distances);			        		
+							elapsedTimeNano=System.nanoTime()-starttimeNano;
+							//elapsedTimeMs=getExecutionLength(elapsedTimeNano);
+							times.add((int)(elapsedTimeNano/1000000));
+							// here update transformation weight
+							calledBeforeTreeUpdated=false;
+						    calculateIncrementalWeightsForTransformation(beastMClist, logIncrementalWeights, currentExponentDouble, calledBeforeTreeUpdated);
+						    calculateIncrementalWeightsForTransformationAddLeafComponent(beastMClist, logIncrementalWeights, populationsizePositionInStateArray, distances);
+						}
+					}
+				}
+
+				String strng=Arrays.toString(logIncrementalWeights);
                	outWeights.println(strng);
                	
                	ESSval=ESS(logWeightsNormalized);
 				
 				outEss.println(rowCounterString + ESSval);
 				
-/*				for(int i=0; i<beastMClist.length; i++)
-				{
-					Tree tr=((Tree) beastMClist[0].m_mcmc.getState().stateNode[treepositionInStateArray]);
-					System.out.println("particle "+i+", nodes: "+tr.getNodeCount()+", stored: "+tr.getStoredNodes().length);
-				}
-				
-*/				// only resample if ESS<half particles and if we are not in the last step
+
                	//if(nextExponentDouble<1.0) // Leo: this needs be de-commented, it is currently commented for debug purp only!!!
                	{
     				if(ESSval<(N_int/2.0)) 

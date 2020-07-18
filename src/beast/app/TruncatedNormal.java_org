@@ -4,7 +4,6 @@ import org.apache.commons.math3.distribution.AbstractRealDistribution;
 import org.apache.commons.math3.exception.OutOfRangeException;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.random.Well19937c;
-import org.apache.commons.math3.special.*;
 
 /**
  * Truncated normal distribution, mostly from
@@ -29,99 +28,9 @@ public class TruncatedNormal extends AbstractRealDistribution {
 	protected final double aa;
 	protected final double bb;
 	protected final org.apache.commons.math3.distribution.NormalDistribution norm;//=new org.apache.commons.math3.distribution.NormalDistribution(mean, sd);
+
 	
-    public static double sampleUpgraded(double m, double s, double l, double u)
-    {
-    	double x=sampleUpgraded((l-m)/s,(u-m)/s);
-    	
-    	double Z=(m+(s*x));
-    	return Z;
-    }
-    
-    public static double ntail(double l, double u)
-    {
-    	RandomGenerator rng=new Well19937c();
-    	double c=(l*l)/2.0;
-    	double doubleU=(u*u)/2.0;
-
-    	double n=1.0;
-    	double f= java.lang.Math.expm1(c-doubleU);
-    	double x;//=c-Math.log(1+rng.nextDouble()*f);
-    	double rndval;//=rng.nextDouble();
-    	
-    	do
-    	{
-    		x=c-Math.log(1+rng.nextDouble()*f);
-    		rndval=rng.nextDouble();
-    	}
-    	while((rndval*rndval*x)>=c);
-    	
-    	double result=Math.sqrt(2*x);
-
-    	return result;
-    }
-    
-    public static double trnd(double l, double u)
-    {
-    	org.apache.commons.math3.distribution.NormalDistribution normG = new org.apache.commons.math3.distribution.NormalDistribution();
-    	double x;
-    	
-    	do
-    	{
-    		x=normG.sample();
-    	}while(x<l || x>u);
-    	
-    	return x;
-    }
-    
-    public static double tn(double l, double u)
-    {
-    	RandomGenerator rng=new Well19937c();
-    	double tol=2.0;
-    	double result =0.0;
-    	
-    	if(Math.abs(u-l)>tol)
-    	{
-    		result=trnd(l,u);
-    	}
-    	else
-    	{
-    	    //tl=l(I); tu=u(I); pl=erfc(tl/sqrt(2))/2; pu=erfc(tu/sqrt(2))/2;
-    	    double pl=org.apache.commons.math3.special.Erf.erfc(l/Math.sqrt(2));
-    	    double pu=org.apache.commons.math3.special.Erf.erfc(u/Math.sqrt(2));
-    	    result=Math.sqrt(2)*org.apache.commons.math3.special.Erf.erfcInv(2*(pl-(pl-pu)*rng.nextDouble()));
-    	    //x(I)=sqrt(2)*erfcinv(2*(pl-(pl-pu).*rand(size(tl))));
-    	}
-    	
-    	return result;
-    }
-    
-    public static double sampleUpgraded(double l, double u)
-    {
-    	double a=.66; // threshold
-    	double result=0.0;
-    	
-    	if(l>=a) // a<=l<u
-    	{
-    		result=ntail(l, u);
-    	}
-    	else
-    	{
-    		if(u<=-a) // l<u<=-a
-    		{
-        	    //tl=-u(J); tu=-l(J); x(J)=-ntail(tl,tu);
-        	    result=-ntail(-u,-l);
-    		}
-    		else
-    		{// otherwise
-    			result=tn(l, u);
-    		}
-    	}
-    	
-    	return result;
-    }
-
-    public TruncatedNormal(RandomGenerator rng, double mean, double sd, double lb, double ub) {
+	public TruncatedNormal(RandomGenerator rng, double mean, double sd, double lb, double ub) {
 		super(rng);
 		
 		if( mean == Double.NaN || sd == Double.NaN ||

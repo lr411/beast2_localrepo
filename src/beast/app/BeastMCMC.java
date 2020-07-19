@@ -1052,16 +1052,17 @@ IS_ESS = function(log_weights)
 			});
     }
 
-    public static void calculateIncrementalWeightsForTransformationAddLeafComponent(Sequential[] beastMClist, double[] output_logUnnormalisedIncrementalWeights, final int popsizepositionInStateArray, final int [] distances)
+    public static void calculateIncrementalWeightsForTransformationAddLeafComponent(Sequential[] beastMClist, double[] output_logUnnormalisedIncrementalWeights, final int popsizepositionInStateArray, final int [] distances, HashMap<Integer,Integer> selectedLeaves, final int lengthOfSequence, final int nrOfSequencesBeforeUpdate)
     {
+    	
        	Arrays.parallelSetAll(output_logUnnormalisedIncrementalWeights, e->{
 			
-       		   MCMC mc=beastMClist[e].m_mcmc;
-	       	   State stt=mc.getState();
+       		   //MCMC mc=beastMClist[e].m_mcmc;
+	       	   State stt=beastMClist[e].m_mcmc.getState();
 	       	   double theta=stt.stateNode[popsizepositionInStateArray].getArrayValue();
-       		   double Ms=distances[e];
-       		   double N=1000;
-       		   double t=5;
+       		   double Ms=distances[selectedLeaves.get(e)];
+       		   double N=lengthOfSequence; // length of sequence
+       		   double t=nrOfSequencesBeforeUpdate;
 			   return output_logUnnormalisedIncrementalWeights[e]-Ms*(Math.log(N*theta)-Math.log(t+N*theta));
 			});
     }
@@ -1455,7 +1456,7 @@ IS_ESS = function(log_weights)
      * i.e. distances.length=4 for example, means that the new leaf is t5, i.e. the 5th taxon
     */    
 
-    private static boolean addSequence(Sequential[] beastMClist, int treepositionInStateArray, int popsizepositionInStateArray, int seqNr, int nrOfSequencessBeforeUpdate, final int [] distances)
+    private static HashMap<Integer, Integer> addSequence(Sequential[] beastMClist, int treepositionInStateArray, int popsizepositionInStateArray, int seqNr, int nrOfSequencessBeforeUpdate, final int [] distances)
 	{
 		// add the new sequence first to first element of the list, then use the same shared input for all
 		Tree tret=(Tree)beastMClist[0].m_mcmc.getState().stateNode[treepositionInStateArray];
@@ -1511,7 +1512,7 @@ IS_ESS = function(log_weights)
 		if(sequenceAlreadyPresent)
 		{// signal that the sequence is already in the sequence list
 			
-			return false;
+			return null;
 		}
 		
 		//List<Sequence> 
@@ -1524,12 +1525,18 @@ IS_ESS = function(log_weights)
 		final double lenSeq=lengthOfSeq.doubleValue();
 		
 		// needed for drawing of the height
-		final double sdOfGaussian=Math.sqrt(1.0/lenSeq);
+		final double sdOfGaussian=1.0/Math.sqrt(lenSeq);
 
 		
 		// after having updated the tree we need to update all obj that hv the tree as input?
 		// probably not needed as the initialisation is done anyway in the mcmc init
 		
+		// the first element is the leaf, the second is the distance of the new leaf from each of the previous ones
+		HashMap<Integer, Integer>  selectedLeafMap = new HashMap<Integer, Integer>();
+		for(int i=0; i< beastMClist.length; i++)
+		{// initialise
+			selectedLeafMap.put(i, -1);
+		}
 
 		Arrays.parallelSetAll(beastMClist, e ->
 	       	{ 
@@ -1557,6 +1564,7 @@ IS_ESS = function(log_weights)
 					EnumeratedDistribution enDist=new EnumeratedDistribution<>(pmfWeights);
 					// the following is the draw of the leaf (position of the leaf in the array)
 					selectedLeaf=(Integer) enDist.sample();
+					selectedLeafMap.replace(e, selectedLeaf);
 				}
 	       		/* end of draw of the leaf */
 	       		double my_height=0.0;
@@ -1645,7 +1653,7 @@ IS_ESS = function(log_weights)
     	}
     	);
 		
-		return true;
+		return selectedLeafMap;
 	}
     
     public static void main(String[] args) {
@@ -1818,14 +1826,15 @@ IS_ESS = function(log_weights)
 							// the distances array will be calculated inside the routine to add the sequence
 							int [] distances=new int[nrOfSequencessBeforeUpdate];
 
-							addSequence(beastMClist, treepositionInStateArray, populationsizePositionInStateArray, loc, nrOfSequencessBeforeUpdate, distances);			        		
+							HashMap<Integer,Integer> selectedLeaves=addSequence(beastMClist, treepositionInStateArray, populationsizePositionInStateArray, loc, nrOfSequencessBeforeUpdate, distances);			        		
 							elapsedTimeNano=System.nanoTime()-starttimeNano;
 							//elapsedTimeMs=getExecutionLength(elapsedTimeNano);
 							times.add((int)(elapsedTimeNano/1000000));
 							// here update transformation weight
 							calledBeforeTreeUpdated=false;
 						    calculateIncrementalWeightsForTransformation(beastMClist, logIncrementalWeights, currentExponentDouble, calledBeforeTreeUpdated);
-						    calculateIncrementalWeightsForTransformationAddLeafComponent(beastMClist, logIncrementalWeights, populationsizePositionInStateArray, distances);
+						    calculateIncrementalWeightsForTransformationAddLeafComponent(beastMClist, logIncrementalWeights, populationsizePositionInStateArray, distances, selectedLeaves, 1000, nrOfSequencesBeforeUpdate);
+
 						}
 					}
 				}

@@ -1066,6 +1066,11 @@ IS_ESS = function(log_weights)
 			   return output_logUnnormalisedIncrementalWeights[e]-Ms*(Math.log(N*theta)-Math.log(t+N*theta));
 			});
     }
+
+    public static void calculateIncrementalWeightsForTransformationAddHeightComponent(Sequential[] beastMClist, double[] output_logUnnormalisedIncrementalWeights, final int popsizepositionInStateArray, final int [] distances, HashMap<Integer,Integer> selectedLeaves, final int lengthOfSequence, final int nrOfSequencesBeforeUpdate)
+    {
+    	
+    }
     
     // the output is the updated incremental weights after annealing
     public static void calculateIncrementalWeights(Sequential[] beastMClist, double[] output_logUnnormalisedIncrementalWeights, final double previousExponent, final double nextExponent)
@@ -1447,8 +1452,25 @@ IS_ESS = function(log_weights)
 	 return exponentCnt;
 }
 */	
-    
-    
+    /*
+     * the following is the density of the distribution for the height selection, after formula (24) of the
+     * paper on transformations on SMC, log value returned
+     */
+    public static double calcLogHeightSelection(double theta, double my_height, double meanOfGaussian, double sdOfGaussian)
+    {
+    	double result =0.0;
+    	double fourthird=(4.0/3.0)*theta*my_height;
+    	
+    	double result1=Math.log(2*theta)+fourthird;
+    	double expval=(1-Math.exp(-fourthird));
+    	double result2=-Math.sqrt(3)*Math.sqrt(expval)*Math.sqrt(1.0-(3.0*0.25*expval));
+    	double result3=-Math.log(Math.sqrt(Math.PI*2)*sdOfGaussian);
+    	double result4temp=2*Math.asin(3.0*0.25*expval)-meanOfGaussian;
+    	double result4=-result4temp*result4temp/(2*sdOfGaussian*sdOfGaussian);
+    	
+    	return result1+result2+result3+result4;
+    }
+	  
     /*    
      * the function addSequence adds a sequence of DNA to the exixting taxon set
      * the return value is the array of the distances number of taxa
@@ -1568,9 +1590,9 @@ IS_ESS = function(log_weights)
 				}
 	       		/* end of draw of the leaf */
 	       		double my_height=0.0;
+				double meanOfGaussian=2*Math.asin(Math.sqrt(distances[selectedLeaf.intValue()]/lenSeq));
 	       		/* start of the part of drawing the height */
 				{
-					double meanOfGaussian=2*Math.asin(Math.sqrt(distances[selectedLeaf.intValue()]/lenSeq));
 					double upperBoundTruncatedGaussian=2.094395102393195; // this is 2*Math.asin(sqrt(3)/2.0);
 					//org.apache.commons.math3.distribution.NormalDistribution norm=new org.apache.commons.math3.distribution.NormalDistribution(meanOfGaussian, sdOfGaussian);
 					//TruncatedNormal tn = new TruncatedNormal(meanOfGaussian, sdOfGaussian,  Double.NEGATIVE_INFINITY, upperBoundTruncatedGaussian);
@@ -1602,6 +1624,22 @@ IS_ESS = function(log_weights)
 	       		/* end of draw of the height */
 
 				
+				/* 
+				 * here we can calculate the components for the weights
+				 */
+				/*
+				 * Leaf first
+				 */
+	       		   double Ms=distances[selectedLeaf.intValue()];
+	       		   double N=lenSeq; // length of sequence
+	       		   double t=nrOfSequencessBeforeUpdate;
+				   double logUnnormalisedIncrementalWeightsLeafSelection=-Ms*(Math.log(N*theta)-Math.log(t+N*theta));
+				/*
+				 * height afterwards
+				 */
+				   double logUnnormalisedIncrementalWeightsHeightSelection=calcLogHeightSelection(theta, my_height, meanOfGaussian, sdOfGaussian);
+				  
+				   
 	       		Tree tretre=(Tree) stt.stateNode[treepositionInStateArray];
 	       		TaxonSet txs_x=tretre.m_taxonset.get();
 	       		
@@ -1833,8 +1871,8 @@ IS_ESS = function(log_weights)
 							// here update transformation weight
 							calledBeforeTreeUpdated=false;
 						    calculateIncrementalWeightsForTransformation(beastMClist, logIncrementalWeights, currentExponentDouble, calledBeforeTreeUpdated);
-						    calculateIncrementalWeightsForTransformationAddLeafComponent(beastMClist, logIncrementalWeights, populationsizePositionInStateArray, distances, selectedLeaves, 1000, nrOfSequencesBeforeUpdate);
-
+						    calculateIncrementalWeightsForTransformationAddLeafComponent(beastMClist, logIncrementalWeights, populationsizePositionInStateArray, distances, selectedLeaves, 1000, nrOfSequencessBeforeUpdate);
+						    calculateIncrementalWeightsForTransformationAddHeightComponent(beastMClist, logIncrementalWeights, populationsizePositionInStateArray, distances, selectedLeaves, 1000, nrOfSequencessBeforeUpdate);
 						}
 					}
 				}

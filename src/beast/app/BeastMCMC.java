@@ -124,6 +124,20 @@ public class BeastMCMC {
      */
     static public int m_nThreads = 1;
     
+    static private String[] m_sequencesArray = {
+			"GTTGGCACAGTCGAATGACTGGTATACTGTTCGTCAACGATTACATAGGACTCGACTGAGCGGGACGAACTTAGGCATAATGGGGAAAGTAGCCTCCCTTCCATACCGCAAGATTTGGTATACTCTCCCCGTCTGGCAGAATCGTCCCCCTATTTTGTCCACTAGTTTACACGTGGCAGAAGCCGGACGGGGTATTGCCTCGTCTCGCTATGCGAAGTGGAGGCCAAACGATAACTAAATAAACAAGGACCACTACAGATGTGAATGGGCACCACTTAAGCATCTGCATCGAACACATGGGAAAACCTTTCGTTCAAGCAAATCTAAACTTAGACCACCGACCTCTTGTGATGCTCATTCGGACGGAGAGTGATCCAAGGGAGTCTGGGTTACGGGTCTTGTGTAGACCTTTCAGTCAATGCCTCCATTTTGATCCAAACACTGGATGTTCAATCACTCGTTAGTAGCCCACTGTTATGAGAGGACACCAGTTGACCAGGATGCCGACGCCTATGGTAACGGCGAGTGTAGAGTCCGAATAGTTGGCAAACTATCGAGACTGTTTGCACGTAAAACCGGCATTCAGCAACTGTTGACCGGTGGTAATCCTCGAGGGGTCAAATCACTGATCCATTAGAGTACCCTGTACTAGCCTATACAACCGAAGGTAAATCGATACCTAACAGGGGTTATGCGCTCCTAAACGCTTCCCAGAGTGTGCGCTGCTCGGCTAAGGCGTTCCAAACTTGTAAAAATCTTTACGCGGATTACTTGATGGGACGATTTACCACACCCACAGGCTCATCTGTACGTTGATCGGAGCTGCGATTAACACACGGTAAGGCACGGTGGTATCAAAACTTTACATTCATGAAGTATGAGGGTGTCACAATCAAAGTACCAGGCATAAAAATTGCCTGTAACCTTGGGATTCGTAAATCCAGCCGAAGGCTGACAAATTCGGGCGGAAGACCCTAATTTACAAAACCTCGGAGGTAAG",
+            "CTGGGCTCTGGGGGTATTCTACTCGGCGCTCCGTTCGCACATCAACTGATAATAGTATCATCAGCTTACGGGTCGGCGTGGGCGGTCCATCTTGTTTGCCTAAAGTTGATAAAAGGAGGTGGCAGATGCATATTGTCGAAGGAATCAGCATGGTCTGGCATTGAAATCCAAGCCTTTATGGGCCTGTGCTGCTCCGGACCACTTGCCTCTGCGCGGATCCAGCTCGTCACTGAGACTCTCCACCAATAATTCAAGCAGCTTTGAACGTGGTAAGGATAGGACCCCGTCCCGTGGCTACGCAGTCTACTCGGACTCTATGAAGCGAAAATCAGGTTCTCATGAAGGTCTCAAATCGATGTTTCTCAATGACTATGCAATAGATGTGCGGTGTACTACGCTTCAGATGATTGAATACTTGCCCTGCATCGAGACGCAATGTGTGGTGATATGATAAAAATCAGGTCCATGGAACTTCCAGAATAGTCAACGACTGTATGCGGCGCGTCAATGAAAAACCGACTTCCGGACTAACGTGCGATTCGCCAAGGACCACACCCGAGATGGCGCACACAGAATAGACTGGGCAAATATATTATGCTACTTTTGGTCATCGGGGTACGAGAGGTAGCCTCAGAACCGGATAAGCAGCCGCCCTGCCGTAGGGGGTCTCCGTGACAATAGACTGTAATCATCACAGTCGTAATCAGGCGTTCCATACAGTTATGCTTCGCTGAGGGTCTGGTAGATGGCTTCGGACTAGACGGCAGCACCGTGTTGACGGCCTCATTACGGGTGCAAGACCGGTTTGAGCTTCACGTGTCACAGATTTTTAAGTTGCAAATCACTCATCTCCGACACAGAGGGAAGAGGTAAGCGCACTGTTCCTCTCTGACTAGACTGGAAAGGGGTTAAAGCACTTTCTCTATTGGCTCCCATATCCGTCACTTCTGACTTCATCATGATCTACACCGCAATGCCCACTTTTCTGAAAGGACCTTGG",
+            "CTGGGCTAGGGGGCTATTCTACTCGGCGTTCCGTTCGCACATCAACTGATAATTGTTTCATCAGCTTACGGGTTGGTGTGGGCGGTCCATCTGGTTTGCCTAAAGGTGATAAAAGAAGTTGCCCGATGCATATTGTTGAAGCTATCATCATGGTCTGGCATTGCAATCCAAGCCTTTATGGGCCTGTGCTGCTCCGGCCCACTTGCCTCTGCGCGGATCCAGCTCGTGAATGAGACTCTCCTCCAAGAAATCAAGCAGCTCTGAACGTGGTAAGAATTGGAACACGTCCCGTAGCTACGCAGTCTACGCGGACTCTATGAAGCGAAAATCAGGTTCCCATGAAGGTCTCTAATCCGTGTTTCTCAATGAATTTGCAATAGATGTCCGGTGTACTACGCTTAAGATGATTGAAAACCTGCCCTGATTCGAGATGAAATCTGTGGTGACAAGATAGACGTTGAGTCCCTGGAACTCCCAGAATAGTCAACGACTGTATGCGGCGCGCCGATCAAAACCCGACATCCGGATTGAGGTGCGATTCGCCAAGGACCCCACCCGAGATGGGGCACACACAATATACTGGGTTAATATATTGTGCTACTTTTGGTCAACGGGGTACCAGAGGGAGCCTCTGAACCGGATAAGCAGCCCCCCCGCCGTAGGGGGTCTCCGTGACAATAGACTGTAATCATCACATTTATATTCAGGCGTACCATAGAGTTATGCTTCGCTGAGGGTCCGGTAGATGGCTTCTGTCTAGACGGCAGCAGCGTGTTGACGGCCTCATAACGGTTGCAAGACCGGTTTGAGCTCCACGGGTCACAGATTTTTAAGTTGCAAATTGCTCATCTCCGACAGAGAGGGAAGAGCTAAGGGCGCTGTCACTCTCTGACCAGACTGGAAAGGGTTTAAAGCACTGTCTCTATTGGCTCCAATCTCCGTCACTTCTGACTTCATCATGATCTACACCGCAATGCCCAGTTTTCAGAAAGGAACTTCG",
+            "AAGCCCGTGCTTTACAGTCCGCATTTTACTAGTGCACTAAATACTACACTCCGTTGGAGTTCCGCCGGATAGGTATGCATCTAAAAGAGTCAGGCCTCCATTCTCTCAGCAACGCGGATTCCAGCAGAGTCTCCATTTCCGATTGTCGTCCTGATACCGGGGGAAGAGGTGTTATTTATCTCTCCACCATATTCTTGGTTGTACCCTGTCTTGGCCTTAGGGGAGCCTTACTTGCTCCTGTGACCGGGTGAACTCCCGCGTTCCCGTCCGAGGGTCTTCCTTCGAAACACGCTGTTCGTCACCACGTTCGTCCGAGAGACCCGTGCATTTCCAGACGTACTCGTGTGCTCCACGTCAATCACGGACTAATTGTAGTACAGCGCGTGTTAATTGCAGCCTTCTAAGATCCGTTAGCCAGGGGATGGATAAATCCCCTAGCGTTAGTTGAACTCAGTAGAAGACGGAACTACTACCTATATCGCTACCGACACCGGGCAGGGGGACAGATGGGGACTAGAGCCTTATATCGTAGGATGAAAAGTCCTCCCAAGACATTGTCAGACGGATCCCAGTCCATTGATAGGTGTAGCGGGTAGTCATCTAATGTGTAAGGCCAACTATGATAGTACACATCCACGCACATACGCTTCGTAGATGCCGGCCTGCCTCCTCAATCTAGTAAGGATCTACTGCATTTTATATAACAAACAACGACGGACTTGTTCCGTGCTACTATACAGTCTGGAACACAGCCATGCGTGGAAAACTCACCAGCCAGCATGGGTGTAAGGACTTCTATAGGCAGCGGTGGAAGAGTAGGGTAGTTGGTATTTCGTCAGTTGGCAAGGTATGTTAGCGGGGCGTCGAGGGTTATGACGGTTGCACAAGTCTGGGTGATTATCAACAGCAAGCGTCGTTGACCAGTACGTTCGATACCGGGAAGGTCCACGTGCGTTTACACAATGAGACTATAACCCGCGCCAAACGACACAAGAAAATA",
+            "AAGACCGTGCTTTGCGGTCCACACTTAAATAGTGCAAGAATTACTACACTCCATTGGTGTTTCGCCGGATATGTATGCATCTAAAAGAGTCAGCCCTCCAGTCTCGCAGCAACCCGGATTCCAGCAGAGTCTCTATTTCGGATTGTCGTCCTGAGACCGAGGGAAGAGCTGCTCTTTATCTCTCCACCATATTCTTGGTTATACCCTGTCTTGTCCTTAGGGGAGCCTTCCTTGCGCCTGTGAACGGGAGAGCTCCCGCGTGCCCGTCCGTGGGTCTACGTTCGAAAAACTCTGTTCGTCACTACGTTCGGCCGAGAGTACCGTGCACTTCCAGACGTACTCGTGTGCTCCACGTCAGTCACTGACTAATTGTAGCACAGCGCCTTTGAATTCAAGCCTTCTAAGATCCGTTAGCCAGGGGATGGACAAATCCCCTAGCGATAGTTGAACTCAGTAGAAGACGGAACTACTACCTATATCGCTACCGACACCGGGCAGGGGGGCAGATGGGGACTACCGCCTTATATCGTAGGATGAAAAGTCCTCCCATTACAATGTCAGAGCGATCCCACCCCATTGATGGATGTAGTGGATAGTCACCTAATGTGTATGGCCAACTATGATAGTACACTTCCACGCACATACGCTTCGTTGATGCCCGCCTCCCACCTAGATCTAGTAAGTATCTCCTGCATTTTATATAACAAACAGTGACGGACTTGTTCCGTGCGACTATACAGCCTGGAAGACAGCCATGCGTGGAAAACTCACCCGCCAGCATGGGTTTAAGGACTTCTATAGGCAGCGGTGGATGAGTAGGGTAGTTGGTATTTCGTCAGTTGGCAAGGTATGTTAGCGGGGCGTCGAGGGTCATGATGGTTGCACAAGTCTCGGTGATTATCAACTCCAACCGTAGTTGACCAGTACGTTCGATACCGGGAAGGTCCAGGTGCGTTTACACAATGAGACTTTAACCCGCGCCAAACGACACAAGAAAATA",
+            "AGTGCTCAAGCCGGACCTGACGCGACCAAATATCCATCTTGAGTTCCCAAGTCTCTACACACAGCGGGGAGTTCTCGCATCAACTGACCTATCGTCGCGATTATCTCAGCGGTAACCCCAGCAGTAAGAACCTAGAGATAGTCGCCGTTAAGTTGTACATTATGAGTTATTTGACAAACTTCACAAACTGCAATTCCGGCGGGCCGGACTTTCCCATTGCGCGGCTCTCTACCACGTCTGGGGAAGCACTTACATCAGTAGCTCTTGTGCTTGGCCAACACACATACGATAAAGATCCAACATCTCCGTGCGTGGGGGCAATTCCCACACACAGCATTGCATTGGTTCAGACCAGCATCTCAGAGTGCGAATAAGCGGGCAAATTTTCATTGCTACAACCGCGATCTTCGTTTATGCTCGGCCGGAAATTTGGAAAGGAGCAAAGCTGACCCACGAGCGCGAGTCCCGCTAGCAGAAAAGTCATGTTGCATGCGTAACGGCAGTACGGGCACGGGGGTCGACCGCACTACAGATGTATGCAGTAATATTTGACTAGGGCCCTCAGGTGTGTAAACAGTAAACCGGAAATTCTCTACGTTGTTTTAGTGGACTCCCCTCTCAGGTTAAGGGGCGCCGACGTAACGCGACCGGCTTTAACATTGCGATAATCAATAGGCTGCGCAATTGTAATTCTAGGTTCTAGATAAAAGTTGGATAGTGCACGTTGTAACTACCTGACTATACGCTGCAGCGTCACAAGCATAAGTCCCCTGTGGTAGTGCTCAGTAAGGCTCACTCAGGGTACGTGCAGCGTCTTTTTCGTGCAGCCGAGCATAGTCTAAACGTTTGAGTCTAAACATAGTCAGAACGGTATGCCACTTCCCTCTCGACGACTAGCCACACACCGTGTTACAGGCTGAGTCAAAAGTATTGTGCAGAAACTAAATGGCAGTACCACAAGAGTGCCTTTTTCGGGTTTACTGTGCACTTGCGAGATCGT",
+            "AGTGCTCAAGACGGACGTGACGCGACCAAATATCCATCTTGAGTTCCGAAGTCTCTACACATAGCGGGGGGTTCTCGCATCAACTGACCTATCGACGCGACTATCTCTGCGGTAACCCCAGCAGTAAGAAGAAAGAGATAGTCGCCGTTAAGTTGTACATTATGAGTTATTTGACAAACTTCCCAAACTGCAATTCCGGCGGGCCGCACCTTCCCATTGCGCGGCTCTCGACCACGTCGGGGGAAGCACTTACATCAATATCTCACGTGCTTGGCAAACACACATACGATAAAGGTCCAACATCTCGGTGCGTGGGGGCAAGTCCCACACACAGCATTGCATTGGTTCAGACCAGCATCTCAGAGTGCGAATAAGCGGGCAAATTTTCTTTGCTATAACTGCGATCTTCGTGCATGCTCGGCCGGAAATTTGGAAAGGAGCAAGGCTGACCCACCAGCGCGAGTCCGGCTAGTATAAAAGTCATGTTGCATGCGTACCGTCAGTACGGGCACGGGGTTCGACCGCACAACAGGTGTTTGCAGTAATATTTGGCTAGGGCTCTCAGGTGTGTAAACAGTAAGCGGGAAATTCTCTACGTTGTTTAAGAGGACCCCCCTCTCAGGTTGAGGGTCGCCGATGTAACGCGGCCAGCTTTAACATTGCGATATTCAAGTGCCTGCGCAATCGTAATTCTAGGTTCTAGATAAAAGTTGGATAGTGCACGTTGTAACTACCTGTCTATACGCTGCAGCGTCACAAGCATAAGTCCCCAGTGGTAGTGCTCATTAAGGCTCACTCAGGGTCCGTGCAGCGTCTTTTTTGTGCAGCCGAGAATAGTTTAAACGTTTGAGTATAAACATAGTCAGAACGGTATGCCAGTCCCCTCTCGACGAGTAGCCACAGGCCGCGATAAAGGCTGAGTCAAAAGTATTGTCCAGAAACTAAATGACAGTACCACAAGAGTGCCTTTTTCCGGCGTACGGTGCAATAGCGAGATCGT",
+            "GCTGGCACAGTCGAATGATTGGTATAATGTTCGTCAACCATTACATAGGACTCGTCTGAGCGGGACGAACTTAGGCATCATGGGGAAAGAAGCCTCCCTTCTATAGCGCAAGATTTGGTATACTCTCCCCGTCGGGCAGAATCGTCCCCCTATTTTTTCCACTAGTTTACAGGTGGCAGAAGCCGGACGGCGTATTGGCCCGACTAGCTATGCGAAGTGGAGGCCAAACGATAACTAAATAGACAAGGACCACTACCGATGTGAATGGGCACCACGTAAGCATCTGAATCGCACACATGGGAAAACCTTTCGTTCAACCAAACCTAAAGTTATACCACGGGCCTTTTGTGATGCTCATTCGGACGGAGGGCCATCCAAGGGAGTCTGGGATGGGGGTCTTGGGTAGACCTTTCAGTCAAGGCCTCCATTTTGATCCAAACATCGAATGTTCAATCACTCGTTAGTAGCCGACTGTTATGAGAGGACACCAGTTGACCCGGATGCCCACGCCTATGGTAACGGCGAGTGTAGAGTCCGAATAGGTGGCATCGTATCGAGACTGTTTGCACGTAAAATCGGCTTTCAGCGACTGTTGACCGGTGGTAATCCTCGAGGGGTCAATTGACTAATCTATTAGAGTACCCATTACTACTCTATATAACCGAAGGTAAATCGATGCCTAACAGGGGTTATCCGCTCCTAAACGCTTCCCAGAGTGTGCCCAGCTCGACTAAGGCGTACCAAACTTGTTAAAATCTTTACTCGGATTACTTGATGGGACGATTTACCACACCCACAGGCTCATCTACACGTTAATCGGAGCTGCGAGTAACACACGGTAAGGCACGGTGGTATCAAACCTTTACATTCAATAAGCATTAGGGTGTCACAATGAGAGTAGCAGGCATAACATCTGCCTGTAACCTTGGGATTCGTAAATCCAGCCGAAGGCTGACGAATTCGGGCGGAAGACACTAATTTACGACACCTTGGTGGAAAG",
+            "AAGACCTTGCTTTGCGGTCCGCACTCTACTAGTGCACTAAATAGTTCACTCCGTGGGAGTGTCCCCGGATATGTATGCATCTAAAAGACTGAAAGCTTCAGTCTCTGAGCAACGCGGCTTCCAGCAGAGTCTCGTTGTCCGATTGCCGTCCTGATACCTAGGGAAGAGTTGCTCTTCCTCTCTCCACCAAATTCTTGGTTGTACCCTGTCTTTGCCTTGGGGGAGCCTTACTTGCCCCTGTGACCGGGTGAACCCACGCGTGCCCGTCCGAGGCTCTACCTACGAAAAACTCTTTTCGTCACCAGCAAGTGCCGAGGGAACCCAGCACTTCCAGACGCACTGGTGTCCACCACGTCAATACCTGACTATTTGGAGTACGGCGCCTATTAGTTTAAGACTTTGAAGATCCGCTAGCCACGGTATGGATCAATCCCCTATCCTCAGTTTAACTCAATAGAAGACGGTTCAACTCCCTATATCGCAACCGACTCCGGGCAGTGGTAGAGATGGGTACTAGCGCCTTATATCGTAGGATAAAAAGTCCTCCCATTACATTATCAGACCGTTCCCAGGCCATTGATAGATGTAGTGGGAATACACCTAATGTGTATGTCCGCCTATGATTGTACAAATCCACGCACATGCTCTGCGTGGATGCCCGCCTCCCTCCCAGATGCAGTAAGGATCTCCTGCATTTTGTTTAACAACCAACTACGGAGTTGTTCCGTGCTACACTTCAGTCTGGAAGCCAGCCATCCATCGAAAAGTCACCAGGCAGCATGGGTGGAAGGCCTTCTATAGGCAGCGGAGGAAAAGTAGGGTAGTTGGTATTTCTTTCGTTGGCAAGGTATGTTAGCGGGACGTCGAGGGCCGGGATGGTTGCACAAGTCTAGGCGATTATCAACTGCAAAAGTTGATGACCAGTCCGTTCGATACCGGGAAGGTCCCTGAGGGGTTACACATCGAGACTAGAACGCGCGCCAAACGACACAAGAAGATA",
+            "AAGACCGTGCTTTGCGGTCCGCACTCTACTAGTGCACTAAATAGTTCACTCCGTGGGAGTTTCCCCGGATATGTATGCATCTAAAAGACAGAAACCGTCAGTCTCTCAGCAACGCGTCTTCCAGCAGAGTCTCGTTGTCCGATTGCCGTCCTGATACCTAGGGAAGAGTTGCTCCTCATCTCTCCACCAAATTCTTGGTTGTACCCTGTCTTTGGCTTGGGGGAGCCTTACTTGCTCCTGTGACCGGGTGAACCACCGCGTGCCCGTCCGAGGGTCTACCTTCGCAAAACTCTTTTCGTCACCAGGAACGGCAGAAGGAACCCAGCACTTCCAGACGCACTGGAGTCCTCCACGTCAATCCCTGACTATTTGTAGGACCGCGCCTATTAGTTTAAGACTTTGAAGATCCGCTAGCCACGGTATGTATAATTCCTCTATAGTTAGTTTAACTCAATAGAAGACGGTTCTACTCCCTATATCGCAACCGACTTCGGGCAGGGGAACAGATGGGTACTAGCGCCTTCTATCGTAGGATAAAAAGTCCTCCCATTACATTGTGAGGCCGTTCCCAGGCCATTGATAGATGTAGTGGGAAGACACCTAATGTGTATGATCACCTATGATTGTACAAATCCACGCACATGCTCTGCGTTGATGCCCGCCTCCCTCCCAGATCCAGTAAGGATCTCCTGCATTTTGTTTAACAACCAACTACGGAGTTGTTCCGTGCTACACTTCTGTCTGGAAGACAGCCACCCGTCGAAAAGACAACAGGCAGCATGGGTGGAAGGCCTTCTATAGGTAGCGGAGGAAAAGTAGGGTAGTTGGTATTTCTTTCGTTGGCAAGGTATGTTAGCGGGACGTCGAGGGCCGGCATGGTTGCACAAGTCTCGGCGATTATCAACTGCAAAAGTTGATGACCAGTACGTTCGATACCGGGAAGGGCCATGAGGGTTTACACATCGAGACTATAACGCGCGCCTAACGACACAAGAAGATA",
+            "GTTAGCACAGTCGGATGACTGGTATAATGTTCGTCAACGATTACATAGGACTCGACTGATCGGGACGAACTTAGGCATAAGGGGGAAAGTAGCCTCCCTTCTATACCGGAAGGTTTGGTATACTCTCCCCGTCTGGCAGAATCGTCCCTCTATTTTGTCCACTAGTTTACACGTGGCAGAAGCCGGCCGGGGTATTGCCTCGACTCGCTATGCGAAGTGGAGGCCAAACGATAACTAAATAAACAAGGACCACTACGGATGTGAGTGGGCACCACTTAAGCGTCTGCATCGAACACATGGGAAAACCTTTCGTTAAAGCAAACCTAAAGTTAGACCACGGACCTCTTGTGATGCTAATTCGGACGGAGGGCCAGCCAAGGGAGTCTGGGTTACGGGTCTTGGGTAGACCTTTCAGTCAATGCCTCCATTTTGGTCCAAACAACGAATGTTCAATCACTCGGTAGTAGCCCAGTGTTATGAGTGGACATCAGTTGACCAGGATGCCCACGCCTATGGTAACGGCGAGTGTAGAGTCCGAATAGGTGGTATCCTATCGAGACTGTTTGTACGTAAAACCGGCATTCAGCAACTGTTGACCGGTGGTAATCCTCGAGGGGTCTAATCACCGATCCATTAGAGTACCCTGTACTACCCTATACAACCGAAGGTAAATCGATACCTAACAGGGGTTATGCGCTCGTAAATGCTCCCCGGAGTGTACGCTGCTCGGCTAAGGCGTTCCAAACTTGTTAAAATCTTTACTCGGATTACTTGATGGGACGATTTACCACACCCACAGGCTCATCTATACGTTGATCGGAGCTGCGATTAACAGACGGTAACGCACGGTGGTATCAAAACATTACATTCATTAAGCATGAGGGTGTCACATTGAAAGTACCAGGCATAAAAATTGCCTGTAACCTTGGGATTCGTAAATCCAGCCGAAGGCTGACAAATTCGGGCGGAGGACACTAATTTACAACACCTCGGAGGTAAG"
+	};
+
     //static private boolean m_dialogInitialized=false;
     /**
      * thread pool *
@@ -1470,7 +1484,187 @@ IS_ESS = function(log_weights)
     	
     	return result1+result2+result3+result4;
     }
-	  
+
+    /*    
+     * the function addSequence adds a sequence of DNA to the exixting taxon set
+     * the return value is the array of the distances number of taxa
+     * the new leaf position in the array of leaves can be inferred by the length of the array
+     * i.e. distances.length=4 for example, means that the new leaf is t5, i.e. the 5th taxon
+    */    
+
+    private static boolean checkAndAddSequenceAndCalculateDistances(Sequential[] beastMClist, int treepositionInStateArray, final String DNAsequence, int nrOfSequencessBeforeUpdate, final int [] distances)
+	{
+		// add the new sequence first to first element of the list, then use the same shared input for all
+		Tree tret=(Tree)beastMClist[0].m_mcmc.getState().stateNode[treepositionInStateArray];
+		// the numberOfSequencesAfterUpdate is return value: number of updated number of leaves
+		// int nrOfSequencessBeforeUpdate=tret.getLeafNodeCount();
+		int numberOfSequencesAfterUpdate=nrOfSequencessBeforeUpdate+1;
+		final String seqstr=DNAsequence;
+		final TaxonSet txs=tret.m_taxonset.get();
+		final Input<TaxonSet> txset=tret.m_taxonset;
+		Alignment ali=txs.alignmentInput.get();
+
+		// final int [] distances=new int[nrOfSequencessBeforeUpdate];
+		// get the sequence of the last leaf
+		final int nrOfElements=seqstr.length();
+		
+		Arrays.parallelSetAll(distances, e ->
+       	{ 
+       		String curSeqString=ali.getSequence(e).dataInput.get();
+       		int dist=0;
+       		// calculate the distance
+       		for(int i=0;i<nrOfElements;i++)
+       		{
+       			if(seqstr.charAt(i)!=curSeqString.charAt(i))
+       			{
+       				dist++;
+       			}
+       		}
+       		return dist;
+       	});
+		
+		// check if there is any distance equal to 0 (implies that this sequence was already in)
+		boolean sequenceAlreadyPresent = Arrays.stream(distances).parallel().anyMatch(i -> i==0);
+		
+		if(!sequenceAlreadyPresent)
+		{// add the sequence to the alignment
+			String taxonID="t"+numberOfSequencesAfterUpdate;
+			Sequence seq=new Sequence(taxonID, seqstr);
+			
+			ali.initializeWithAddedSequenceList(Arrays.asList(seq), false);
+		}
+		
+		// return true if the sequence was added
+		return (!sequenceAlreadyPresent);
+	}
+
+    /*    
+     * the function addSequence adds a sequence of DNA to the exixting taxon set
+     * the return value is the array of the distances number of taxa
+     * the new leaf position in the array of leaves can be inferred by the length of the array
+     * i.e. distances.length=4 for example, means that the new leaf is t5, i.e. the 5th taxon
+    */    
+
+    private static ArrayList<List<Double>> drawLeafAndHeightAndCalculateLog(Sequential[] beastMClist, int treepositionInStateArray, int popsizepositionInStateArray, int sequenceLength, int nrOfSequencessBeforeUpdate, final int [] distances)
+	{
+		// add the new sequence first to first element of the list, then use the same shared input for all
+		Tree tret=(Tree)beastMClist[0].m_mcmc.getState().stateNode[treepositionInStateArray];
+		// the numberOfSequencesAfterUpdate is return value: number of updated number of leaves
+		// int nrOfSequencessBeforeUpdate=tret.getLeafNodeCount();
+		int numberOfSequencesAfterUpdate=nrOfSequencessBeforeUpdate+1;
+		
+		final TaxonSet txs=tret.m_taxonset.get();
+		final Input<TaxonSet> txset=tret.m_taxonset;
+		Alignment ali=txs.alignmentInput.get();
+
+
+		final Input<Alignment> aliinput=txs.alignmentInput;
+		
+
+		final Integer lengthOfSeq=sequenceLength;
+		final double lenSeq=lengthOfSeq.doubleValue();
+		
+		// needed for drawing of the height
+		final double sdOfGaussian=1.0/Math.sqrt(lenSeq);
+
+		
+		// after having updated the tree we need to update all obj that hv the tree as input?
+		// probably not needed as the initialisation is done anyway in the mcmc init
+		
+		// the first element is the leaf, the second is the distance of the new leaf from each of the previous ones
+		ArrayList<List<Double>>  retValues = new ArrayList<>();
+		for(int i=0; i< beastMClist.length; i++)
+		{// initialise and add a list of doubles for
+			retValues.add(new ArrayList<Double>());
+		}
+
+		Arrays.parallelSetAll(beastMClist, e ->
+	       	{ 
+	       		// add sequence here to all
+	       		// would be good to have a shared taxa, taxonset, alignment for all particles
+	       		
+	       		List<Double> retvalRow=new ArrayList<>();
+	       		MCMC mc=beastMClist[e].m_mcmc;
+	       		State stt=mc.getState();
+	       		double theta=stt.stateNode[popsizepositionInStateArray].getArrayValue();
+
+	       		/* start of the part of drawing the leaf */
+				Integer selectedLeaf=0;
+				//double theta=beastMClist[e];
+				{
+					double qtToElevate=(lenSeq*theta)/(nrOfSequencessBeforeUpdate+(lenSeq*theta)); // this will hv to change and contain the effective pop size
+					double []probabilityWeight= new double[distances.length];//{0.1,0.2,0.25,0.85};//
+					Arrays.parallelSetAll(probabilityWeight, ee -> {return Math.exp(distances[ee]*Math.log(qtToElevate));});
+					org.apache.commons.math3.util.Pair<Integer, Double> itemToInit=new org.apache.commons.math3.util.Pair<Integer, Double>(0,0.0);
+					List<org.apache.commons.math3.util.Pair<Integer, Double>> pmfWeights=new ArrayList<org.apache.commons.math3.util.Pair<Integer, Double>>(Collections.nCopies(probabilityWeight.length, itemToInit));
+	        		
+					Arrays.parallelSetAll(probabilityWeight, ee ->{
+	        			pmfWeights.set(ee, new org.apache.commons.math3.util.Pair<Integer, Double>(ee,probabilityWeight[ee]));
+	        			return probabilityWeight[ee];
+	        		});
+					EnumeratedDistribution enDist=new EnumeratedDistribution<>(pmfWeights);
+					// the following is the draw of the leaf (position of the leaf in the array)
+					selectedLeaf=(Integer) enDist.sample();
+					//selectedLeafMap.replace(e, selectedLeaf);
+				}
+	       		/* end of draw of the leaf */
+	       		double my_height=0.0;
+				double meanOfGaussian=2*Math.asin(Math.sqrt(distances[selectedLeaf.intValue()]/lenSeq));
+	       		/* start of the part of drawing the height */
+				{
+					double upperBoundTruncatedGaussian=2.094395102393195; // this is 2*Math.asin(sqrt(3)/2.0);
+					//org.apache.commons.math3.distribution.NormalDistribution norm=new org.apache.commons.math3.distribution.NormalDistribution(meanOfGaussian, sdOfGaussian);
+					//TruncatedNormal tn = new TruncatedNormal(meanOfGaussian, sdOfGaussian,  Double.NEGATIVE_INFINITY, upperBoundTruncatedGaussian);
+
+					double inerval;
+						double beta=TruncatedNormal.sampleUpgraded(Double.NEGATIVE_INFINITY, upperBoundTruncatedGaussian); //tn.sample();
+						if(beta > upperBoundTruncatedGaussian)
+						{
+				            throw new RuntimeException(
+				                    "Unable to draw properly from the truncated Gaussian\n");
+						}
+						// from the paper on Sequential Monte Carlo transformations,
+						// calculate the height (formula 24 of paper)
+						// decide if it is better to have a different height for every particle:
+						// the process of selectin height is independent of the tree
+						double sinVal=Math.sin(beta/2.0);
+						inerval=1.0-((4.0/3.0)*sinVal*sinVal);
+
+						if(inerval > 0)
+						{
+						    my_height=(-3.0/((4.0)*theta))*Math.log(1.0-((4.0/3.0)*sinVal*sinVal));
+						}
+						else
+						{
+				            throw new RuntimeException(
+				                    "Error in formula from the truncated Gaussian, negative log argument!!!\n");
+						}
+				}
+	       		/* end of draw of the height */
+				retvalRow.add(selectedLeaf.doubleValue());
+				retvalRow.add(my_height);
+				
+				/* 
+				 * here we can calculate the components for the weights
+				 */
+				/*
+				 * Leaf first
+				 */
+	       		   double Ms=distances[selectedLeaf.intValue()];
+	       		   double N=lenSeq; // length of sequence
+	       		   double t=nrOfSequencessBeforeUpdate;
+				   double logUnnormalisedIncrementalWeightsLeafSelection=-Ms*(Math.log(N*theta)-Math.log(t+N*theta));
+				/*
+				 * height afterwards
+				 */
+				   double logUnnormalisedIncrementalWeightsHeightSelection=calcLogHeightSelection(theta, my_height, meanOfGaussian, sdOfGaussian);
+				   
+				  return beastMClist[e];
+	       	});
+		
+	   return retValues;    	
+	}
+    
     /*    
      * the function addSequence adds a sequence of DNA to the exixting taxon set
      * the return value is the array of the distances number of taxa
@@ -1630,6 +1824,9 @@ IS_ESS = function(log_weights)
 				/*
 				 * Leaf first
 				 */
+				
+				// we need to calculate these quantities after the tree has been updated (i.e. after sequence added
+				
 	       		   double Ms=distances[selectedLeaf.intValue()];
 	       		   double N=lenSeq; // length of sequence
 	       		   double t=nrOfSequencessBeforeUpdate;
@@ -1853,26 +2050,33 @@ IS_ESS = function(log_weights)
 
 						for(int loc=0;loc<10;loc++)
 						{
-							calledBeforeTreeUpdated=true;
-						    calculateIncrementalWeightsForTransformation(beastMClist, logIncrementalWeights, currentExponentDouble, calledBeforeTreeUpdated);
-							starttimeNano=System.nanoTime();
-							// add the new sequence first to first element of the list, then use the same shared input for all
-							
 							Tree tret=(Tree)beastMClist[0].m_mcmc.getState().stateNode[treepositionInStateArray];
 							// the numberOfSequencesAfterUpdate is return value: number of updated number of leaves
 							int nrOfSequencessBeforeUpdate=tret.getLeafNodeCount();
 							// the distances array will be calculated inside the routine to add the sequence
 							int [] distances=new int[nrOfSequencessBeforeUpdate];
+							
+							// check if the sequence is already present
+						    if(checkAndAddSequenceAndCalculateDistances(beastMClist, treepositionInStateArray, m_sequencesArray[loc%m_sequencesArray.length], nrOfSequencessBeforeUpdate, distances))
+						    {// all good, the sequence was not already in the data, proceed
+								calledBeforeTreeUpdated=true;
+							    calculateIncrementalWeightsForTransformation(beastMClist, logIncrementalWeights, currentExponentDouble, calledBeforeTreeUpdated);
+								starttimeNano=System.nanoTime();
+								// add the new sequence first to first element of the list, then use the same shared input for all
+								
 
-							HashMap<Integer,Integer> selectedLeaves=addSequence(beastMClist, treepositionInStateArray, populationsizePositionInStateArray, loc, nrOfSequencessBeforeUpdate, distances);			        		
-							elapsedTimeNano=System.nanoTime()-starttimeNano;
-							//elapsedTimeMs=getExecutionLength(elapsedTimeNano);
-							times.add((int)(elapsedTimeNano/1000000));
-							// here update transformation weight
-							calledBeforeTreeUpdated=false;
-						    calculateIncrementalWeightsForTransformation(beastMClist, logIncrementalWeights, currentExponentDouble, calledBeforeTreeUpdated);
-						    calculateIncrementalWeightsForTransformationAddLeafComponent(beastMClist, logIncrementalWeights, populationsizePositionInStateArray, distances, selectedLeaves, 1000, nrOfSequencessBeforeUpdate);
-						    calculateIncrementalWeightsForTransformationAddHeightComponent(beastMClist, logIncrementalWeights, populationsizePositionInStateArray, distances, selectedLeaves, 1000, nrOfSequencessBeforeUpdate);
+									
+
+								HashMap<Integer,Integer> selectedLeaves=addSequence(beastMClist, treepositionInStateArray, populationsizePositionInStateArray, loc, nrOfSequencessBeforeUpdate, distances);			        		
+								elapsedTimeNano=System.nanoTime()-starttimeNano;
+								//elapsedTimeMs=getExecutionLength(elapsedTimeNano);
+								times.add((int)(elapsedTimeNano/1000000));
+								// here update transformation weight
+								calledBeforeTreeUpdated=false;
+							    calculateIncrementalWeightsForTransformation(beastMClist, logIncrementalWeights, currentExponentDouble, calledBeforeTreeUpdated);
+							    calculateIncrementalWeightsForTransformationAddLeafComponent(beastMClist, logIncrementalWeights, populationsizePositionInStateArray, distances, selectedLeaves, 1000, nrOfSequencessBeforeUpdate);
+							    calculateIncrementalWeightsForTransformationAddHeightComponent(beastMClist, logIncrementalWeights, populationsizePositionInStateArray, distances, selectedLeaves, 1000, nrOfSequencessBeforeUpdate);
+						    }
 						}
 					}
 				}

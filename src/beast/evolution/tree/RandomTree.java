@@ -744,6 +744,30 @@ public class RandomTree extends Tree implements StateNodeInitialiser {
         
         return idx;
     }
+    
+    /*
+     * in the transformation paper, for demarginalisation
+     * we need to find all the leaves that lead to the same
+     */
+    public ArrayList<Integer> FindAllLeavesFromInternalNode(Tree tree, int startingNode, ArrayList<Integer> currentList) {
+    	
+    	if(startingNode<=tree.getLeafNodeCount())
+    	{
+    		currentList.add(startingNode);
+    	}
+    	else
+    	{
+    		Node nd=tree.getNode(startingNode);
+    		List<Node> lst=nd.getChildren();
+    		for(Node nodeOfList:lst)
+    		{
+    			currentList=FindAllLeavesFromInternalNode(tree, nodeOfList.getNr(), currentList);
+    		}
+    	}
+    	
+    	return currentList;
+    }
+    
     /**
      * Coalesce two nodes in the active list. This method removes the two
      * (randomly selected) active nodes and replaces them with the new node at

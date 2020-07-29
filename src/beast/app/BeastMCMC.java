@@ -154,8 +154,8 @@ public class BeastMCMC {
      */
     private final static int selectedLeafPosition=0;
     private final static int heightPosition=1;
-    private final static int logLeafComponentPosition=2;
-    private final static int logHeightComponentPosition=3;
+    private final static int meanGaussianPosition=2;
+    private final static int sigmaGaussianPosition=3;
 
 
     BeastDialog m_dialog=null;
@@ -1078,17 +1078,17 @@ IS_ESS = function(log_weights)
 
     public static void calculateIncrementalWeightsForTransformationAddLeafComponent(Sequential[] beastMClist, double[] output_logUnnormalisedIncrementalWeights, ArrayList<List<Double>> values)
     {
-       	Arrays.parallelSetAll(output_logUnnormalisedIncrementalWeights, e->{
+/*       	Arrays.parallelSetAll(output_logUnnormalisedIncrementalWeights, e->{
        	    return output_logUnnormalisedIncrementalWeights[e]-values.get(e).get(logLeafComponentPosition);
        	});
-    }
+*/    }
     
     public static void calculateIncrementalWeightsForTransformationAddHeightComponent(Sequential[] beastMClist, double[] output_logUnnormalisedIncrementalWeights, ArrayList<List<Double>> values)
     {
-       	Arrays.parallelSetAll(output_logUnnormalisedIncrementalWeights, e->{
+/*       	Arrays.parallelSetAll(output_logUnnormalisedIncrementalWeights, e->{
        	    return output_logUnnormalisedIncrementalWeights[e]-values.get(e).get(logHeightComponentPosition);
        	});
-    }
+*/    }
 
     // the output is the updated incremental weights after annealing
     public static void calculateIncrementalWeights(Sequential[] beastMClist, double[] output_logUnnormalisedIncrementalWeights, final double previousExponent, final double nextExponent)
@@ -1648,7 +1648,9 @@ IS_ESS = function(log_weights)
 				/* end of draw of the height */
 				retvalRow.set(selectedLeafPosition, selectedLeaf.doubleValue());
 				retvalRow.set(heightPosition, my_height);
-				
+				retvalRow.set(meanGaussianPosition,meanOfGaussian);
+				retvalRow.set(sigmaGaussianPosition,meanOfGaussian);
+
 				/* 
 				 * here we can calculate the components for the weights
 				 */
@@ -1660,13 +1662,13 @@ IS_ESS = function(log_weights)
 	       		   double t=nrOfSequencessBeforeUpdate;
 				   double logUnnormalisedIncrementalWeightsLeafSelection=Ms*(Math.log(N*theta)-Math.log(t+N*theta));
 
-				   retvalRow.set(logLeafComponentPosition, logUnnormalisedIncrementalWeightsLeafSelection);
+				  // retvalRow.set(logLeafComponentPosition, logUnnormalisedIncrementalWeightsLeafSelection);
 				   /*
 				 * height afterwards
 				 */
 				   double logUnnormalisedIncrementalWeightsHeightSelection=calcLogHeightSelection(theta, my_height, meanOfGaussian, sdOfGaussian);
 
-				   retvalRow.set(logHeightComponentPosition, logUnnormalisedIncrementalWeightsHeightSelection);
+				  // retvalRow.set(logHeightComponentPosition, logUnnormalisedIncrementalWeightsHeightSelection);
 				   
 				   retValues.set(e, retvalRow);
 				  return beastMClist[e];
@@ -1700,7 +1702,7 @@ IS_ESS = function(log_weights)
        			/*
        			 * height afterwards
        			 */
-    		    double logUnnormalisedIncrementalWeightsHeightSelection=calcLogHeightSelection(theta, my_height, meanOfGaussian, sdOfGaussian);
+    		   // double logUnnormalisedIncrementalWeightsHeightSelection=calcLogHeightSelection(theta, my_height, meanOfGaussian, sdOfGaussian);
        		}
     	  });
 
@@ -1826,13 +1828,13 @@ IS_ESS = function(log_weights)
 	       		   double t=nrOfSequencessBeforeUpdate;
 				   double logUnnormalisedIncrementalWeightsLeafSelection=Ms*(Math.log(N*theta)-Math.log(t+N*theta));
 
-				   retvalRow.set(logLeafComponentPosition, logUnnormalisedIncrementalWeightsLeafSelection);
+				  // retvalRow.set(logLeafComponentPosition, logUnnormalisedIncrementalWeightsLeafSelection);
 				   /*
 				 * height afterwards
 				 */
 				   double logUnnormalisedIncrementalWeightsHeightSelection=calcLogHeightSelection(theta, my_height, meanOfGaussian, sdOfGaussian);
 
-				   retvalRow.set(logHeightComponentPosition, logUnnormalisedIncrementalWeightsHeightSelection);
+				  // retvalRow.set(logHeightComponentPosition, logUnnormalisedIncrementalWeightsHeightSelection);
 				   
 				   retValues.set(e, retvalRow);
 				  return beastMClist[e];

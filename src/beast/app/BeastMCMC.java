@@ -1674,8 +1674,40 @@ IS_ESS = function(log_weights)
 		
 	   return retValues;    	
 	}
+
+    private static double calculateLeavesComponents(Sequential[] beastMClist, int treepositionInStateArray, int popsizepositionInStateArray, int sequenceLength, int nrOfSequencessBeforeUpdate, final int [] distances, ArrayList<HashSet<Integer>> leaves)
+	{
+    	double result =0.0;
+		/* 
+		 * here we can calculate the components for the weights
+		 */
+		/*
+		 * Leaf first
+		 */
+    	IntStream.range(0, 10).parallel().forEach(i -> {
+    		// outer loop if for each particle
+    		MCMC mc=beastMClist[i].m_mcmc;
+       		State stt=mc.getState();
+       		double theta=stt.stateNode[popsizepositionInStateArray].getArrayValue();;
+    		double N=sequenceLength; // length of sequence
+       		double t=nrOfSequencessBeforeUpdate;
+       		HashSet<Integer> leavesSet=leaves.get(i);
+       		for(Integer selectedLeaf:leavesSet)
+       		{
+    			double meanOfGaussian=2*Math.asin(Math.sqrt(distances[selectedLeaf.intValue()]/N));
+       			double Ms=distances[selectedLeaf.intValue()];
+       			double logUnnormalisedIncrementalWeightsLeafSelection=Ms*(Math.log(N*theta)-Math.log(t+N*theta));
+       			/*
+       			 * height afterwards
+       			 */
+    		    double logUnnormalisedIncrementalWeightsHeightSelection=calcLogHeightSelection(theta, my_height, meanOfGaussian, sdOfGaussian);
+       		}
+    	  });
+
+    	return result;
+	}
     
-    private static ArrayList<List<Double>> drawLeafAndHeightAndCalculateLogUpdated(Sequential[] beastMClist, int treepositionInStateArray, int popsizepositionInStateArray, int sequenceLength, int nrOfSequencessBeforeUpdate, final int [] distances)
+    private static ArrayList<List<Double>> drawLeafAndHeightAndCalculateLogUpdated(Sequential[] beastMClist, int treepositionInStateArray, int popsizepositionInStateArray, int sequenceLength, int nrOfSequencessBeforeUpdate, final int [] distances, ArrayList<HashSet<Integer>> leaves)
 	{
 		// add the new sequence first to first element of the list, then use the same shared input for all
 		Tree tret=(Tree)beastMClist[0].m_mcmc.getState().stateNode[treepositionInStateArray];
@@ -1703,11 +1735,9 @@ IS_ESS = function(log_weights)
 		
 		// the first element is the leaf, the second is the distance of the new leaf from each of the previous ones
 		ArrayList<List<Double>>  retValues = new ArrayList<>();
-		ArrayList<HashSet<Integer>> leaves = new ArrayList<>();
 		for(int i=0; i< beastMClist.length; i++)
 		{// initialise and add a list of doubles for
 			retValues.add(new ArrayList<Double>());
-			leaves.add(new HashSet<Integer>());
 		}
 
 		Arrays.parallelSetAll(beastMClist, e ->
@@ -1776,11 +1806,14 @@ IS_ESS = function(log_weights)
 				/* end of draw of the height */
 				retvalRow.set(selectedLeafPosition, selectedLeaf.doubleValue());
 				retvalRow.set(heightPosition, my_height);
+				
+				// we need to save mean of gaussian and stddev of gaussian
 				Tree particleTree = (Tree)stt.stateNode[treepositionInStateArray];
 				int chosenNode=RandomTree.getClosestFromLeaf(particleTree, selectedLeaf.intValue(), my_height);
 				HashSet<Integer> leavesSet=leaves.get(e);
 				leavesSet.add(selectedLeaf);
 				leavesSet=RandomTree.FindAllLeavesFromInternalNode(particleTree, chosenNode, leavesSet);
+				leaves.set(e, leavesSet);
 				//retvalRow.set(index, (double)chosenNode);
 				/* 
 				 * here we can calculate the components for the weights
@@ -2283,7 +2316,12 @@ IS_ESS = function(log_weights)
 						    {// all good, the sequence was not already in the data, proceed
 
 						        int sequenceLength=m_sequencesArray[0].length();
-						    	ArrayList<List<Double>> retvals=drawLeafAndHeightAndCalculateLog( beastMClist, treepositionInStateArray, populationsizePositionInStateArray,  sequenceLength, nrOfSequencessBeforeUpdate,  distances);
+						        ArrayList<HashSet<Integer>> leaves = new ArrayList<>();
+								for(int i=0; i< beastMClist.length; i++)
+								{// initialise and add a list of doubles for
+									leaves.add(new HashSet<Integer>());
+								}
+						    	ArrayList<List<Double>> retvals=drawLeafAndHeightAndCalculateLogUpdated( beastMClist, treepositionInStateArray, populationsizePositionInStateArray,  sequenceLength, nrOfSequencessBeforeUpdate,  distances, leaves);
 						    	calledBeforeTreeUpdated=true;
 							    calculateIncrementalWeightsForTransformation(beastMClist, logIncrementalWeights, currentExponentDouble, calledBeforeTreeUpdated);
 								starttimeNano=System.nanoTime();

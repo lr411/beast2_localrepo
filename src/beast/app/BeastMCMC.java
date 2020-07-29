@@ -2141,6 +2141,7 @@ IS_ESS = function(log_weights)
 						{
 							Tree tret=(Tree)beastMClist[0].m_mcmc.getState().stateNode[treepositionInStateArray];
 							// the numberOfSequencesAfterUpdate is return value: number of updated number of leaves
+							State st=beastMClist[0].m_mcmc.getState();
 							int nrOfSequencessBeforeUpdate=tret.getLeafNodeCount();
 							// the distances array will be calculated inside the routine to add the sequence
 							int [] distances=new int[nrOfSequencessBeforeUpdate];

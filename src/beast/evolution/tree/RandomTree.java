@@ -850,7 +850,7 @@ public class RandomTree extends Tree implements StateNodeInitialiser {
         tree.hasStartedEditing=false;
         updateStoredNodes(tree.getNodeCount(), tree);
         tree.hasStartedEditing=false;
-        
+        tree.setEverythingDirty(true);
         // we also need to update the initialisersInput, both value and default value
     	//Input<List<StateNodeInitialiser>> initi=beastMClist[e].m_mcmc.initialisersInput;
 

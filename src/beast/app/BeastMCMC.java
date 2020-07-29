@@ -147,6 +147,16 @@ public class BeastMCMC {
      * random number seed used to initialise Randomizer *
      */
     long m_nSeed = 127;
+    
+    /*
+     * variables that are auxiliary for calculation of formulae
+     * they represent position in a list
+     */
+    private final static int selectedLeafPosition=0;
+    private final static int heightPosition=1;
+    private final static int logLeafComponentPosition=2;
+    private final static int logHeightComponentPosition=3;
+
 
     BeastDialog m_dialog=null;
     
@@ -1066,26 +1076,20 @@ IS_ESS = function(log_weights)
 			});
     }
 
-    public static void calculateIncrementalWeightsForTransformationAddLeafComponent(Sequential[] beastMClist, double[] output_logUnnormalisedIncrementalWeights, final int popsizepositionInStateArray, final int [] distances, HashMap<Integer,Integer> selectedLeaves, final int lengthOfSequence, final int nrOfSequencesBeforeUpdate)
+    public static void calculateIncrementalWeightsForTransformationAddLeafComponent(Sequential[] beastMClist, double[] output_logUnnormalisedIncrementalWeights, ArrayList<List<Double>> values)
     {
-    	
        	Arrays.parallelSetAll(output_logUnnormalisedIncrementalWeights, e->{
-			
-       		   //MCMC mc=beastMClist[e].m_mcmc;
-	       	   State stt=beastMClist[e].m_mcmc.getState();
-	       	   double theta=stt.stateNode[popsizepositionInStateArray].getArrayValue();
-       		   double Ms=distances[selectedLeaves.get(e)];
-       		   double N=lengthOfSequence; // length of sequence
-       		   double t=nrOfSequencesBeforeUpdate;
-			   return output_logUnnormalisedIncrementalWeights[e]-Ms*(Math.log(N*theta)-Math.log(t+N*theta));
-			});
-    }
-
-    public static void calculateIncrementalWeightsForTransformationAddHeightComponent(Sequential[] beastMClist, double[] output_logUnnormalisedIncrementalWeights, final int popsizepositionInStateArray, final int [] distances, HashMap<Integer,Integer> selectedLeaves, final int lengthOfSequence, final int nrOfSequencesBeforeUpdate)
-    {
-    	
+       	    return output_logUnnormalisedIncrementalWeights[e]-values.get(e).get(logLeafComponentPosition);
+       	});
     }
     
+    public static void calculateIncrementalWeightsForTransformationAddHeightComponent(Sequential[] beastMClist, double[] output_logUnnormalisedIncrementalWeights, ArrayList<List<Double>> values)
+    {
+       	Arrays.parallelSetAll(output_logUnnormalisedIncrementalWeights, e->{
+       	    return output_logUnnormalisedIncrementalWeights[e]-values.get(e).get(logHeightComponentPosition);
+       	});
+    }
+
     // the output is the updated incremental weights after annealing
     public static void calculateIncrementalWeights(Sequential[] beastMClist, double[] output_logUnnormalisedIncrementalWeights, final double previousExponent, final double nextExponent)
     {
@@ -1475,11 +1479,11 @@ IS_ESS = function(log_weights)
     	double result =0.0;
     	double fourthird=(4.0/3.0)*theta*my_height;
     	
-    	double result1=Math.log(2*theta)+fourthird;
+    	double result1=Math.log(2*Math.abs(theta))-fourthird;
     	double expval=(1-Math.exp(-fourthird));
-    	double result2=-Math.sqrt(3)*Math.sqrt(expval)*Math.sqrt(1.0-(3.0*0.25*expval));
-    	double result3=-Math.log(Math.sqrt(Math.PI*2)*sdOfGaussian);
-    	double result4temp=2*Math.asin(3.0*0.25*expval)-meanOfGaussian;
+    	double result2=-(Math.log(Math.sqrt(3)) + Math.log(Math.sqrt(expval)) + Math.log(Math.sqrt(1.0-(3.0*0.25*expval))));
+    	double result3=-(Math.log(Math.sqrt(Math.PI*2))+Math.log(sdOfGaussian));
+    	double result4temp=2*Math.asin(Math.sqrt(3.0*0.25*expval))-meanOfGaussian;
     	double result4=-result4temp*result4temp/(2*sdOfGaussian*sdOfGaussian);
     	
     	return result1+result2+result3+result4;
@@ -1583,7 +1587,7 @@ IS_ESS = function(log_weights)
 	       		// add sequence here to all
 	       		// would be good to have a shared taxa, taxonset, alignment for all particles
 	       		
-	       		List<Double> retvalRow=new ArrayList<>();
+	       		List<Double> retvalRow=new ArrayList<>(Arrays.asList(new Double[] {0.0,0.0,0.0,0.0}));
 	       		MCMC mc=beastMClist[e].m_mcmc;
 	       		State stt=mc.getState();
 	       		double theta=stt.stateNode[popsizepositionInStateArray].getArrayValue();
@@ -1640,9 +1644,10 @@ IS_ESS = function(log_weights)
 				                    "Error in formula from the truncated Gaussian, negative log argument!!!\n");
 						}
 				}
-	       		/* end of draw of the height */
-				retvalRow.add(selectedLeaf.doubleValue());
-				retvalRow.add(my_height);
+
+				/* end of draw of the height */
+				retvalRow.set(selectedLeafPosition, selectedLeaf.doubleValue());
+				retvalRow.set(heightPosition, my_height);
 				
 				/* 
 				 * here we can calculate the components for the weights
@@ -1653,12 +1658,17 @@ IS_ESS = function(log_weights)
 	       		   double Ms=distances[selectedLeaf.intValue()];
 	       		   double N=lenSeq; // length of sequence
 	       		   double t=nrOfSequencessBeforeUpdate;
-				   double logUnnormalisedIncrementalWeightsLeafSelection=-Ms*(Math.log(N*theta)-Math.log(t+N*theta));
-				/*
+				   double logUnnormalisedIncrementalWeightsLeafSelection=Ms*(Math.log(N*theta)-Math.log(t+N*theta));
+
+				   retvalRow.set(logLeafComponentPosition, logUnnormalisedIncrementalWeightsLeafSelection);
+				   /*
 				 * height afterwards
 				 */
 				   double logUnnormalisedIncrementalWeightsHeightSelection=calcLogHeightSelection(theta, my_height, meanOfGaussian, sdOfGaussian);
+
+				   retvalRow.set(logHeightComponentPosition, logUnnormalisedIncrementalWeightsHeightSelection);
 				   
+				   retValues.set(e, retvalRow);
 				  return beastMClist[e];
 	       	});
 		
@@ -1890,6 +1900,85 @@ IS_ESS = function(log_weights)
 		
 		return selectedLeafMap;
 	}
+
+    private static void addNormalisedWeights(double[] in_logWeightsNormalized, double[] out_logIncrementalWeights)
+    {
+		Arrays.parallelSetAll(out_logIncrementalWeights, e ->{
+			return out_logIncrementalWeights[e]+in_logWeightsNormalized[e];
+		});
+    }
+    
+    private static void addSequenceUpdated(Sequential[] beastMClist, int treepositionInStateArray, int popsizepositionInStateArray, int nrOfSequencessBeforeUpdate, final int [] distances, ArrayList<List<Double>> values)
+	{
+		// add the new sequence first to first element of the list, then use the same shared input for all
+		Tree tret=(Tree)beastMClist[0].m_mcmc.getState().stateNode[treepositionInStateArray];
+		// the numberOfSequencesAfterUpdate is return value: number of updated number of leaves
+		// int nrOfSequencessBeforeUpdate=tret.getLeafNodeCount();
+		int numberOfSequencesAfterUpdate=nrOfSequencessBeforeUpdate+1;
+		String taxonID="t"+numberOfSequencesAfterUpdate;
+		final TaxonSet txs=tret.m_taxonset.get();
+		final Input<Alignment> aliinput=txs.alignmentInput;
+		
+				  
+		Arrays.parallelSetAll(beastMClist, e ->
+       	{ 
+       		// add sequence here to all
+       		// would be good to have a shared taxa, taxonset, alignment for all particles
+       		
+       		MCMC mc=beastMClist[e].m_mcmc;
+       		State stt=mc.getState();
+	       		Tree tretre=(Tree) stt.stateNode[treepositionInStateArray];
+	       		TaxonSet txs_x=tretre.m_taxonset.get();
+	       		
+	       		// set same alignment and taxonset to all
+	       		// also set startstate for the mcmc
+
+	        	try {
+						RandomTree.insertSequenceCoalescent_updated(tretre,values.get(e).get(0).intValue(), values.get(e).get(1).doubleValue());
+			        	List<StateNodeInitialiser> inits=beastMClist[e].m_mcmc.initialisersInput.get();
+			        	for(StateNodeInitialiser st:inits)
+			        	{
+			        		if (st instanceof RandomTree)
+			        		{
+			        			((RandomTree)st).taxaInput=aliinput;
+			        			RandomTree.copyTree((RandomTree)st, tretre);
+			        		}
+			        	}
+			       		txs_x=txs;
+			       		tretre.m_traitList=tret.m_traitList;
+			       		tretre.m_taxonset=tret.m_taxonset;
+			       		tretre.nodeTypeInput=tret.nodeTypeInput;
+			       		mc.startStateInput.setValue(stt, null);
+			       		CompoundDistribution dst=(CompoundDistribution) mc.GetLikelihoodFromInput();
+			       		Map<String, Input<?>> mp=dst.getInputs();
+			       		mp.get("Alignment");
+			       		List<Distribution> trdt=dst.pDistributions.get();
+			       		for(Distribution distrib:trdt)
+			       		{
+			       			if(distrib instanceof ThreadedTreeLikelihood)
+			       			{
+				       			ThreadedTreeLikelihood trd=(ThreadedTreeLikelihood)distrib;
+				       			trd.dataInput=aliinput;
+				       			trd.treeInput.setValue(tretre, null);
+			       			}
+			       			distrib.initAndValidate();
+			       		}
+			       		
+				} catch (InstantiationException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (IllegalAccessException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (ClassNotFoundException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} 	       		
+	        	return beastMClist[e];
+    	}
+    	);
+		
+	}
     
     public static void main(String[] args) {
         
@@ -2059,23 +2148,28 @@ IS_ESS = function(log_weights)
 							// check if the sequence is already present
 						    if(checkAndAddSequenceAndCalculateDistances(beastMClist, treepositionInStateArray, m_sequencesArray[loc%m_sequencesArray.length], nrOfSequencessBeforeUpdate, distances))
 						    {// all good, the sequence was not already in the data, proceed
-								calledBeforeTreeUpdated=true;
+
+						        int sequenceLength=m_sequencesArray[0].length();
+						    	ArrayList<List<Double>> retvals=drawLeafAndHeightAndCalculateLog( beastMClist, treepositionInStateArray, populationsizePositionInStateArray,  sequenceLength, nrOfSequencessBeforeUpdate,  distances);
+						    	calledBeforeTreeUpdated=true;
 							    calculateIncrementalWeightsForTransformation(beastMClist, logIncrementalWeights, currentExponentDouble, calledBeforeTreeUpdated);
 								starttimeNano=System.nanoTime();
 								// add the new sequence first to first element of the list, then use the same shared input for all
 								
-
-									
-
-								HashMap<Integer,Integer> selectedLeaves=addSequence(beastMClist, treepositionInStateArray, populationsizePositionInStateArray, loc, nrOfSequencessBeforeUpdate, distances);			        		
+								//HashMap<Integer,Integer> selectedLeaves=addSequence(beastMClist, treepositionInStateArray, populationsizePositionInStateArray, loc, nrOfSequencessBeforeUpdate, distances);			        		
+								addSequenceUpdated(beastMClist, treepositionInStateArray, populationsizePositionInStateArray, nrOfSequencessBeforeUpdate, distances, retvals);			        		
+								
 								elapsedTimeNano=System.nanoTime()-starttimeNano;
 								//elapsedTimeMs=getExecutionLength(elapsedTimeNano);
 								times.add((int)(elapsedTimeNano/1000000));
 								// here update transformation weight
 								calledBeforeTreeUpdated=false;
 							    calculateIncrementalWeightsForTransformation(beastMClist, logIncrementalWeights, currentExponentDouble, calledBeforeTreeUpdated);
-							    calculateIncrementalWeightsForTransformationAddLeafComponent(beastMClist, logIncrementalWeights, populationsizePositionInStateArray, distances, selectedLeaves, 1000, nrOfSequencessBeforeUpdate);
-							    calculateIncrementalWeightsForTransformationAddHeightComponent(beastMClist, logIncrementalWeights, populationsizePositionInStateArray, distances, selectedLeaves, 1000, nrOfSequencessBeforeUpdate);
+							    calculateIncrementalWeightsForTransformationAddLeafComponent(beastMClist, logIncrementalWeights, retvals);
+							    calculateIncrementalWeightsForTransformationAddHeightComponent(beastMClist, logIncrementalWeights, retvals);
+							    addNormalisedWeights(logIncrementalWeights, logWeightsNormalized);
+							    // here normalise weights
+				               	normaliseWeights(logIncrementalWeights, logWeightsNormalized);
 						    }
 						}
 					}

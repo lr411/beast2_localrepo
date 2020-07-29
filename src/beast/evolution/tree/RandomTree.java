@@ -749,8 +749,9 @@ public class RandomTree extends Tree implements StateNodeInitialiser {
      * in the transformation paper, for demarginalisation
      * we need to find all the leaves that lead to the same
      */
-    public ArrayList<Integer> FindAllLeavesFromInternalNode(Tree tree, int startingNode, ArrayList<Integer> currentList) {
+    public static HashSet<Integer> FindAllLeavesFromInternalNode(Tree tree, int startingNode, HashSet<Integer> currentList) {
     	
+        // if it's a leaf: later on change it, dont use the positional, see if there are no children then its a leaf
     	if(startingNode<=tree.getLeafNodeCount())
     	{
     		currentList.add(startingNode);
@@ -916,6 +917,7 @@ public class RandomTree extends Tree implements StateNodeInitialiser {
     	{
     		index=ndArr.length-1;
     	}
+    	
     	// the closest will coalesce with our new node
     	//OptionalDouble opt=sortedHeights[index];
     	//int closestIndex=IntStream.range(1,3);//   Arrays.stream(heights).parallel().filter(i->);

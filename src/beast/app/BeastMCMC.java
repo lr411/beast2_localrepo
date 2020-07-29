@@ -1675,6 +1675,138 @@ IS_ESS = function(log_weights)
 	   return retValues;    	
 	}
     
+    private static ArrayList<List<Double>> drawLeafAndHeightAndCalculateLogUpdated(Sequential[] beastMClist, int treepositionInStateArray, int popsizepositionInStateArray, int sequenceLength, int nrOfSequencessBeforeUpdate, final int [] distances)
+	{
+		// add the new sequence first to first element of the list, then use the same shared input for all
+		Tree tret=(Tree)beastMClist[0].m_mcmc.getState().stateNode[treepositionInStateArray];
+		// the numberOfSequencesAfterUpdate is return value: number of updated number of leaves
+		// int nrOfSequencessBeforeUpdate=tret.getLeafNodeCount();
+		int numberOfSequencesAfterUpdate=nrOfSequencessBeforeUpdate+1;
+		
+		final TaxonSet txs=tret.m_taxonset.get();
+		final Input<TaxonSet> txset=tret.m_taxonset;
+		Alignment ali=txs.alignmentInput.get();
+
+
+		final Input<Alignment> aliinput=txs.alignmentInput;
+		
+
+		final Integer lengthOfSeq=sequenceLength;
+		final double lenSeq=lengthOfSeq.doubleValue();
+		
+		// needed for drawing of the height
+		final double sdOfGaussian=1.0/Math.sqrt(lenSeq);
+
+		
+		// after having updated the tree we need to update all obj that hv the tree as input?
+		// probably not needed as the initialisation is done anyway in the mcmc init
+		
+		// the first element is the leaf, the second is the distance of the new leaf from each of the previous ones
+		ArrayList<List<Double>>  retValues = new ArrayList<>();
+		ArrayList<HashSet<Integer>> leaves = new ArrayList<>();
+		for(int i=0; i< beastMClist.length; i++)
+		{// initialise and add a list of doubles for
+			retValues.add(new ArrayList<Double>());
+			leaves.add(new HashSet<Integer>());
+		}
+
+		Arrays.parallelSetAll(beastMClist, e ->
+	       	{ 
+	       		// add sequence here to all
+	       		// would be good to have a shared taxa, taxonset, alignment for all particles
+	       		
+	       		List<Double> retvalRow=new ArrayList<>(Arrays.asList(new Double[] {0.0,0.0,0.0,0.0}));
+	       		MCMC mc=beastMClist[e].m_mcmc;
+	       		State stt=mc.getState();
+	       		double theta=stt.stateNode[popsizepositionInStateArray].getArrayValue();
+
+	       		/* start of the part of drawing the leaf */
+				Integer selectedLeaf=0;
+				//double theta=beastMClist[e];
+				{
+					double qtToElevate=(lenSeq*theta)/(nrOfSequencessBeforeUpdate+(lenSeq*theta)); // this will hv to change and contain the effective pop size
+					double []probabilityWeight= new double[distances.length];//{0.1,0.2,0.25,0.85};//
+					Arrays.parallelSetAll(probabilityWeight, ee -> {return Math.exp(distances[ee]*Math.log(qtToElevate));});
+					org.apache.commons.math3.util.Pair<Integer, Double> itemToInit=new org.apache.commons.math3.util.Pair<Integer, Double>(0,0.0);
+					List<org.apache.commons.math3.util.Pair<Integer, Double>> pmfWeights=new ArrayList<org.apache.commons.math3.util.Pair<Integer, Double>>(Collections.nCopies(probabilityWeight.length, itemToInit));
+	        		
+					Arrays.parallelSetAll(probabilityWeight, ee ->{
+	        			pmfWeights.set(ee, new org.apache.commons.math3.util.Pair<Integer, Double>(ee,probabilityWeight[ee]));
+	        			return probabilityWeight[ee];
+	        		});
+					EnumeratedDistribution enDist=new EnumeratedDistribution<>(pmfWeights);
+					// the following is the draw of the leaf (position of the leaf in the array)
+					selectedLeaf=(Integer) enDist.sample();
+					//selectedLeafMap.replace(e, selectedLeaf);
+				}
+	       		/* end of draw of the leaf */
+	       		double my_height=0.0;
+				double meanOfGaussian=2*Math.asin(Math.sqrt(distances[selectedLeaf.intValue()]/lenSeq));
+	       		/* start of the part of drawing the height */
+				{
+					double upperBoundTruncatedGaussian=2.094395102393195; // this is 2*Math.asin(sqrt(3)/2.0);
+					//org.apache.commons.math3.distribution.NormalDistribution norm=new org.apache.commons.math3.distribution.NormalDistribution(meanOfGaussian, sdOfGaussian);
+					//TruncatedNormal tn = new TruncatedNormal(meanOfGaussian, sdOfGaussian,  Double.NEGATIVE_INFINITY, upperBoundTruncatedGaussian);
+
+					double inerval;
+						double beta=TruncatedNormal.sampleUpgraded(Double.NEGATIVE_INFINITY, upperBoundTruncatedGaussian); //tn.sample();
+						if(beta > upperBoundTruncatedGaussian)
+						{
+				            throw new RuntimeException(
+				                    "Unable to draw properly from the truncated Gaussian\n");
+						}
+						// from the paper on Sequential Monte Carlo transformations,
+						// calculate the height (formula 24 of paper)
+						// decide if it is better to have a different height for every particle:
+						// the process of selectin height is independent of the tree
+						double sinVal=Math.sin(beta/2.0);
+						inerval=1.0-((4.0/3.0)*sinVal*sinVal);
+
+						if(inerval > 0)
+						{
+						    my_height=(-3.0/((4.0)*theta))*Math.log(1.0-((4.0/3.0)*sinVal*sinVal));
+						}
+						else
+						{
+				            throw new RuntimeException(
+				                    "Error in formula from the truncated Gaussian, negative log argument!!!\n");
+						}
+				}
+
+				/* end of draw of the height */
+				retvalRow.set(selectedLeafPosition, selectedLeaf.doubleValue());
+				retvalRow.set(heightPosition, my_height);
+				Tree particleTree = (Tree)stt.stateNode[treepositionInStateArray];
+				int chosenNode=RandomTree.getClosestFromLeaf(particleTree, selectedLeaf.intValue(), my_height);
+				HashSet<Integer> leavesSet=leaves.get(e);
+				leavesSet.add(selectedLeaf);
+				leavesSet=RandomTree.FindAllLeavesFromInternalNode(particleTree, chosenNode, leavesSet);
+				//retvalRow.set(index, (double)chosenNode);
+				/* 
+				 * here we can calculate the components for the weights
+				 */
+				/*
+				 * Leaf first
+				 */
+	       		   double Ms=distances[selectedLeaf.intValue()];
+	       		   double N=lenSeq; // length of sequence
+	       		   double t=nrOfSequencessBeforeUpdate;
+				   double logUnnormalisedIncrementalWeightsLeafSelection=Ms*(Math.log(N*theta)-Math.log(t+N*theta));
+
+				   retvalRow.set(logLeafComponentPosition, logUnnormalisedIncrementalWeightsLeafSelection);
+				   /*
+				 * height afterwards
+				 */
+				   double logUnnormalisedIncrementalWeightsHeightSelection=calcLogHeightSelection(theta, my_height, meanOfGaussian, sdOfGaussian);
+
+				   retvalRow.set(logHeightComponentPosition, logUnnormalisedIncrementalWeightsHeightSelection);
+				   
+				   retValues.set(e, retvalRow);
+				  return beastMClist[e];
+	       	});
+		
+	   return retValues;    	
+	}
     /*    
      * the function addSequence adds a sequence of DNA to the exixting taxon set
      * the return value is the array of the distances number of taxa
@@ -1933,8 +2065,8 @@ IS_ESS = function(log_weights)
 	       		// set same alignment and taxonset to all
 	       		// also set startstate for the mcmc
 
-	        	try {
-						RandomTree.insertSequenceCoalescent_updated(tretre,values.get(e).get(0).intValue(), values.get(e).get(1).doubleValue());
+	       		try {
+						RandomTree.insertSequenceCoalescent_updated(tretre,values.get(e).get(selectedLeafPosition).intValue(), values.get(e).get(heightPosition).doubleValue());
 			        	List<StateNodeInitialiser> inits=beastMClist[e].m_mcmc.initialisersInput.get();
 			        	for(StateNodeInitialiser st:inits)
 			        	{

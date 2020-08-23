@@ -1,0 +1,1 @@
+-overwrite -seed 1 -beagle -beagle_CPU -beagle_SSE -beagle_double -isonLeoPC -exponentFile "/Users/lr411/Leo/Github/xmlFilesBeast/CESS_20200103_030123_P500_E218_S100000.txt" -sleepseconds 5 -nrOfSMCparticles 1 "/Users/lr411/Leo/Github/xmlFilesBeast/20seq.xml"

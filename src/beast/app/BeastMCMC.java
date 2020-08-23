@@ -243,7 +243,9 @@ public class BeastMCMC {
 //                    new Arguments.Option("warnings", "Show warning messages about BEAST XML file"),
 //                    new Arguments.Option("strict", "Fail on non-conforming BEAST XML file"),
             		
-                    new Arguments.LongOption("sleepseconds", "Specify for how many seconds you want to sleep at the beginning"),
+            		
+                    new Arguments.StringOption("exponentFile", "exponentFile", "Specify a file from where to take the exponents for SMC"),
+            		new Arguments.LongOption("sleepseconds", "Specify for how many seconds you want to sleep at the beginning"),
             		new Arguments.Option("window", "Provide a console window"),
                     new Arguments.Option("options", "Display an options dialog"),
                     new Arguments.Option("working", "Change working directory to input file's directory"),
@@ -2364,6 +2366,8 @@ IS_ESS = function(log_weights)
  
     	System.out.println("Main 0.....");
     	long sleepseconds;
+    	boolean takeExponentsFromFile;
+    	String exponentFileName;
     	
         { // nr of SMC particles, we need to know rightaway
         	Arguments arguments=parseArguments(args);
@@ -2388,6 +2392,19 @@ IS_ESS = function(log_weights)
             }
         }
 
+        {
+        	Arguments arguments=parseArguments(args);
+            if (arguments.hasOption("exponentFile")) 
+            {
+            	takeExponentsFromFile=true;
+            	exponentFileName = arguments.getStringOption("exponentFile");
+            }
+            else
+            {
+            	takeExponentsFromFile=false;
+            	exponentFileName="";
+            }
+        }
     	
     	try {
             System.setProperty("beast.debug", "true"); // 
@@ -2490,9 +2507,39 @@ IS_ESS = function(log_weights)
             
         	double nextExponentDouble=0.0,currentExponentDouble=0.0;
         	
+        	// list of exponents, to be used if there is a input argument to take predefined exponents
+        	List<Double>expList=null;
+        	
+        	if(takeExponentsFromFile == true)
+        	{
+        		  expList= new ArrayList<>();
+        		  //String exponentFileName="/Users/lr411/Leo/Github/xmlFilesBeast/CESS_20200103_030123_P500_E218_S100000.txt";
+        		  try
+        		  {
+        		    BufferedReader reader = new BufferedReader(new FileReader(exponentFileName));
+        		    String line;
+        		    while ((line = reader.readLine()) != null)
+        		    {
+        		      String[] rcrds=line.split(",");
+        		      if(rcrds[0] != null)
+        		    	  expList.add(Double.parseDouble(rcrds[0]));
+        		    }
+        		    reader.close();
+        		  }
+        		  catch (Exception e)
+        		  {
+        		    System.err.format("Exception occurred trying to read '%s'.", exponentFileName);
+        		    e.printStackTrace();
+        		  }
+        	}
+        	
+        	
+        	// this variable is used only if u take the exponent from a file
+            int exponentIndex=0;
             
-            
+            // this variable is used only if you want to add sequences on the fly
             boolean changeSeq=false;
+            
             while(nextExponentDouble<1)//for (exponentCnt=0; exponentCnt<maxvalcnt; exponentCnt++)
             {// starts from the prior and goes to target (reached when the exponent is equal to 1)
             	// smcStates[(int)i][(int)exponentCnt]=mc.getState();
@@ -2508,9 +2555,24 @@ IS_ESS = function(log_weights)
                 
 				if(useCESS)
 				{
-				   nextExponentDouble=getCESSexponent_double(beastMClist, logIncrementalWeights, logWeightsNormalized, currentExponentDouble, 0.9);
-				   if(nextExponentDouble>1.0)
-					   nextExponentDouble=1.0;
+				   if(takeExponentsFromFile)
+				   {
+					   if(exponentIndex>expList.size())
+					   {
+						   nextExponentDouble=1.0;
+					   }
+					   else
+					   {
+						   nextExponentDouble=expList.get(exponentIndex).doubleValue();
+						   exponentIndex++;
+					   }
+				   }
+				   else
+				   {
+					   nextExponentDouble=getCESSexponent_double(beastMClist, logIncrementalWeights, logWeightsNormalized, currentExponentDouble, 0.9);
+					   if(nextExponentDouble>1.0)
+						   nextExponentDouble=1.0;
+				   }
 				}
 				else
 				{

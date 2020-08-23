@@ -33,6 +33,7 @@ import beast.app.beastapp.BeastDialog;
 import beast.app.beastapp.BeastMain;
 import beast.app.beauti.Beauti;
 import beast.app.draw.ExtensionFileFilter;
+import beast.app.util.Arguments;
 import beast.app.util.Version;
 import beast.core.Logger;
 import beast.core.MCMC;
@@ -110,15 +111,16 @@ public class BeastMCMC {
     final public static String DEVELOPERS = "Beast 2 development team";
     final public static String COPYRIGHT = "Beast 2 development team 2011";
     // number of particles for the SMC
-    public static final long NR_OF_PARTICLES = 1;
+    public static long NR_OF_PARTICLES;
     // path to save the logs
-    final static String logsPath="/Users/lr411/Leo/Github/Genomics/logs_BEAST2/";
+    static String logsPath="/Users/lr411/Leo/Github/Genomics/logs_BEAST2/";
     // nr of MCMC moves
     public static final int NR_OF_MCMC_MOVES = 5;
     public BEASTInterface m_treeobj=null;
     public double m_initPopSize;
     public double m_gammaShapeLog;
     public double m_gammaShape;
+    public boolean isonLeoPC=false;
     /**
      * number of threads used to run the likelihood beast.core *
      */
@@ -207,7 +209,8 @@ public class BeastMCMC {
      */
     static BeastDialog CreateAndShowDialog()
     {
-        final Version version = new BEASTVersion2();
+        /*
+    	final Version version = new BEASTVersion2();
         final String titleString = "<html><center><p>Bayesian Evolutionary Analysis Sampling Trees<br>" +
                 "Version " + version.getVersionString() + ", " + version.getDateString() + "</p></center></html>";
         final javax.swing.Icon icon = IconUtils.getIcon(BeastMain.class, "images/beast.png");
@@ -216,6 +219,7 @@ public class BeastMCMC {
         final BeastDialog dialog = new BeastDialog(new JFrame(), titleString, icon);
         
        // if(m_dialogInitialized == false)
+        if(true)
         {
 	        if (!dialog.showDialog(nameString, 1)) {
 	            return null;
@@ -225,6 +229,77 @@ public class BeastMCMC {
        // m_dialogInitialized=true;
 
         return dialog;
+        */
+    	
+    	return null;
+    }
+    
+    private static Arguments parseArguments(String[] args)
+    {
+    final Arguments arguments = new Arguments(
+            new Arguments.Option[]{
+
+//                    new Arguments.Option("verbose", "Give verbose XML parsing messages"),
+//                    new Arguments.Option("warnings", "Show warning messages about BEAST XML file"),
+//                    new Arguments.Option("strict", "Fail on non-conforming BEAST XML file"),
+            		
+                    new Arguments.LongOption("sleepseconds", "Specify for how many seconds you want to sleep at the beginning"),
+            		new Arguments.Option("window", "Provide a console window"),
+                    new Arguments.Option("options", "Display an options dialog"),
+                    new Arguments.Option("working", "Change working directory to input file's directory"),
+                    new Arguments.LongOption("seed", "Specify a random number generator seed"),
+                    new Arguments.StringOption("prefix", "PREFIX", "Specify a prefix for all output log filenames"),
+                    new Arguments.StringOption("statefile", "STATEFILE", "Specify the filename for storing/restoring the state"),
+                    new Arguments.Option("overwrite", "Allow overwriting of log files"),
+                    new Arguments.Option("resume", "Allow appending of log files"),
+                    new Arguments.Option("validate", "Parse the XML, but do not run -- useful for debugging XML"),
+                    // RRB: not sure what effect this option has
+                    new Arguments.IntegerOption("errors", "Specify maximum number of numerical errors before stopping"),
+                    new Arguments.IntegerOption("threads", "The number of computational threads to use (default 1), -1 for number of cores"),
+                    new Arguments.LongOption("nrOfSMCparticles", "The number of particles for SMC computations"),
+                    new Arguments.Option("java", "Use Java only, no native implementations"),
+                    new Arguments.Option("noerr", "Suppress all output to standard error"),
+                    new Arguments.StringOption("loglevel", "LEVEL", "error,warning,info,debug,trace"),
+                    new Arguments.IntegerOption("instances", "divide site patterns amongst number of threads (use with -threads option)"),
+                    new Arguments.Option("beagle", "Use beagle library if available"),
+                    new Arguments.Option("beagle_info", "BEAGLE: show information on available resources"),
+                    new Arguments.StringOption("beagle_order", "order", "BEAGLE: set order of resource use"),
+                    new Arguments.Option("beagle_CPU", "BEAGLE: use CPU instance"),
+                    new Arguments.Option("beagle_GPU", "BEAGLE: use GPU instance if available"),
+                    new Arguments.Option("beagle_SSE", "BEAGLE: use SSE extensions if available"),
+                    new Arguments.Option("beagle_single", "BEAGLE: use single precision if available"),
+                    new Arguments.Option("beagle_double", "BEAGLE: use double precision if available"),
+                    new Arguments.StringOption("beagle_scaling", new String[]{"default", "none", "dynamic", "always"},
+                            false, "BEAGLE: specify scaling scheme to use"),
+                    new Arguments.Option("help", "Print this information and stop"),
+                    new Arguments.Option("version", "Print version and stop"),
+                    new Arguments.Option("strictversions", "Use only package versions as specified in the 'required' attribute"),
+                    new Arguments.StringOption("D", "DEFINITIONS", "attribute-value pairs to be replaced in the XML, e.g., -D \"arg1=10,arg2=20\"").allowMultipleUse(),
+                    new Arguments.Option("isonLeoPC", "runs on Leo pc"),
+                    new Arguments.Option("sampleFromPrior", "samples from prior for MCMC analysis (by adding sampleFromPrior=\"true\" in the first run element)"),
+            });
+
+    try {
+        arguments.parseArguments(args);
+    } catch (Arguments.ArgumentException ae) {
+    	Log.info.println();
+    	Log.info.println(ae.getMessage());
+    	Log.info.println();
+        printUsage(arguments);
+        System.exit(1);
+    }
+    
+    return arguments;
+}
+    
+    private static void printUsage(final Arguments arguments) {
+
+        arguments.printUsage("beast", "[<input-file-name>]");
+        Log.info.println();
+        Log.info.println("  Example: beast test.xml");
+        Log.info.println("  Example: beast -window test.xml");
+        Log.info.println("  Example: beast -help");
+        Log.info.println();
     }
     
     /**
@@ -233,6 +308,8 @@ public class BeastMCMC {
      * @throws JSONException 
      * @throws JSONParserException 
      */
+  
+    
     public void parseArgs(String[] args, boolean useDialog) throws IOException, XMLParserException, JSONException {
         int i = 0;
         boolean resume = false;
@@ -241,6 +318,8 @@ public class BeastMCMC {
         Map<String, String> parserDefinitions = new HashMap<>();
 
         File beastFile = null;
+        
+        Arguments arguments=parseArguments(args);
 
         try {
             while (i < args.length) {
@@ -319,7 +398,9 @@ public class BeastMCMC {
                             beastFile = new File(args[i]);
                             i++;
                         } else {
-                            throw new IllegalArgumentException("Wrong argument");
+                        	// Leo: taken out this
+                            //throw new IllegalArgumentException("Wrong argument");
+                        	i++;
                         }
                     }
                 }
@@ -328,7 +409,67 @@ public class BeastMCMC {
             e.printStackTrace();
             throw new IllegalArgumentException("Error parsing command line arguments: " + Arrays.toString(args) + "\nArguments ignored\n\n" + getUsage());
         }
+        
+        { // this is for debug purpose, if it runs on my PC there are local settings
+        	isonLeoPC=arguments.hasOption("isonLeoPC");
+        	if(isonLeoPC)
+        	{
+        		logsPath="/Users/lr411/Leo/Github/Genomics/logs_BEAST2/";
+        	}
+        	else
+        	{
+        		logsPath=System.getProperty("user.dir")+"/";
+        	}
+        	
+        }
+        
 
+        {
+		        /*
+		         * beagle info goes here
+		         */
+		        boolean useBeagle = arguments.hasOption("beagle") ||
+		                arguments.hasOption("beagle_CPU") ||
+		                arguments.hasOption("beagle_GPU") ||
+		                arguments.hasOption("beagle_SSE") ||
+		                arguments.hasOption("beagle_double") ||
+		                arguments.hasOption("beagle_single") ||
+		                arguments.hasOption("beagle_order");
+		        boolean beagleShowInfo = false;
+		        long beagleFlags = 0;
+		        boolean useSSE = true;
+		        if (arguments.hasOption("beagle_CPU")) {
+		            beagleFlags |= BeagleFlag.PROCESSOR_CPU.getMask();
+		            useSSE = false;
+		        }
+		        if (arguments.hasOption("beagle_GPU")) {
+		            beagleFlags |= BeagleFlag.PROCESSOR_GPU.getMask();
+		            useSSE = false;
+		        }
+		        if (arguments.hasOption("beagle_SSE")) {
+		            beagleFlags |= BeagleFlag.PROCESSOR_CPU.getMask();
+		            useSSE = true;
+		        }
+		        if (useSSE) {
+		            beagleFlags |= BeagleFlag.VECTOR_SSE.getMask();
+		        }
+		        if (arguments.hasOption("beagle_double")) {
+		            beagleFlags |= BeagleFlag.PRECISION_DOUBLE.getMask();
+		        }
+		        if (arguments.hasOption("beagle_single")) {
+		            beagleFlags |= BeagleFlag.PRECISION_SINGLE.getMask();
+		        }
+		
+		        
+		        if (beagleFlags != 0) {
+		            System.setProperty("beagle.preferred.flags", Long.toString(beagleFlags));
+		        }
+		        if (!useBeagle) {
+		            System.setProperty("java.only", "true");
+		        }
+        }// end of beagle part
+
+        
         if (beastFile == null) {
             // Not resuming so get starting options...
 
@@ -340,12 +481,21 @@ public class BeastMCMC {
         //    {// only do once
                 // Leo: create and show only once
                 //m_dialog = CreateAndShowDialog();
-        	    BeastDialog dialog=m_dialog; // just to avoid changing names
+        	    //BeastDialog dialog=m_dialog; // just to avoid changing names
 
                 List<String> MCMCargs = new ArrayList<>();
 
+                if (arguments.hasOption("overwrite")) {
+                    MCMCargs.add("-overwrite");
+                }
+
+                if (arguments.hasOption("resume")) {
+                    MCMCargs.add("-resume");
+                }
+                /*
+                 * Leo: taken out so that we have a version wo dialog
                 switch (m_dialog.getLogginMode()) {
-	                case 0:/* do not ovewrite */
+	                case 0: do not ovewrite 
 	                    break;
 	                case 1:
 	                    MCMCargs.add("-overwrite");
@@ -354,18 +504,53 @@ public class BeastMCMC {
 	                    MCMCargs.add("-resume");
 	                    break;
 	            }
+              */
 	            MCMCargs.add("-seed");
-	            MCMCargs.add(m_dialog.getSeed() + "");
+	            
+	            if (arguments.hasOption("seed")) {
+	            	MCMCargs.add(arguments.getLongOption("seed") + "");
+	            }
+	            else
+	            {
+	            	
+	            }
+	            
+
+	            // LEO: taken dialog out
+	           // MCMCargs.add(m_dialog.getSeed() + "");
 	
+	            if (arguments.hasOption("threads")) {
+	                int threadCount = arguments.getIntegerOption("threads");
+		            if (threadCount <= 0) {
+		            	threadCount = Runtime.getRuntime().availableProcessors();
+		            	Log.warning.println("Setting number of threads to " + threadCount);
+		            }
+	                MCMCargs.add("-threads");
+	                MCMCargs.add(threadCount + "");
+	            }
+	            /*
+	             * LEO: taken dialog out
 	            if (m_dialog.getThreadPoolSize() > 0) {
 	                MCMCargs.add("-threads");
-	                MCMCargs.add(m_dialog.getThreadPoolSize() + "");
+	                MCMCargs.add(threadCount + "");
 	            }
+	            */
+	            
           //  }
 	            
-            boolean useBeagle = dialog.useBeagle();
+            // boolean useBeagle = dialog.useBeagle();
+            // LEO: taken dialog out
+	            boolean useBeagle = arguments.hasOption("beagle") ||
+                    arguments.hasOption("beagle_CPU") ||
+                    arguments.hasOption("beagle_GPU") ||
+                    arguments.hasOption("beagle_SSE") ||
+                    arguments.hasOption("beagle_double") ||
+                    arguments.hasOption("beagle_single") ||
+                    arguments.hasOption("beagle_order");
             boolean beagleShowInfo = false;
             long beagleFlags = 0;
+            /*
+             * LEO: taken dialog out
             if (useBeagle) {
                 beagleShowInfo = dialog.showBeagleInfo();
                 if (dialog.preferBeagleCPU()) {
@@ -384,6 +569,32 @@ public class BeastMCMC {
                     beagleFlags |= BeagleFlag.PRECISION_SINGLE.getMask();
                 }
             }
+            */
+
+            boolean useSSE = true;
+            if (arguments.hasOption("beagle_CPU")) {
+                beagleFlags |= BeagleFlag.PROCESSOR_CPU.getMask();
+                useSSE = false;
+            }
+            if (arguments.hasOption("beagle_GPU")) {
+                beagleFlags |= BeagleFlag.PROCESSOR_GPU.getMask();
+                useSSE = false;
+            }
+            if (arguments.hasOption("beagle_SSE")) {
+                beagleFlags |= BeagleFlag.PROCESSOR_CPU.getMask();
+                useSSE = true;
+            }
+            if (useSSE) {
+                beagleFlags |= BeagleFlag.VECTOR_SSE.getMask();
+            }
+            if (arguments.hasOption("beagle_double")) {
+                beagleFlags |= BeagleFlag.PRECISION_DOUBLE.getMask();
+            }
+            if (arguments.hasOption("beagle_single")) {
+                beagleFlags |= BeagleFlag.PRECISION_SINGLE.getMask();
+            }
+
+            
             if (beagleFlags != 0) {
                 System.setProperty("beagle.preferred.flags", Long.toString(beagleFlags));
             }
@@ -391,7 +602,9 @@ public class BeastMCMC {
                 System.setProperty("java.only", "true");
             }
 
-            File inputFile = dialog.getInputFile();
+            File inputFile = new File(args[args.length-1]);; //dialog.getInputFile();
+           
+            
             if (!beagleShowInfo && inputFile == null) {
                 System.err.println("No input file specified");
                 System.exit(1);
@@ -1128,7 +1341,7 @@ IS_ESS = function(log_weights)
        	{ // here probably better not to call the deepcopy method we created
        		// because we need to sample from prior
        		Sequential bmc= new Sequential();	               		
-            bmc.SetDlg(dlg);
+            //bmc.SetDlg(dlg);
        	    // the mcmc run is done with the previous exponent
         	try {
                 bmc.parseArgs(args);
@@ -1690,7 +1903,7 @@ IS_ESS = function(log_weights)
     		// outer loop if for each particle
     		MCMC mc=beastMClist[i].m_mcmc;
        		State stt=mc.getState();
-       		double theta=stt.stateNode[popsizepositionInStateArray].getArrayValue();;
+       		double theta=stt.stateNode[popsizepositionInStateArray].getArrayValue();
     		double N=sequenceLength; // length of sequence
        		double t=nrOfSequencessBeforeUpdate;
        		HashSet<Integer> leavesSet=leaves.get(i);
@@ -2148,7 +2361,34 @@ IS_ESS = function(log_weights)
 	}
     
     public static void main(String[] args) {
+ 
+    	System.out.println("Main 0.....");
+    	long sleepseconds;
+    	
+        { // nr of SMC particles, we need to know rightaway
+        	Arguments arguments=parseArguments(args);
+            if (arguments.hasOption("nrOfSMCparticles")) {
+            	NR_OF_PARTICLES=arguments.getLongOption("nrOfSMCparticles");
+            }
+            else
+            {
+            	NR_OF_PARTICLES=1;
+            }
+            System.out.println("If it is an SMC run, I will be using "+ NR_OF_PARTICLES+" particles");
+        }
         
+        { // nr of SMC particles, we need to know rightaway
+        	Arguments arguments=parseArguments(args);
+            if (arguments.hasOption("sleepseconds")) {
+            	sleepseconds=arguments.getLongOption("sleepseconds");
+            }
+            else
+            {
+            	sleepseconds=0;
+            }
+        }
+
+    	
     	try {
             System.setProperty("beast.debug", "true"); // 
             
@@ -2166,7 +2406,7 @@ IS_ESS = function(log_weights)
         	double logIncrementalWeights[] = new double[N_int]; // vector of weights for the particles
             double logWeightsNormalized[] = new double[N_int]; // vector of weights for the particles
             
-            BeastDialog dlg=CreateAndShowDialog();
+            //BeastDialog dlg=CreateAndShowDialog();
             //double currentExponent, previousExponent; //exponent to be used for simulated annhealing
             long exponentCnt;
             Path currentRelativePath = Paths.get("");
@@ -2177,9 +2417,13 @@ IS_ESS = function(log_weights)
 
         	// this is the list of the particles of the SMC
             Sequential[] beastMClist = new Sequential[N_int];
+            if(sleepseconds>0)
+            {
+            	Thread.sleep(sleepseconds*1000);
+            }
 
            	// here we init the list of particles and sample from the prior
-        	initParticlesAndSampleFromPrior(beastMClist, dlg, args);
+        	initParticlesAndSampleFromPrior(beastMClist, null, args);
             
             // get the position of the tree in the state array
             int treepositionInStateArray=getTreePosition((MCMC)beastMClist[0].m_runnable); // position of the tree in the state vector
@@ -2248,8 +2492,8 @@ IS_ESS = function(log_weights)
         	
             
             
-            boolean changeSeq=true;
-            while(nextExponentDouble<0.1)//for (exponentCnt=0; exponentCnt<maxvalcnt; exponentCnt++)
+            boolean changeSeq=false;
+            while(nextExponentDouble<1)//for (exponentCnt=0; exponentCnt<maxvalcnt; exponentCnt++)
             {// starts from the prior and goes to target (reached when the exponent is equal to 1)
             	// smcStates[(int)i][(int)exponentCnt]=mc.getState();
             	//if(exponentCnt>=(maxvalcnt/100))
@@ -2257,6 +2501,11 @@ IS_ESS = function(log_weights)
             	
             	double outNextExponent=0.0;
 //           	    int nextCESS=getCESSexponent(beastMClist, logIncrementalWeights, logWeightsNormalized, stepSize, previousExponent, (int) exponentCnt, maxvalcnt+1, outNextExponent);
+                if(sleepseconds>0)
+                {
+                	Thread.sleep(sleepseconds*1000);
+                }
+                
 				if(useCESS)
 				{
 				   nextExponentDouble=getCESSexponent_double(beastMClist, logIncrementalWeights, logWeightsNormalized, currentExponentDouble, 0.9);
@@ -2275,7 +2524,11 @@ IS_ESS = function(log_weights)
 				
 				System.out.println("Exponent: "+nextExponentDouble);
 				
-
+                if(sleepseconds>0)
+                {
+                	Thread.sleep(sleepseconds*1000);
+                	sleepseconds=0;
+                }
 				// reweight done below, calculation of the incremental part
             	calculateIncrementalWeights(beastMClist, logIncrementalWeights, currentExponentDouble, nextExponentDouble);
 				// CESS to be calculated before renormalising
@@ -2284,7 +2537,9 @@ IS_ESS = function(log_weights)
 
             	CESSval=CESS(logIncrementalWeights, logWeightsNormalized);
 
-            	rowCounterString=currentExponentDouble + divider;
+				System.out.println("CESS: "+CESSval);
+
+				rowCounterString=currentExponentDouble + divider;
             	
 				outCEss.println(rowCounterString + CESSval);
 
@@ -2356,7 +2611,7 @@ IS_ESS = function(log_weights)
 				outEss.println(rowCounterString + ESSval);
 				
 
-               	//if(nextExponentDouble<1.0) // Leo: this needs be de-commented, it is currently commented for debug purp only!!!
+               	if(nextExponentDouble<1.0) // Leo: this needs be de-commented, it is currently commented for debug purp only!!!
                	{
     				if(ESSval<(N_int/2.0)) 
                    	{

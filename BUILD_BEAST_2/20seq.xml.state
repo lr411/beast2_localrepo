@@ -1,0 +1,18 @@
+<itsabeastystatewerein version='2.0' sample='39999'>
+<statenode id='Tree.t:simtree_20seq'>((0:2.2006076025995367,(((5:0.05916328571281976,6:0.05916328571281976)20:0.5270688014960927,11:0.5862320872089124)23:1.5721455448153736,(((2:0.12001582490175683,3:0.12001582490175683)22:0.13974511062128775,15:0.2597609355230446)35:0.15122526338106973,(((4:0.08772788864511602,(7:0.05430911601350521,(10:0.024694255824091155,12:0.024694255824091155)33:0.029614860189414054)27:0.03341877263161081)26:0.19370791812921787,(17:0.18534030570414517,18:0.18534030570414517)21:0.09609550107018872)29:0.049204809015896356,14:0.33064061579023024)36:0.08034558311388407)32:1.7473914331201716)34:0.042229970575250686)25:1.2110598399134127,(((1:0.13464283367376398,19:0.13464283367376398)24:0.10103505836152535,16:0.23567789203528933)31:1.0366954824445083,((8:0.0528885235297494,9:0.0528885235297494)28:0.4036053186418505,13:0.4564938421715999)37:0.8158795323081978)30:2.139294068033152)38:0.0</statenode>
+<statenode id='gammaShape.s:simtree_20seq'>gammaShape.s:simtree_20seq[1 1] (0.001,1000.0): 14.480507462698206 </statenode>
+<statenode id='popSize.t:simtree_20seq'>popSize.t:simtree_20seq[1 1] (-Infinity,Infinity): 2.2282886812051133 </statenode>
+</itsabeastystatewerein>
+<!--
+{"operators":[
+{"id":"gammaShapeScaler.s:simtree_20seq","p":0.35883035046249223,"accept":20,"reject":41,"acceptFC":6,"rejectFC":3,"rejectIv":0,"rejectOp":0},
+{"id":"CoalescentConstantTreeScaler.t:simtree_20seq","p":0.7153004243692394,"accept":107,"reject":1408,"acceptFC":31,"rejectFC":228,"rejectIv":0,"rejectOp":0},
+{"id":"CoalescentConstantTreeRootScaler.t:simtree_20seq","p":0.30973625964824236,"accept":632,"reject":910,"acceptFC":93,"rejectFC":213,"rejectIv":150,"rejectOp":150},
+{"id":"CoalescentConstantUniformOperator.t:simtree_20seq","p":"NaN","accept":2614,"reject":13439,"acceptFC":406,"rejectFC":2328,"rejectIv":0,"rejectOp":0},
+{"id":"CoalescentConstantSubtreeSlide.t:simtree_20seq","p":0.7992444259720456,"accept":923,"reject":7194,"acceptFC":154,"rejectFC":1233,"rejectIv":2996,"rejectOp":2996},
+{"id":"CoalescentConstantNarrow.t:simtree_20seq","p":"NaN","accept":712,"reject":7148,"acceptFC":132,"rejectFC":1266,"rejectIv":0,"rejectOp":0},
+{"id":"CoalescentConstantWide.t:simtree_20seq","p":"NaN","accept":10,"reject":1600,"acceptFC":1,"rejectFC":261,"rejectIv":838,"rejectOp":838},
+{"id":"CoalescentConstantWilsonBalding.t:simtree_20seq","p":"NaN","accept":16,"reject":1609,"acceptFC":3,"rejectFC":283,"rejectIv":272,"rejectOp":272},
+{"id":"PopSizeScaler.t:simtree_20seq","p":0.5145912816893001,"accept":1035,"reject":582,"acceptFC":112,"rejectFC":161,"rejectIv":0,"rejectOp":0}
+]}
+-->

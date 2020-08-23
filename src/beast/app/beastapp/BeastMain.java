@@ -66,6 +66,7 @@ public class BeastMain {
 		Log.info = System.out;
 		Log.debug = System.out;
 		Log.trace = System.out;
+		System.out.println("BeastMain(final BeastMCMC beastMCMC 1....");
 
 
         final Logger infoLogger = Logger.getLogger("beast.app");
@@ -245,7 +246,8 @@ public class BeastMain {
     //Main method
     public static void main(final String[] args) throws java.io.IOException {
 
-        final List<String> MCMCargs = new ArrayList<>();
+        System.out.println("This is beastmain 249");
+    	final List<String> MCMCargs = new ArrayList<>();
 //    	Utils.loadUIManager();
 
         final Arguments arguments = new Arguments(

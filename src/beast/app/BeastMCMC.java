@@ -115,6 +115,7 @@ public class BeastMCMC {
     // path to save the logs
     static String logsPath="/Users/lr411/Leo/Github/Genomics/logs_BEAST2/";
     // nr of MCMC moves
+    protected long m_particleNr;
     public static final int NR_OF_MCMC_MOVES = 5;
     public BEASTInterface m_treeobj=null;
     public double m_initPopSize;
@@ -167,6 +168,11 @@ public class BeastMCMC {
      */
     Runnable m_runnable;
 
+    protected void setParticleNr(long particleNr)
+    {
+    	m_particleNr=particleNr;
+    }
+    
     /*
      * Leo: the MCMC element that we will be using,
      * it is the same as the m_runnable member of the beastmcmc]
@@ -180,18 +186,18 @@ public class BeastMCMC {
     }
     
     // the following two functions initialize the randomizer (useful for random nr generation)
-    public static void initRandomizer(long seed)
+    public void initRandomizer(long seed)
     {    	
-        Randomizer.setSeed(seed);
+        Randomizer.setSeed(seed + m_particleNr<<4);
     }
     
     // init the randomizer using the current time in milliseconds
-    public static void initRandomizer()
+    public void initRandomizer()
     {
 	    Calendar calendar = Calendar.getInstance();
 	    long randSeed = calendar.getTimeInMillis();
     	
-        Randomizer.setSeed(randSeed);
+	    initRandomizer(randSeed);
     }
     
     /**
@@ -422,6 +428,7 @@ public class BeastMCMC {
         	{
         		logsPath=System.getProperty("user.dir")+"/";
         	}
+        	//System.out.println("Current dir is "+ logsPath);
         	
         }
         
@@ -1342,7 +1349,8 @@ IS_ESS = function(log_weights)
         Arrays.parallelSetAll(beastMClist, e ->
        	{ // here probably better not to call the deepcopy method we created
        		// because we need to sample from prior
-       		Sequential bmc= new Sequential();	               		
+       		Sequential bmc= new Sequential();
+       		bmc.setParticleNr(e);
             //bmc.SetDlg(dlg);
        	    // the mcmc run is done with the previous exponent
         	try {
@@ -2430,7 +2438,7 @@ IS_ESS = function(log_weights)
             String s = currentRelativePath.toAbsolutePath().toString();
 
             // init the random generator: MUST do otherwise each run might bring same results
-            initRandomizer();
+            //initRandomizer();
 
         	// this is the list of the particles of the SMC
             Sequential[] beastMClist = new Sequential[N_int];
@@ -2673,16 +2681,16 @@ IS_ESS = function(log_weights)
 				outEss.println(rowCounterString + ESSval);
 				
 
-               	if(nextExponentDouble<1.0) // Leo: this needs be de-commented, it is currently commented for debug purp only!!!
+               	if(nextExponentDouble<=1.0) 
                	{
-    				if(ESSval<(N_int/2.0)) 
-                   	{
+    				if((ESSval<(N_int/2.0)) || (nextExponentDouble==1.0))
+                   	{// at the moment we resample always at the end to make it like the mcmc
         				List<Integer> stratifiedList=stratified_resample((double [])logWeightsNormalized);
 
                    		// update the particles list according to the list output from the resample process
                    		updateParticlesList(stratifiedList, beastMClist);
                        	// in the following initialize the weights to 1/N
-                        initNotmalisedWeights(logWeightsNormalized, minuslogN);    				
+                        initNotmalisedWeights(logWeightsNormalized, minuslogN);  
                    	}
 
                    	// only do MCMC move if we are not in the last step

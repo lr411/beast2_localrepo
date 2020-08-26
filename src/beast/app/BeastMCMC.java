@@ -1466,6 +1466,49 @@ IS_ESS = function(log_weights)
 	        baos.writeTo(outputStream);
     }
     
+    public static void saveStateSpaceParticles(Sequential[] beastMClist, String appendString, int N_int) throws IOException
+    {
+		MCMC mccdummy=beastMClist[0].m_mcmc;
+		int statenodesNr=mccdummy.getState().getNrOfStateNodes();
+
+    	for(int stateNodeCnt=0; stateNodeCnt<statenodesNr;stateNodeCnt++)
+    	{
+	    	ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		    PrintStream out = new PrintStream(baos);
+		    
+		    // init the logger with a header
+			MCMC mcc=beastMClist[0].m_mcmc;
+			String id=mcc.getState().stateNode[stateNodeCnt].getID();
+			int index=id.indexOf('.');
+			id=id.substring(0,index!=-1?index:id.length()-1);
+			mcc.getState().stateNode[stateNodeCnt].init(out);            
+		    out.println();
+			// log all the particles
+		    for(int i=0; i<N_int;i++)
+			{
+		     	MCMC mc=beastMClist[i].m_mcmc;
+		    	mc.getState().stateNode[stateNodeCnt].log(i, out);
+		    	out.println();
+		    	//System.out.println(mc.getState().stateNode[treepositionInStateArray].toString());
+			}
+		    
+		    out.close();
+		    String appendStr;
+		    if(id.startsWith("Tree"))
+		    {
+		    	appendStr=createTreesAppendString(id,appendString);
+		    }
+		    else
+		    {
+		    	appendStr=createTxtAppendString(id,appendString);
+		    }
+		    
+		    OutputStream outputStream = new FileOutputStream(appendStr);
+		        baos.writeTo(outputStream);
+    	}
+    }
+    
+    /*
     public static void saveTreeParticles(Sequential[] beastMClist, String appendString, int treepositionInStateArray, int N_int) throws IOException
     {
 	    ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -1490,6 +1533,7 @@ IS_ESS = function(log_weights)
 	        baos.writeTo(outputStream);
 	        
     }
+    */
     
     static int getCESSexponent_revised( Sequential[] beastMClist, double[] logIncrementalWeights, double[] logWeightsNormalized, int previousExponent, int maxExponent, double stepSize, double normalisedTargetCESS)
     {
@@ -2722,11 +2766,16 @@ IS_ESS = function(log_weights)
             // save the logs with parameters
             saveLogs(informativeAppendString, ess, cess, weightsStream);
             
+            // saveStateSpaceLogs(informativeAppendString,popSizeStream, gammaShapeStream);
+            
             // save average rejections
             saveAvgRej(informativeAppendString, avgRejectionList, "AvgRejection");
             
             // save the tree particles
-            saveTreeParticles(beastMClist, informativeAppendString, treepositionInStateArray, N_int);
+            //saveTreeParticles(beastMClist, informativeAppendString, treepositionInStateArray, N_int);
+            
+            // save state space array
+            saveStateSpaceParticles(beastMClist, informativeAppendString, N_int);
             
         } catch (Exception e) {
             e.printStackTrace();

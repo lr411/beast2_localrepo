@@ -122,6 +122,7 @@ public class BeastMCMC {
     public double m_gammaShapeLog;
     public double m_gammaShape;
     public boolean isonLeoPC=false;
+    public static double targetCESSval;
     /**
      * number of threads used to run the likelihood beast.core *
      */
@@ -262,6 +263,7 @@ public class BeastMCMC {
                     new Arguments.Option("resume", "Allow appending of log files"),
                     new Arguments.Option("validate", "Parse the XML, but do not run -- useful for debugging XML"),
                     // RRB: not sure what effect this option has
+                    new Arguments.RealOption("targetCESS", "Specify the target CESS"),
                     new Arguments.IntegerOption("errors", "Specify maximum number of numerical errors before stopping"),
                     new Arguments.IntegerOption("threads", "The number of computational threads to use (default 1), -1 for number of cores"),
                     new Arguments.LongOption("nrOfSMCparticles", "The number of particles for SMC computations"),
@@ -432,7 +434,6 @@ public class BeastMCMC {
         	
         }
         
-
         {
 		        /*
 		         * beagle info goes here
@@ -1598,7 +1599,7 @@ IS_ESS = function(log_weights)
 
     static double getCESSexponent_double( Sequential[] beastMClist, double[] logIncrementalWeights, double[] logWeightsNormalized, double prevExponent, double normalisedTargetCESS)
     {
-    	final double acceptableRange=0.1;
+    	final double acceptableRange=0.0;//0.1;
      	int maxcNt=40;
      	double CESSval;
 	    double range=(1.0-prevExponent);
@@ -2446,6 +2447,19 @@ IS_ESS = function(log_weights)
 
         {
         	Arguments arguments=parseArguments(args);
+        	if(arguments.hasOption("targetCESS"))
+        	{
+        		targetCESSval=arguments.getRealOption("targetCESS");
+        	}
+        	else
+        	{
+        		targetCESSval=0.9;
+        	}
+        	
+        }
+
+        {
+        	Arguments arguments=parseArguments(args);
             if (arguments.hasOption("exponentFile")) 
             {
             	takeExponentsFromFile=true;
@@ -2621,7 +2635,7 @@ IS_ESS = function(log_weights)
 				   }
 				   else
 				   {
-					   nextExponentDouble=getCESSexponent_double(beastMClist, logIncrementalWeights, logWeightsNormalized, currentExponentDouble, 0.9);
+					   nextExponentDouble=getCESSexponent_double(beastMClist, logIncrementalWeights, logWeightsNormalized, currentExponentDouble, targetCESSval);
 					   if(nextExponentDouble>1.0)
 						   nextExponentDouble=1.0;
 				   }

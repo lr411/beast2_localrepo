@@ -162,6 +162,8 @@ public class BeastMCMC {
     private final static int sigmaGaussianPosition=3;
 
 
+    public static boolean adaptiveVariance;
+
     BeastDialog m_dialog=null;
     
     /**
@@ -1365,6 +1367,7 @@ IS_ESS = function(log_weights)
             // initialise the state of the posterior
             mc.initStateAndPosterior();
             
+            
             // this is to avoid repeated casting afterwards
             bmc.m_mcmc=(MCMC) bmc.m_runnable;
             
@@ -2110,6 +2113,51 @@ IS_ESS = function(log_weights)
 		
 	   return retValues;    	
 	}
+
+    /*
+     * this function is used to calculate the adaptive version of the SMC
+     */
+    public static double calculateWeightedMoment(Sequential[] beastMClist, double[]logNormalisedWeights, int positionInStateArray, int momentNumber)
+    {
+    
+    	if(momentNumber<1 || momentNumber>2)
+    	{
+            throw new RuntimeException(
+                    "The function does not calculate moments higher than 2\n");
+    	}
+    	
+    	double momentSum=0.0;
+    	double weight;
+    	double paramVal;
+    	MCMC mc;
+    	int nParticles=beastMClist.length;
+    	for(int i=0; i<nParticles; i++)
+    	{
+    		weight=Math.exp(logNormalisedWeights[i]);
+    		paramVal=beastMClist[i].m_mcmc.getState().stateNode[positionInStateArray].getArrayValue();
+    		
+    		if(momentNumber==1)
+    		{
+    			momentSum+=(weight*paramVal);
+    		}
+    		else
+    		{ // assume it's second moment
+    			momentSum+=(weight*weight*paramVal*paramVal);
+    		}
+    	}
+    	
+    	momentSum/=(nParticles*1.0);
+    	return momentSum;
+    }
+    
+    public static double calculateParameterVariance(Sequential[] beastMClist, double[]logNormalisedWeights, int positionInStateArray)
+    {
+    	double firstMoment=calculateWeightedMoment(beastMClist, logNormalisedWeights, positionInStateArray,1);
+    	double secondMoment=calculateWeightedMoment(beastMClist, logNormalisedWeights, positionInStateArray,2);
+    	
+    	return secondMoment-(firstMoment*firstMoment);
+    }
+
     /*    
      * the function addSequence adds a sequence of DNA to the exixting taxon set
      * the return value is the array of the distances number of taxa
@@ -2455,7 +2503,7 @@ IS_ESS = function(log_weights)
         	{
         		targetCESSval=0.9;
         	}
-        	
+            System.out.println("Target CESS is: "+ targetCESSval);
         }
 
         {
@@ -2472,7 +2520,19 @@ IS_ESS = function(log_weights)
             }
         }
     	
-    	try {
+        {
+        	Arguments arguments=parseArguments(args);
+            if (arguments.hasOption("adaptiveVariance")) 
+            {
+            	adaptiveVariance=true;
+            }
+            else
+            {
+            	adaptiveVariance=false;
+            }
+        }
+
+        try {
             System.setProperty("beast.debug", "true"); // 
             
             long N=BeastMCMC.NR_OF_PARTICLES;
@@ -2674,6 +2734,20 @@ IS_ESS = function(log_weights)
 				// double cessNorm=CESS_Normalised(logIncrementalWeights, logWeightsNormalized);
                 // normalising below, logWeightsNormalized is the output, logIncrementalWeights the input
                	normaliseWeights(logIncrementalWeights, logWeightsNormalized);
+               	
+               	if(adaptiveVariance)
+               	{
+                   	// here calculate current mean and variance of the set of particles for populationSize, we use the weights
+                   	final double currentVar=calculateParameterVariance(beastMClist, logWeightsNormalized, populationsizePositionInStateArray);
+                   	//setParticleVariance
+                   	Arrays.parallelSetAll(logWeightsNormalized, e->{
+            			//BeastMCMC bmc=beastMClist[e];
+                   		Sequential bmcc=beastMClist[e];
+                   		bmcc.m_mcmc.setParticleVariance(currentVar);
+                   		return logWeightsNormalized[e];
+                   	});
+
+               	}
 
 				List <Integer> times = new ArrayList<>();
 				

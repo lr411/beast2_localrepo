@@ -31,6 +31,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -47,6 +49,7 @@ import beast.app.BeastMCMC;
 import beast.core.util.CompoundDistribution;
 import beast.core.util.Evaluator;
 import beast.core.util.Log;
+import beast.math.distributions.Normal;
 import beast.util.Randomizer;
 
 
@@ -119,6 +122,16 @@ public class MCMC extends Runnable {
     // this is used  by algorithms like SMC which rely on particle numbering
     protected long m_particleNr;
     
+    // te following is used in adaptive SMC
+    protected static double m_particleStd;
+    protected static boolean m_adaptiveMCMC;
+    
+    public void setParticleVariance(double newVariance)
+    {
+    	m_adaptiveMCMC=true;
+    	m_particleStd=Math.sqrt(newVariance);
+    }
+
     public void setParticleNr(long newNr)
     {
     	m_particleNr=newNr;
@@ -848,6 +861,7 @@ public class MCMC extends Runnable {
 //            }
 
         final Operator operator = operatorSchedule.selectOperator();
+        boolean popSizeOperator=false;
 
         if (printDebugInfo) System.err.print("\n" + sampleNr + " " + operator.getName()+ ":");
 
@@ -856,6 +870,11 @@ public class MCMC extends Runnable {
         {
         	int ill;
         	ill=4;
+        }
+        
+        if(IDstr.startsWith("PopSize"))
+        {
+        	popSizeOperator=true;
         }
         final Distribution evaluatorDistribution = operator.getEvaluatorDistribution();
         Evaluator evaluator = null;
@@ -883,7 +902,27 @@ public class MCMC extends Runnable {
                 }
             };
         }
-        final double logHastingsRatio = operator.proposal(evaluator);
+        
+        final double logHastingsRatio;
+        
+        if(m_adaptiveMCMC && popSizeOperator)
+        {
+        	logHastingsRatio=0;
+        	// move the particle according to a Gaussian with the set variance and current value as mean
+        	// also here get the state space position we
+        	//double dd=Random.nextGaussian();
+        	// ThreadLocalRandom;
+        	double newParamVal=ThreadLocalRandom.current().nextGaussian()*m_particleStd /*+currentval*/;
+        	State stt=getState();
+        	int i=1;
+        }
+        else
+        {
+        	logHastingsRatio = operator.proposal(evaluator);
+        }
+
+        // here, if evaluator is not null, return a proposal of our chosing
+        operator.proposal(evaluator);
 
         if (logHastingsRatio != Double.NEGATIVE_INFINITY) {
 

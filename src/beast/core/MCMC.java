@@ -46,6 +46,7 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 
 import beast.app.BeastMCMC;
+import beast.core.parameter.RealParameter;
 import beast.core.util.CompoundDistribution;
 import beast.core.util.Evaluator;
 import beast.core.util.Log;
@@ -125,6 +126,13 @@ public class MCMC extends Runnable {
     // te following is used in adaptive SMC
     protected static double m_particleStd;
     protected static boolean m_adaptiveMCMC;
+    protected static int m_popSizeInStateArray=-1;
+    
+
+    public void setPopSizePositionInStateArray(int posn)
+    {
+    	m_popSizeInStateArray=posn;
+    }
     
     public void setParticleVariance(double newVariance)
     {
@@ -914,6 +922,9 @@ public class MCMC extends Runnable {
         	// ThreadLocalRandom;
         	double newParamVal=ThreadLocalRandom.current().nextGaussian()*m_particleStd /*+currentval*/;
         	State stt=getState();
+        	
+        	RealParameter stn=(RealParameter) stt.stateNode[m_popSizeInStateArray]; //.values[0]=newParamVal;
+        	stn.setValue(newParamVal);
         	int i=1;
         }
         else

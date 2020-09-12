@@ -254,7 +254,8 @@ public class BeastMCMC {
             		
             		
                     new Arguments.StringOption("exponentFile", "exponentFile", "Specify a file from where to take the exponents for SMC"),
-            		new Arguments.LongOption("sleepseconds", "Specify for how many seconds you want to sleep at the beginning"),
+            		new Arguments.LongOption("sleepseconds", "Specify for how many seconds you want to sleep at the beginning"),            		
+            		new Arguments.Option("adaptiveVariance", "Adaptive variance of MCMC moves"),
             		new Arguments.Option("window", "Provide a console window"),
                     new Arguments.Option("options", "Display an options dialog"),
                     new Arguments.Option("working", "Change working directory to input file's directory"),
@@ -2585,6 +2586,13 @@ IS_ESS = function(log_weights)
             	System.err.println("Unable to find Tree class in statenode");
                 System.exit(0);
             }
+            
+           	Arrays.parallelSetAll(logWeightsNormalized, e->{
+           		Sequential bmcc=beastMClist[e];
+           		bmcc.m_mcmc.setPopSizePositionInStateArray(populationsizePositionInStateArray);
+           		return logWeightsNormalized[e];
+           	});
+            
             
             // save the ESS
             ByteArrayOutputStream ess = new ByteArrayOutputStream();

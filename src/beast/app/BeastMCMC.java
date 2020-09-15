@@ -192,6 +192,7 @@ public class BeastMCMC {
     public void initRandomizer(long seed)
     {    	
         Randomizer.setSeed(seed + m_particleNr<<4);
+        ThreadLocalRandom.current().setSeed(seed+ (seed/2) + m_particleNr<<4);
     }
     
     // init the randomizer using the current time in milliseconds

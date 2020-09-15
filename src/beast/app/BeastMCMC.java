@@ -1364,10 +1364,15 @@ IS_ESS = function(log_weights)
 				e1.printStackTrace();
 			}
             MCMC mc= (MCMC)bmc.m_runnable;
+            // set particle nr also in the mcmc
+            mc.setParticleNr(e);
+        	RealParameter popParam=(RealParameter) mc.getState().stateNode[2]; //.values[0]=newParamVal;
+        	double paramthis=popParam.getValue();
             mc.SetDistributionsFromInput();
             // initialise the state of the posterior
             mc.initStateAndPosterior();
-            
+            //aaaaaaaaaaaaaaaaa
+        	double paramthisAfter=popParam.getValue();
             
             // this is to avoid repeated casting afterwards
             bmc.m_mcmc=(MCMC) bmc.m_runnable;

@@ -127,6 +127,7 @@ public class MCMC extends Runnable {
     protected static double m_particleStd;
     protected static boolean m_adaptiveMCMC;
     protected static int m_popSizeInStateArray=-1;
+    private static int m_timesOfNegativePopSize=0;
     
 
     public void setPopSizePositionInStateArray(int posn)
@@ -867,6 +868,8 @@ public class MCMC extends Runnable {
 //                state.storeToFile(sample);
 //            	operatorSchedule.storeToFile();
 //            }
+        
+        long currentParticleNr=m_particleNr;
 
         final Operator operator = operatorSchedule.selectOperator();
         boolean popSizeOperator=false;
@@ -912,6 +915,7 @@ public class MCMC extends Runnable {
         }
         
         final double logHastingsRatio;
+        State stt=getState();
         
         if(m_adaptiveMCMC && popSizeOperator)
         {
@@ -920,11 +924,18 @@ public class MCMC extends Runnable {
         	// also here get the state space position we
         	//double dd=Random.nextGaussian();
         	// ThreadLocalRandom;
-        	double newParamVal=ThreadLocalRandom.current().nextGaussian()*m_particleStd /*+currentval*/;
-        	State stt=getState();
+        	stt=getState();
         	
-        	RealParameter stn=(RealParameter) stt.stateNode[m_popSizeInStateArray]; //.values[0]=newParamVal;
-        	stn.setValue(newParamVal);
+        	RealParameter popParam=(RealParameter) stt.stateNode[m_popSizeInStateArray]; //.values[0]=newParamVal;
+        	double currValParam=popParam.getValue();
+        	double newParamVal=ThreadLocalRandom.current().nextGaussian()*m_particleStd +popParam.getValue();
+        	if(newParamVal<0)
+        	{
+        		newParamVal=-newParamVal;
+        		m_timesOfNegativePopSize++;
+        		System.out.println("Times of negative pop size: "+ m_timesOfNegativePopSize);
+        	}
+        	popParam.setValue(newParamVal);
         	int i=1;
         }
         else
@@ -933,7 +944,7 @@ public class MCMC extends Runnable {
         }
 
         // here, if evaluator is not null, return a proposal of our chosing
-        operator.proposal(evaluator);
+        //operator.proposal(evaluator);
 
         if (logHastingsRatio != Double.NEGATIVE_INFINITY) {
 

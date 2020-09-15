@@ -192,7 +192,8 @@ public class BeastMCMC {
     public void initRandomizer(long seed)
     {    	
         Randomizer.setSeed(seed + m_particleNr<<4);
-        ThreadLocalRandom.current().setSeed(seed+ (seed/2) + m_particleNr<<4);
+        //if(!ThreadLocalRandom.current())
+        //ThreadLocalRandom.current().setSeed(seed+ (seed/2) + m_particleNr<<4);
     }
     
     // init the randomizer using the current time in milliseconds
@@ -1368,6 +1369,7 @@ IS_ESS = function(log_weights)
             // set particle nr also in the mcmc
             mc.setParticleNr(e);
         	RealParameter popParam=(RealParameter) mc.getState().stateNode[2]; //.values[0]=newParamVal;
+        	StateNode[] stnl=mc.getState().stateNode;
         	double paramthis=popParam.getValue();
             mc.SetDistributionsFromInput();
             // initialise the state of the posterior

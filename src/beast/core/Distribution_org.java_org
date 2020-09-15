@@ -126,7 +126,7 @@ public abstract class Distribution extends CalculationNode implements Loggable, 
      * @param state the state to record the new sample value in
      * @param random a random number generator
      */
-    public void sampleStateNode(StateNode stateNode, State state, Random random) {
+    protected void sampleStateNode(StateNode stateNode, State state, Random random) {
         // find distribution governing this state node and re-sample.
         for (BEASTInterface output : stateNode.getOutputs()) {
             if (output instanceof Distribution) {

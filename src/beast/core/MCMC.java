@@ -401,6 +401,19 @@ public class MCMC extends Runnable {
     {
     	state.initAndValidate();
     	state.robustlyCalcPosterior(m_posterior_fromInput);
+    	State stt=state;
+    	for(StateNode stn:state.stateNode)
+    	{
+    		if(stn.ID.startsWith("Tree"))
+    		{
+    			continue;
+    		}
+    		m_prior_fromInput.sampleStateNode(stn, stt, ThreadLocalRandom.current());
+    		int i;
+    		i=33;
+    	}
+    	//m_prior_fromInput.sample(state, ThreadLocalRandom.current());
+    	//bbbbbbbbbbbbbb
     }
     
     public double calculateLogPSimulatedAnnhealing(double exponent)

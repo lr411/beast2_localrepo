@@ -1356,6 +1356,9 @@ IS_ESS = function(log_weights)
        	{ // here probably better not to call the deepcopy method we created
        		// because we need to sample from prior
        		Sequential bmc= new Sequential();
+            //if(!ThreadLocalRandom.current())
+            //  ThreadLocalRandom.current().setSeed(e);
+
        		bmc.setParticleNr(e);
             //bmc.SetDlg(dlg);
        	    // the mcmc run is done with the previous exponent

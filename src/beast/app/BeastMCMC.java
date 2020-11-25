@@ -2555,7 +2555,7 @@ IS_ESS = function(log_weights)
             final double minuslogN=-java.lang.Math.log(N); // log(1/N) using log properties
 
             // variable for the annealing, how many steps to arrive from 0 to 1 (for ex. if 100 then steps are 0.01, 0.02...)
-            final int maxvalcnt=100000; // this is nr of steps minus 1
+            final int maxvalcnt=500; // this is nr of steps minus 1
             
         	// variables for the weights in log space
         	double logIncrementalWeights[] = new double[N_int]; // vector of weights for the particles
@@ -2647,7 +2647,7 @@ IS_ESS = function(log_weights)
         	
         	// here add the new sequence
         	
-        	boolean useCESS=true;
+        	boolean useCESS=false;
         	int nextCESS;
             
         	double nextExponentDouble=0.0,currentExponentDouble=0.0;
@@ -2829,6 +2829,8 @@ IS_ESS = function(log_weights)
                	
                	ESSval=ESS(logWeightsNormalized);
 				
+               	System.out.println("ESS: "+ESSval);
+               	
 				outEss.println(rowCounterString + ESSval);
 				
 

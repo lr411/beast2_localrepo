@@ -116,7 +116,7 @@ public class BeastMCMC {
     static String logsPath="/Users/lr411/Leo/Github/Genomics/logs_BEAST2/";
     // nr of MCMC moves
     protected long m_particleNr;
-    public static final int NR_OF_MCMC_MOVES = 5;
+    public static final int NR_OF_MCMC_MOVES = 20;
     public BEASTInterface m_treeobj=null;
     public double m_initPopSize;
     public double m_gammaShapeLog;
@@ -1269,6 +1269,46 @@ IS_ESS = function(log_weights)
 		//	System.out.println("After particle "+e+", nodes: "+tretre.getNodeCount()+", stored: "+tretre.getStoredNodes().length);
         	// here get the nr of rejections
         	nrOfMCMCrejections[e]=mc.getNrOfMCMCrejections();
+            mc.getNrOfMovesElemStateSpace();
+            mc.getNrOfRejectionsElemStateSpace();
+
+        	// setting the exponent sets the target distribution
+        	mc.setSimulatedAnnhealingExponent(currentExponent);
+       		
+       		return bmcc;
+			});
+    }
+
+	// does the mcmc move and also set the exponent for the following annealing
+	// [Leo: consider to split these two moves in the future for better readability of the code
+	// at the moment we keep them together for efficiency]
+    public static void doMCMC_andSetExponentForAnnealing_extended(Sequential[] beastMClist, final double currentExponent, long[] nrOfMCMCrejections,long[] nrOfMCMCMovesElemStateSpace, long[]nrOfMCMCRejectionsElemStateSpace)
+    {
+       	Arrays.parallelSetAll(beastMClist, e->{
+			//BeastMCMC bmc=beastMClist[e];
+       		Sequential bmcc=beastMClist[e];
+       	    // here update the weights
+        	Tree tretre=(Tree)beastMClist[e].m_mcmc.getState().stateNode[0];
+
+		//	System.out.println("Before particle "+e+", nodes: "+tretre.getNodeCount()+", stored: "+tretre.getStoredNodes().length);
+			
+       	    MCMC mc=bmcc.m_mcmc;
+
+       	    // the mcmc run is done with the previous exponent
+        	try {
+        		mc.setInitState(false);
+				bmcc.run();
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+
+		//	System.out.println("After particle "+e+", nodes: "+tretre.getNodeCount()+", stored: "+tretre.getStoredNodes().length);
+        	// here get the nr of rejections
+        	nrOfMCMCrejections[e]=mc.getNrOfMCMCrejections();
+        	nrOfMCMCMovesElemStateSpace[e]=mc.getNrOfMovesElemStateSpace();
+        	nrOfMCMCRejectionsElemStateSpace[e]=mc.getNrOfRejectionsElemStateSpace();
+
         	// setting the exponent sets the target distribution
         	mc.setSimulatedAnnhealingExponent(currentExponent);
        		
@@ -1458,6 +1498,22 @@ IS_ESS = function(log_weights)
 	    for(int i=0; i<avgRejectionList.size();i++)
 		{
 	    	out.println(avgRejectionList.get(i));
+		}
+	    
+	    out.close();
+	    
+	    OutputStream outputStream = new FileOutputStream(createTxtAppendString(paramName,appendString));
+	        baos.writeTo(outputStream);
+    }
+
+    private static void saveList(String appendString, List<Double> paramList, String paramName) throws IOException {
+    	// TODO Auto-generated method stub
+	    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+	    PrintStream out = new PrintStream(baos);
+	    
+	    for(int i=0; i<paramList.size();i++)
+		{
+	    	out.println(paramList.get(i));
 		}
 	    
 	    out.close();
@@ -2162,12 +2218,52 @@ IS_ESS = function(log_weights)
     	return momentSum;
     }
     
+    /*
+     * this function is used to calculate the adaptive version of the SMC
+     */
+    public static double calculateWeightedVarianceLogSpace(Sequential[] beastMClist, double[]logNormalisedWeights, int positionInStateArray)
+    {
+    	double momentSum=0.0;
+    	double weight;
+    	double paramValLog;
+    	MCMC mc;
+    	int nParticles=beastMClist.length;
+    	// substitute the following with parallel
+    	for(int i=0; i<nParticles; i++)
+    	{
+    		weight=Math.exp(logNormalisedWeights[i]);
+    		paramValLog=Math.log(beastMClist[i].m_mcmc.getState().stateNode[positionInStateArray].getArrayValue());
+    		
+    		momentSum+=(weight*paramValLog);
+    	}
+    	
+    	momentSum/=(nParticles*1.0);
+    	
+    	double stdDev=0;
+    	double tmp;
+    	for(int i=0; i<nParticles; i++)
+    	{
+    		weight=Math.exp(logNormalisedWeights[i]);
+    		paramValLog=Math.log(beastMClist[i].m_mcmc.getState().stateNode[positionInStateArray].getArrayValue());
+    		tmp=(weight*paramValLog)-momentSum;
+    		stdDev+=tmp*tmp;
+    	}
+    	stdDev/=(nParticles*1.0);
+    	return stdDev;
+    }
+    
     public static double calculateParameterVariance(Sequential[] beastMClist, double[]logNormalisedWeights, int positionInStateArray)
     {
     	double firstMoment=calculateWeightedMoment(beastMClist, logNormalisedWeights, positionInStateArray,1);
     	double secondMoment=calculateWeightedMoment(beastMClist, logNormalisedWeights, positionInStateArray,2);
     	
     	return secondMoment-(firstMoment*firstMoment);
+    }
+
+    public static double calculateParameterVarianceLogSpace(Sequential[] beastMClist, double[]logNormalisedWeights, int positionInStateArray)
+    {
+    	
+    	return calculateWeightedVarianceLogSpace( beastMClist, logNormalisedWeights, positionInStateArray);
     }
 
     /*    
@@ -2628,9 +2724,17 @@ IS_ESS = function(log_weights)
         	final String divider=",";
         	long startTime=System.nanoTime();
         	long[] nrOfMCMCrejections=new long[N_int];
+        	long[] nrOfMCMCMovesElemStateSpace=new long[N_int];
+            long[] nrOfMCMCRejectionsElemStateSpace=new long[N_int];
+
         	//List<Integer> nrOfMCMCrej=new ArrayList<>();
         	List<Double> avgRejectionList=new ArrayList<>();
         	double[] avgRejection=new double[maxvalcnt];
+        	// the following count moves and rejections on specific elements of state space (can be pop size, tree etc)
+        	List<Double> avgMcmcMovesOnElementList=new ArrayList<>();
+        	double[] avgMcmcMovesOnElement=new double[maxvalcnt];
+        	List<Double> avgRejectionOnElementList=new ArrayList<>();
+        	double[] avgRejectionOnElement=new double[maxvalcnt];
         	
         	// init all the avgRejection elements to "not done"
         	final long MCMC_NotDone=-1;
@@ -2647,7 +2751,7 @@ IS_ESS = function(log_weights)
         	
         	// here add the new sequence
         	
-        	boolean useCESS=false;
+        	boolean useCESS=true;
         	int nextCESS;
             
         	double nextExponentDouble=0.0,currentExponentDouble=0.0;
@@ -2754,10 +2858,27 @@ IS_ESS = function(log_weights)
                 // normalising below, logWeightsNormalized is the output, logIncrementalWeights the input
                	normaliseWeights(logIncrementalWeights, logWeightsNormalized);
                	
-               	if(adaptiveVariance)
+               	
+               	boolean doLogCalculation=false;
+               	if(adaptiveVariance && doLogCalculation)
+               	{
+                   	// here calculate current mean and variance of the set of particles for populationSize, we use the weights
+                   	final double currentLogSpaceVariance=calculateParameterVarianceLogSpace(beastMClist, logWeightsNormalized, populationsizePositionInStateArray);
+
+                   	//setParticleVariance
+                   	Arrays.parallelSetAll(logWeightsNormalized, e->{
+            			//BeastMCMC bmc=beastMClist[e];
+                   		Sequential bmcc=beastMClist[e];
+                   		bmcc.m_mcmc.setParticleVariance(currentLogSpaceVariance);
+                   		return logWeightsNormalized[e];
+                   	});
+               	}
+               	
+               	if(adaptiveVariance && (!doLogCalculation))
                	{
                    	// here calculate current mean and variance of the set of particles for populationSize, we use the weights
                    	final double currentVar=calculateParameterVariance(beastMClist, logWeightsNormalized, populationsizePositionInStateArray);
+
                    	//setParticleVariance
                    	Arrays.parallelSetAll(logWeightsNormalized, e->{
             			//BeastMCMC bmc=beastMClist[e];
@@ -2850,9 +2971,20 @@ IS_ESS = function(log_weights)
                    	//if(exponentCnt<maxvalcnt-1) 
                    	{
                         // do the mcmc moves on the particles and set the exponent for annealing
+                        doMCMC_andSetExponentForAnnealing_extended(beastMClist, currentExponentDouble, nrOfMCMCrejections, nrOfMCMCMovesElemStateSpace,nrOfMCMCRejectionsElemStateSpace);
+                        /*
                         doMCMC_andSetExponentForAnnealing(beastMClist, currentExponentDouble, nrOfMCMCrejections);
+                         
+                        nrOfMCMCMovesElemStateSpace=new long[N_int];
+                        long[] nrOfMCMCRejectionsElemStateSpace;
+                        */
                         auxDoubleVar=Arrays.stream(nrOfMCMCrejections).average().getAsDouble();
                         avgRejectionList.add(auxDoubleVar);
+                        
+                        auxDoubleVar=Arrays.stream(nrOfMCMCMovesElemStateSpace).average().getAsDouble();
+                        avgMcmcMovesOnElementList.add(auxDoubleVar);
+                        auxDoubleVar=Arrays.stream(nrOfMCMCRejectionsElemStateSpace).average().getAsDouble();
+                        avgRejectionOnElementList.add(auxDoubleVar);
                         //avgRejection[(int) exponentCnt]=auxDoubleVar;
                    	}
 /*    				System.out.println("After");
@@ -2878,8 +3010,14 @@ IS_ESS = function(log_weights)
             // saveStateSpaceLogs(informativeAppendString,popSizeStream, gammaShapeStream);
             
             // save average rejections
-            saveAvgRej(informativeAppendString, avgRejectionList, "AvgRejection");
+            saveList(informativeAppendString, avgRejectionList, "AvgRejection");
             
+            // save average moves on a specific elem of state space
+            saveList(informativeAppendString, avgMcmcMovesOnElementList, "AvgMCMC_MovesOnElem");
+
+            // save average rej on a specific elem of state space
+            saveList(informativeAppendString, avgRejectionOnElementList, "AvgMCMC_RejOnElem");
+
             // save the tree particles
             //saveTreeParticles(beastMClist, informativeAppendString, treepositionInStateArray, N_int);
             

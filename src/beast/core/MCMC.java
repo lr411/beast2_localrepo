@@ -349,6 +349,8 @@ public class MCMC extends Runnable {
     protected int burnIn;
     protected long chainLength;
     protected long nrOfRejections;
+    protected int nrOfMovesElemStateSpace;
+    protected int nrOfRejectionsElemStateSpace;
     protected Distribution posterior;
     protected double beta=1.0; // exponent for the simulated annhealing
 
@@ -776,6 +778,15 @@ public class MCMC extends Runnable {
     	return nrOfRejections;
     }
     
+    public int getNrOfMovesElemStateSpace()
+    {
+    	return nrOfMovesElemStateSpace;
+    }
+    
+    public int getNrOfRejectionsElemStateSpace()
+    {
+    	return nrOfRejectionsElemStateSpace;
+    }
     /**
      * main MCMC loop 
      * @throws IOException *
@@ -788,6 +799,9 @@ public class MCMC extends Runnable {
         	Log.warning.println("Please wait while BEAST takes " + burnIn + " pre-burnin samples");
         }
         nrOfRejections=0;
+        nrOfMovesElemStateSpace=0;
+        nrOfRejectionsElemStateSpace=0;
+        
         for (long sampleNr = -burnIn; sampleNr <= chainLength; sampleNr++) {
             final Operator operator = propagateState(sampleNr);
 
@@ -886,7 +900,7 @@ public class MCMC extends Runnable {
         long currentParticleNr=m_particleNr;
 
         final Operator operator = operatorSchedule.selectOperator();
-        boolean popSizeOperator=false;
+        boolean popSizeOperator;
 
         if (printDebugInfo) System.err.print("\n" + sampleNr + " " + operator.getName()+ ":");
 
@@ -900,6 +914,15 @@ public class MCMC extends Runnable {
         if(IDstr.startsWith("PopSize"))
         {
         	popSizeOperator=true;
+        }
+        else
+        {
+        	popSizeOperator=false;
+        }
+        
+        if(popSizeOperator==true)
+        {
+        	nrOfMovesElemStateSpace++;
         }
         final Distribution evaluatorDistribution = operator.getEvaluatorDistribution();
         Evaluator evaluator = null;
@@ -934,7 +957,7 @@ public class MCMC extends Runnable {
         if(m_adaptiveMCMC && popSizeOperator)
         {
         	
-        	if(true)
+        	if(false)
         	{
 	        	RealParameter popParam=(RealParameter) stt.stateNode[m_popSizeInStateArray]; //.values[0]=newParamVal;
 	        	double currValParam=popParam.getValue();
@@ -943,11 +966,12 @@ public class MCMC extends Runnable {
 	        	double meanTruncatedGauss=currentParamLog;
 	        	// according to paper from Rosenthal Optimal Proposal Distributions and Adaptive MCMC
 	        	// for 1-D param it's maybe different
-	        	double stdDevTruncatedGauss=Math.log(2.38*m_particleStd);
+	        	double stdDevTruncatedGauss=Math.sqrt(2.38)*m_particleStd;
 	        	// use lower bound of truncated Gaussian so that we never ever ever ever hv a negative population size
 	        	double lowerBoundTruncatedGaussian=-(currentParamLog-currentParamLog*0.0001);
-
-	        	double beta=TruncatedNormal.sampleUpgraded(meanTruncatedGauss,stdDevTruncatedGauss,lowerBoundTruncatedGaussian, Double.POSITIVE_INFINITY);
+// LEO: DOES IT NEED TO BE NOT MEAN 0????
+	        	//double beta=TruncatedNormal.sampleUpgraded(meanTruncatedGauss,stdDevTruncatedGauss,lowerBoundTruncatedGaussian, Double.POSITIVE_INFINITY);
+	        	double beta=ThreadLocalRandom.current().nextGaussian()*stdDevTruncatedGauss +meanTruncatedGauss;
 	        	double newParamVal=currValParam*Math.exp(beta);//ThreadLocalRandom.current().nextGaussian()*m_particleStd +popParam.getValue();
 	        	if(newParamVal<=0)
 	        	{
@@ -958,7 +982,8 @@ public class MCMC extends Runnable {
 		                    "Unable to draw properly from the truncated Gaussian in adaptive variance\n");
 	        	}
 	        	popParam.setValue(newParamVal);
-	        	logHastingsRatio=-beta;
+	        	// the following is the jacobian of the transformation
+	        	logHastingsRatio=beta;
 	        	int i=1;				
         	}
         	else
@@ -972,12 +997,19 @@ public class MCMC extends Runnable {
 	        	
 	        	RealParameter popParam=(RealParameter) stt.stateNode[m_popSizeInStateArray]; //.values[0]=newParamVal;
 	        	double currValParam=popParam.getValue();
+	        	double meanTruncatedGauss=currValParam;
+	        	double stdDevTruncatedGauss=m_particleStd;
+	        	// use lower bound of truncated Gaussian so that we never ever ever ever hv a negative population size
+	        	double lowerBoundTruncatedGaussian=-(currValParam-currValParam*0.0001);
+	        	//double newParamVal=TruncatedNormal.sampleUpgraded(meanTruncatedGauss,stdDevTruncatedGauss,lowerBoundTruncatedGaussian, Double.POSITIVE_INFINITY);
 	        	double newParamVal=ThreadLocalRandom.current().nextGaussian()*m_particleStd +popParam.getValue();
 	        	if(newParamVal<0)
 	        	{
 	        		newParamVal=-newParamVal;
 	        		m_timesOfNegativePopSize++;
 	        		System.out.println("Times of negative pop size: "+ m_timesOfNegativePopSize);
+		            // throw new RuntimeException(
+			        //            "Unable to draw properly from the truncated Gaussian in adaptive variance\n");
 	        	}
 	        	popParam.setValue(newParamVal);
 	        	int i=1;
@@ -1031,6 +1063,10 @@ public class MCMC extends Runnable {
             } else {
                 // reject
             	nrOfRejections++;
+                if(popSizeOperator==true)
+                {
+                	nrOfRejectionsElemStateSpace++;
+                }
                 if (sampleNr >= 0) {
                     operator.reject(newLogLikelihood == Double.NEGATIVE_INFINITY ? -1 : 0);
                 }

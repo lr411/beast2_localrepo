@@ -2729,16 +2729,18 @@ IS_ESS = function(log_weights)
 
         	//List<Integer> nrOfMCMCrej=new ArrayList<>();
         	List<Double> avgRejectionList=new ArrayList<>();
-        	double[] avgRejection=new double[maxvalcnt];
+        	//double[] avgRejection=new double[maxvalcnt];
         	// the following count moves and rejections on specific elements of state space (can be pop size, tree etc)
         	List<Double> avgMcmcMovesOnElementList=new ArrayList<>();
-        	double[] avgMcmcMovesOnElement=new double[maxvalcnt];
+        	//double[] avgMcmcMovesOnElement=new double[maxvalcnt];
         	List<Double> avgRejectionOnElementList=new ArrayList<>();
-        	double[] avgRejectionOnElement=new double[maxvalcnt];
+        	//double[] avgRejectionOnElement=new double[maxvalcnt];
+        	List<Double> avgRejectionRateOnElementList=new ArrayList<>();
+        	
         	
         	// init all the avgRejection elements to "not done"
-        	final long MCMC_NotDone=-1;
-            Arrays.parallelSetAll(avgRejection, e->MCMC_NotDone);
+        	//final long MCMC_NotDone=-1;
+            //Arrays.parallelSetAll(avgRejection, e->MCMC_NotDone);
         	double auxDoubleVar;
             
         	// size of the step for the exponent
@@ -2970,6 +2972,7 @@ IS_ESS = function(log_weights)
                    	// only do MCMC move if we are not in the last step
                    	//if(exponentCnt<maxvalcnt-1) 
                    	{
+                    	double auxDoubleVarTmp;
                         // do the mcmc moves on the particles and set the exponent for annealing
                         doMCMC_andSetExponentForAnnealing_extended(beastMClist, currentExponentDouble, nrOfMCMCrejections, nrOfMCMCMovesElemStateSpace,nrOfMCMCRejectionsElemStateSpace);
                         /*
@@ -2983,9 +2986,26 @@ IS_ESS = function(log_weights)
                         
                         auxDoubleVar=Arrays.stream(nrOfMCMCMovesElemStateSpace).average().getAsDouble();
                         avgMcmcMovesOnElementList.add(auxDoubleVar);
+                        auxDoubleVarTmp=auxDoubleVar;
                         auxDoubleVar=Arrays.stream(nrOfMCMCRejectionsElemStateSpace).average().getAsDouble();
                         avgRejectionOnElementList.add(auxDoubleVar);
+                        
+                        if(auxDoubleVarTmp >0)
+                        {
+                        	auxDoubleVar=(auxDoubleVar/auxDoubleVarTmp)*100.0;
+                        }
+                        else
+                        {
+                        	auxDoubleVar=Double.POSITIVE_INFINITY;
+                        }
                         //avgRejection[(int) exponentCnt]=auxDoubleVar;
+                    	avgRejectionRateOnElementList.add(auxDoubleVar);
+                    	
+                    	
+                    	// init all the avgRejection elements to "not done"
+                    	//final long MCMC_NotDone=-1;
+                        //Arrays.parallelSetAll(avgRejection, e->MCMC_NotDone);
+
                    	}
 /*    				System.out.println("After");
     				for(int i=0; i<beastMClist.length; i++)

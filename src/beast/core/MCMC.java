@@ -988,7 +988,7 @@ public class MCMC extends Runnable {
         	}
         	else
         	{
-	        	logHastingsRatio=0;
+	        	//logHastingsRatio=0;
 	        	// move the particle according to a Gaussian with the set variance and current value as mean
 	        	// also here get the state space position we
 	        	//double dd=Random.nextGaussian();
@@ -1001,8 +1001,8 @@ public class MCMC extends Runnable {
 	        	double stdDevTruncatedGauss=m_particleStd;
 	        	// use lower bound of truncated Gaussian so that we never ever ever ever hv a negative population size
 	        	double lowerBoundTruncatedGaussian=-(currValParam-currValParam*0.0001);
-	        	//double newParamVal=TruncatedNormal.sampleUpgraded(meanTruncatedGauss,stdDevTruncatedGauss,lowerBoundTruncatedGaussian, Double.POSITIVE_INFINITY);
-	        	double newParamVal=ThreadLocalRandom.current().nextGaussian()*m_particleStd +popParam.getValue();
+	        	double newParamVal=TruncatedNormal.sampleUpgraded(meanTruncatedGauss,stdDevTruncatedGauss,lowerBoundTruncatedGaussian, Double.POSITIVE_INFINITY);
+	        	//double newParamVal=ThreadLocalRandom.current().nextGaussian()*m_particleStd +popParam.getValue();
 	        	if(newParamVal<0)
 	        	{
 	        		newParamVal=-newParamVal;
@@ -1012,6 +1012,16 @@ public class MCMC extends Runnable {
 			        //            "Unable to draw properly from the truncated Gaussian in adaptive variance\n");
 	        	}
 	        	popParam.setValue(newParamVal);
+	        	// log hastings ratio in case of truncated gaussian (proposal not symmetric)
+	        	// he ratio of proposals is:
+	        	// [1-erf(lower_bound*-x)]/[1-erf(lower_bound-x*)]
+	        	// where x* and x are new proposed and old value of parameter
+	        	double lowerBoundTruncatedGaussianProposedVal=-(newParamVal-newParamVal*0.0001);
+	        	double valNumerator=org.apache.commons.math3.special.Erf.erf(lowerBoundTruncatedGaussianProposedVal-currValParam);
+	           	double valDenominator=org.apache.commons.math3.special.Erf.erf(lowerBoundTruncatedGaussian-newParamVal);
+	   	        logHastingsRatio=java.lang.Math.log1p(valNumerator)-java.lang.Math.log1p(valDenominator);
+	        	//double val=;//org.apache.commons.math3.special.Erf(3);
+	        	
 	        	int i=1;
         	}
         }

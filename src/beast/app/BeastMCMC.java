@@ -1427,6 +1427,16 @@ IS_ESS = function(log_weights)
             
             return bmc;
        	});
+        int positionInStateArray=2;
+        double logWeightsNormalized[] = new double[(int)BeastMCMC.NR_OF_PARTICLES];
+
+       	double minuslogN=-Math.log(BeastMCMC.NR_OF_PARTICLES);
+        // in the following initialize the weights to 1/N
+        initNotmalisedWeights(logWeightsNormalized, minuslogN);
+        double firstMoment=calculateParameterFirstMoment(beastMClist, logWeightsNormalized, positionInStateArray);
+        double secondMoment=calculateParameterSecondMoment(beastMClist, logWeightsNormalized, positionInStateArray);
+        double variance=calculateParameterVariance(firstMoment, secondMoment);
+
     }
     
     public static String getDateString()
@@ -2212,11 +2222,13 @@ IS_ESS = function(log_weights)
     		}
     		else
     		{ // assume it's second moment
-    			momentSum+=(weight*weight*paramVal*paramVal);
+    			//momentSum+=(weight*weight*paramVal*paramVal);
+    			momentSum+=(weight*paramVal*paramVal);
     		}
     	}
     	
-    	momentSum/=(nParticles*1.0);
+    	// it's already weighted
+    	//momentSum/=(nParticles*1.0);
     	return momentSum;
     }
     
@@ -2254,10 +2266,29 @@ IS_ESS = function(log_weights)
     	return Var;
     }
     
-    public static double calculateParameterVariance(Sequential[] beastMClist, double[]logNormalisedWeights, int positionInStateArray)
+    public static double calculateParameterFirstMoment(Sequential[] beastMClist, double[]logNormalisedWeights, int positionInStateArray)
     {
     	double firstMoment=calculateWeightedMoment(beastMClist, logNormalisedWeights, positionInStateArray,1);
+    	
+    	return firstMoment;
+    }
+
+    public static double calculateParameterSecondMoment(Sequential[] beastMClist, double[]logNormalisedWeights, int positionInStateArray)
+    {
     	double secondMoment=calculateWeightedMoment(beastMClist, logNormalisedWeights, positionInStateArray,2);
+    	
+    	return secondMoment;
+    }
+
+    public static double calculateParameterVariance(double firstMoment, double secondMoment)
+    {
+    	return secondMoment-(firstMoment*firstMoment);
+    }
+
+    public static double calculateParameterVariance(Sequential[] beastMClist, double[]logNormalisedWeights, int positionInStateArray)
+    {
+    	double firstMoment=calculateParameterFirstMoment(beastMClist, logNormalisedWeights, positionInStateArray);
+    	double secondMoment=calculateParameterSecondMoment(beastMClist, logNormalisedWeights, positionInStateArray);
     	
     	return secondMoment-(firstMoment*firstMoment);
     }
@@ -2868,7 +2899,7 @@ IS_ESS = function(log_weights)
                	normaliseWeights(logIncrementalWeights, logWeightsNormalized);
                	
                	
-               	boolean doLogCalculation=false;
+               	boolean doLogCalculation=true;
                	if(adaptiveVariance && doLogCalculation)
                	{
                    	// here calculate current mean and variance of the set of particles for populationSize, we use the weights
@@ -2922,7 +2953,7 @@ IS_ESS = function(log_weights)
                    	Arrays.parallelSetAll(logWeightsNormalized, e->{
             			//BeastMCMC bmc=beastMClist[e];
                    		Sequential bmcc=beastMClist[e];
-                   		bmcc.m_mcmc.setParticleStdDev(stdDevConstant);
+                   		bmcc.m_mcmc.setParticleStdDev(stdDevConstant*currentStdDev);
                    		return logWeightsNormalized[e];
                    	});
                    	System.out.println("Current stdev: "+ stdDevConstant);
@@ -3104,7 +3135,7 @@ IS_ESS = function(log_weights)
             // save average percentage rej on a specific elem of state space
             saveList(informativeAppendString, meanOfElementList, "evolutionOfMeanOnElem");
             // save average percentage rej on a specific elem of state space
-            saveList(informativeAppendString, meanOfElementList, "evolutionOfVarOnElem");
+            saveList(informativeAppendString, varOfElementList, "evolutionOfVarOnElem");
 
             // save the tree particles
             //saveTreeParticles(beastMClist, informativeAppendString, treepositionInStateArray, N_int);

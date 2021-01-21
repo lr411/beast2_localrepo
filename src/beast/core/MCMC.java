@@ -963,50 +963,51 @@ public class MCMC extends Runnable {
         
         if(m_adaptiveMCMC && popSizeOperator)
         {
-        	if(true)
-        	{
-	        	RealParameter popParam=(RealParameter) stt.stateNode[m_popSizeInStateArray]; //.values[0]=newParamVal;
-	        	double currValParam=popParam.getValue();
-	        	//double currentParamLog=Math.log(currValParam);
-	        	// it's a random walk in log space, so we have means and std dev accordingly
-	        	//double beta=0.75+ThreadLocalRandom.current().nextDouble()*((1.0/0.75)-0.75);
-	        	//double beta=0.75+ThreadLocalRandom.current().nextDouble()*(1.5745*m_particleStd*3.46);
-	        	double beta=0.75+ThreadLocalRandom.current().nextDouble()*(1.5745*m_particleStd);
-
-
-	        	double newParamVal=currValParam*beta;//ThreadLocalRandom.current().nextGaussian()*m_particleStd +popParam.getValue();
-	        	popParam.setValue(newParamVal);
-	        	logHastingsRatio=-beta;
-	        	int i=1;				
-        	}
-        	
 //        	if(true)
-//        	{
+//        	{// multiplicative like beast, with variance adjusted
 //	        	RealParameter popParam=(RealParameter) stt.stateNode[m_popSizeInStateArray]; //.values[0]=newParamVal;
 //	        	double currValParam=popParam.getValue();
-//	        	double currentParamLog=Math.log(currValParam);
+//	        	//double currentParamLog=Math.log(currValParam);
 //	        	// it's a random walk in log space, so we have means and std dev accordingly
-//	        	double meanTruncatedGauss=currentParamLog;
-//	        	// according to paper from Rosenthal Optimal Proposal Distributions and Adaptive MCMC
-//	        	// for 1-D param it's maybe different
-//	        	double stdDevTruncatedGauss=Math.abs(Math.log(2.38*m_particleStd))*m_multConst;
-//	        	// use lower bound of truncated Gaussian so that we never ever ever ever hv a negative population size
-//	        	double lowerBoundTruncatedGaussian=-(currentParamLog-currentParamLog*0.0001);
+//	        	//double beta=0.75+ThreadLocalRandom.current().nextDouble()*((1.0/0.75)-0.75);
+//	        	//double beta=0.75+ThreadLocalRandom.current().nextDouble()*(1.5745*m_particleStd*3.46);
+//	        	double beta=0.75+ThreadLocalRandom.current().nextDouble()*(1.5745*m_particleStd);
 //
-//	        	double beta=TruncatedNormal.sampleUpgraded(meanTruncatedGauss,stdDevTruncatedGauss,lowerBoundTruncatedGaussian, Double.POSITIVE_INFINITY);
-//	        	double newParamVal=currValParam*Math.exp(beta);//ThreadLocalRandom.current().nextGaussian()*m_particleStd +popParam.getValue();
-//	        	if(newParamVal<=0)
-//	        	{
-//	        		//newParamVal=-newParamVal;
-//	        		//m_timesOfNegativePopSize++;
-//	        		//System.out.println("Times of negative pop size: "+ m_timesOfNegativePopSize);
-//		             throw new RuntimeException(
-//		                    "Unable to draw properly from the truncated Gaussian in adaptive variance\n");
-//	        	}
+//
+//	        	double newParamVal=currValParam*beta;//ThreadLocalRandom.current().nextGaussian()*m_particleStd +popParam.getValue();
 //	        	popParam.setValue(newParamVal);
 //	        	logHastingsRatio=-beta;
 //	        	int i=1;				
 //        	}
+        	
+        	if(true)
+        	{// in progress
+	        	RealParameter popParam=(RealParameter) stt.stateNode[m_popSizeInStateArray]; //.values[0]=newParamVal;
+	        	double currValParam=popParam.getValue();
+	        	double currentParamLog=Math.log(currValParam);
+	        	// it's a random walk in log space, so we have means and std dev accordingly
+	        	double meanTruncatedGauss=currentParamLog;
+	        	// according to paper from Rosenthal Optimal Proposal Distributions and Adaptive MCMC
+	        	// for 1-D param it's maybe different
+	        	double stdDevTruncatedGauss=Math.abs(1.54*m_particleStd);//*m_multConst;
+	        	// use lower bound of truncated Gaussian so that we never ever ever ever hv a negative population size
+	        	double lowerBoundTruncatedGaussian=-(currentParamLog-currentParamLog*0.0001);
+
+	        	//double beta=TruncatedNormal.sampleUpgraded(meanTruncatedGauss,stdDevTruncatedGauss,lowerBoundTruncatedGaussian, Double.POSITIVE_INFINITY);
+	        	double beta=ThreadLocalRandom.current().nextGaussian()*stdDevTruncatedGauss + currentParamLog;
+	        	double newParamVal=currValParam*Math.exp(beta);//ThreadLocalRandom.current().nextGaussian()*m_particleStd +popParam.getValue();
+	        	if(newParamVal<=0)
+	        	{
+	        		//newParamVal=-newParamVal;
+	        		//m_timesOfNegativePopSize++;
+	        		//System.out.println("Times of negative pop size: "+ m_timesOfNegativePopSize);
+		             throw new RuntimeException(
+		                    "Unable to draw properly from the truncated Gaussian in adaptive variance\n");
+	        	}
+	        	popParam.setValue(newParamVal);
+	        	logHastingsRatio=+beta;
+	        	int i=1;				
+        	}
         	
 //        	if(true)
 //        	{

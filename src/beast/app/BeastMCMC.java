@@ -116,7 +116,7 @@ public class BeastMCMC {
     static String logsPath="/Users/lr411/Leo/Github/Genomics/logs_BEAST2/";
     // nr of MCMC moves
     protected long m_particleNr;
-    public static final int NR_OF_MCMC_MOVES = 40;
+    public static int NR_OF_MCMC_MOVES;
     static public int prova=2;
     public BEASTInterface m_treeobj=null;
     public double m_initPopSize;
@@ -124,6 +124,7 @@ public class BeastMCMC {
     public double m_gammaShape;
     public boolean isonLeoPC=false;
     public static double targetCESSval;
+    public static int mcmcMovesInputArg;
     protected double m_multiplicativeConst;
     /**
      * number of threads used to run the likelihood beast.core *
@@ -263,6 +264,7 @@ public class BeastMCMC {
                     new Arguments.StringOption("exponentFile", "exponentFile", "Specify a file from where to take the exponents for SMC"),
             		new Arguments.LongOption("sleepseconds", "Specify for how many seconds you want to sleep at the beginning"),            		
             		new Arguments.Option("adaptiveVariance", "Adaptive variance of MCMC moves"),
+                    new Arguments.IntegerOption("nrMCMCmoves", "Specify default number of mcmc moves at each step"),
             		new Arguments.Option("window", "Provide a console window"),
                     new Arguments.Option("options", "Display an options dialog"),
                     new Arguments.Option("working", "Change working directory to input file's directory"),
@@ -2684,6 +2686,18 @@ IS_ESS = function(log_weights)
         		targetCESSval=0.9;
         	}
             System.out.println("Target CESS is: "+ targetCESSval);
+        }
+
+        {
+        	Arguments arguments=parseArguments(args);
+            if (arguments.hasOption("nrMCMCmoves")) 
+            {
+            	NR_OF_MCMC_MOVES = arguments.getIntegerOption("nrMCMCmoves");
+            }
+            else
+            {
+            	NR_OF_MCMC_MOVES=5;
+            }
         }
 
         {

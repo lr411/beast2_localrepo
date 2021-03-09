@@ -116,7 +116,7 @@ public class BeastMCMC {
     static String logsPath="/Users/lr411/Leo/Github/Genomics/logs_BEAST2/";
     // nr of MCMC moves
     protected long m_particleNr;
-    public static final int NR_OF_MCMC_MOVES = 20;
+    public static final int NR_OF_MCMC_MOVES = 40;
     static public int prova=2;
     public BEASTInterface m_treeobj=null;
     public double m_initPopSize;
@@ -163,9 +163,12 @@ public class BeastMCMC {
     private final static int meanGaussianPosition=2;
     private final static int sigmaGaussianPosition=3;
 
-
     public static boolean adaptiveVariance;
 
+	//List<Integer> nrOfMCMCrej=new ArrayList<>();
+	
+
+    
     BeastDialog m_dialog=null;
     
     /**
@@ -2237,32 +2240,31 @@ IS_ESS = function(log_weights)
      */
     public static double calculateWeightedVarianceLogSpace(Sequential[] beastMClist, double[]logNormalisedWeights, int positionInStateArray)
     {
-    	double momentSum=0.0;
+    	double firstMoment=0.0;
+    	double secondMoment=0.0;
+    	double Var;
     	double weight;
     	double paramValLog;
     	MCMC mc;
     	int nParticles=beastMClist.length;
     	// substitute the following with parallel
+    	// first moment and second moment
     	for(int i=0; i<nParticles; i++)
     	{
     		weight=Math.exp(logNormalisedWeights[i]);
     		paramValLog=Math.log(beastMClist[i].m_mcmc.getState().stateNode[positionInStateArray].getArrayValue());
     		
-    		momentSum+=(weight*paramValLog);
+    		firstMoment+=(weight*paramValLog);
+    		
+    		secondMoment+=(weight*paramValLog*paramValLog);
     	}
     	
-    	momentSum/=(nParticles*1.0);
+    	// it's already weighted
+    	//momentSum/=(nParticles*1.0);
     	
-    	double Var=0;
-    	double tmp;
-    	for(int i=0; i<nParticles; i++)
-    	{
-    		weight=Math.exp(logNormalisedWeights[i]);
-    		paramValLog=Math.log(beastMClist[i].m_mcmc.getState().stateNode[positionInStateArray].getArrayValue());
-    		tmp=(weight*paramValLog)-momentSum;
-    		Var+=tmp*tmp;
-    	}
-    	Var/=(nParticles*1.0);
+    	Var=secondMoment-(firstMoment*firstMoment);
+    	
+    	
     	return Var;
     }
     
@@ -2604,6 +2606,43 @@ IS_ESS = function(log_weights)
 		
 	}
     
+//    private void updateMeanAndVariance(boolean printMean, boolean printVariance, long[] nrOfMCMCrejections, long[] nrOfMCMCMovesElemStateSpace, long[]nrOfMCMCRejectionsElemStateSpace,Sequential[] beastMClist,  double[]logWeightsNormalized, int populationsizePositionInStateArray)
+//    {
+//            	
+//    	auxDoubleVar=Arrays.stream(nrOfMCMCrejections).average().getAsDouble();
+//        avgRejectionList.add(auxDoubleVar);
+//        
+//        auxDoubleVar=Arrays.stream(nrOfMCMCMovesElemStateSpace).average().getAsDouble();
+//        avgMcmcMovesOnElementList.add(auxDoubleVar);
+//        auxDoubleVarTmp=auxDoubleVar;
+//        auxDoubleVar=Arrays.stream(nrOfMCMCRejectionsElemStateSpace).average().getAsDouble();
+//        avgRejectionOnElementList.add(auxDoubleVar);
+//        
+//        if(auxDoubleVarTmp >0)
+//        {
+//        	auxDoubleVar=(auxDoubleVar/auxDoubleVarTmp)*100.0;
+//        }
+//        else
+//        {
+//        	auxDoubleVar=Double.POSITIVE_INFINITY;
+//        }
+//        //avgRejection[(int) exponentCnt]=auxDoubleVar;
+//    	avgRejectionRateOnElementList.add(auxDoubleVar);
+//    	
+//    	System.out.println("Average rej: "+auxDoubleVar);
+//
+//    	double firstMoment=calculateWeightedMoment(beastMClist,  logWeightsNormalized, populationsizePositionInStateArray,1);
+//    	double secondMoment=calculateWeightedMoment(beastMClist, logWeightsNormalized, populationsizePositionInStateArray,2);
+//    	
+//    	// variance
+//    	auxDoubleVar=secondMoment-(firstMoment*firstMoment);
+//    	
+//    	meanOfElementList.add(firstMoment);
+//    	varOfElementList.add(auxDoubleVar);
+//
+//    	System.out.println("Mean: "+firstMoment);
+//    }
+    
     public static void main(String[] args) {
  
     	System.out.println("Main 0.....");
@@ -2676,10 +2715,11 @@ IS_ESS = function(log_weights)
         try {
             System.setProperty("beast.debug", "true"); // 
             
+            
             long N=BeastMCMC.NR_OF_PARTICLES;
             
             int N_int= (int) N; // to avoid repeated casting
-            
+
             // constant set to log(1/N) for practical purposes (we don't need to recalculate it over n over)
             final double minuslogN=-java.lang.Math.log(N); // log(1/N) using log properties
 
@@ -2759,8 +2799,7 @@ IS_ESS = function(log_weights)
         	long[] nrOfMCMCrejections=new long[N_int];
         	long[] nrOfMCMCMovesElemStateSpace=new long[N_int];
             long[] nrOfMCMCRejectionsElemStateSpace=new long[N_int];
-
-        	//List<Integer> nrOfMCMCrej=new ArrayList<>();
+        	
         	List<Double> avgRejectionList=new ArrayList<>();
         	//double[] avgRejection=new double[maxvalcnt];
         	// the following count moves and rejections on specific elements of state space (can be pop size, tree etc)
@@ -2771,8 +2810,6 @@ IS_ESS = function(log_weights)
         	List<Double> avgRejectionRateOnElementList=new ArrayList<>();
         	List<Double> meanOfElementList=new ArrayList<>();
         	List<Double> varOfElementList=new ArrayList<>();
-        	
-        	
         	// init all the avgRejection elements to "not done"
         	//final long MCMC_NotDone=-1;
             //Arrays.parallelSetAll(avgRejection, e->MCMC_NotDone);
@@ -2828,6 +2865,9 @@ IS_ESS = function(log_weights)
             
             boolean useChangedVariance=false;
             double varianceToUse=0.0;
+            
+            double currVariance=5.0;
+            double currVarianceLog=Math.log(5.0);
             
             while(nextExponentDouble<1)//for (exponentCnt=0; exponentCnt<maxvalcnt; exponentCnt++)
             {// starts from the prior and goes to target (reached when the exponent is equal to 1)
@@ -2899,17 +2939,48 @@ IS_ESS = function(log_weights)
                	normaliseWeights(logIncrementalWeights, logWeightsNormalized);
                	
                	
-               	boolean doLogCalculation=true;
+               	boolean doLogCalculation=false;
                	if(adaptiveVariance && doLogCalculation)
                	{
                    	// here calculate current mean and variance of the set of particles for populationSize, we use the weights
                    	final double currentLogSpaceStdDev=calculateParameterStdDevLogSpace(beastMClist, logWeightsNormalized, populationsizePositionInStateArray);
+                   	final double stdDevConstant;
+                   	final double perfectRatio=44;
+                   	final double perfectRatioLowerBound=perfectRatio-1.0;
+                   	final double perfectRatioUpperBound=perfectRatio+1;
+                   	
+                   	if(true && !avgRejectionRateOnElementList.isEmpty())
+                   	{// base on last element if to increase or decrease the variance
+                   		double lastRatio=100-avgRejectionRateOnElementList.get(avgRejectionRateOnElementList.size()-1);
+                   		
+                   		if(lastRatio<perfectRatioLowerBound)
+                   		{// acceptance rate low -> increase variance
+                   			stdDevConstant=(ThreadLocalRandom.current().nextDouble() * 0.5) + 0.5;
+                   		}
+                   		else
+                   		{
+                       		if(lastRatio>perfectRatioUpperBound)
+                       		{// aceptance rate too high, decrease variance
+                   			    stdDevConstant=ThreadLocalRandom.current().nextDouble()+1;
+                       		}
+                       		else
+                       			stdDevConstant=1.0;
+                   		}
+                   	}
+                   	else
+                   	{
+                   		stdDevConstant=1.0;
+                   	}
+
+                   	
+                   	currVarianceLog=stdDevConstant*currentLogSpaceStdDev;
+                   	final double localCurVar=currVarianceLog;
 
                    	//setParticleVariance
                    	Arrays.parallelSetAll(logWeightsNormalized, e->{
             			//BeastMCMC bmc=beastMClist[e];
                    		Sequential bmcc=beastMClist[e];
-                   		bmcc.m_mcmc.setParticleStdDev(currentLogSpaceStdDev);
+                   		bmcc.m_mcmc.setParticleStdDev(localCurVar);
                    		return logWeightsNormalized[e];
                    	});
                    	System.out.println("Current stdev Log: "+ currentLogSpaceStdDev);
@@ -2918,25 +2989,26 @@ IS_ESS = function(log_weights)
                	if(adaptiveVariance && (!doLogCalculation))
                	{
                    	// here calculate current mean and variance of the set of particles for populationSize, we use the weights
-                   	final double currentVar=calculateParameterVariance(beastMClist, logWeightsNormalized, populationsizePositionInStateArray);
+                   	final double currentVarz=5.0;
+               		double currentVar=calculateParameterVariance(beastMClist, logWeightsNormalized, populationsizePositionInStateArray);
                    	final double currentStdDev=Math.sqrt(currentVar);
                    	final double stdDevConstant;
-                   	final double perfectRatio=23.4;
-                   	final double perfectRatioLowerBound=perfectRatio-5.0;
-                   	final double perfectRatioUpperBound=perfectRatio+10.0;
+                   	final double perfectRatio=44;
+                   	final double perfectRatioLowerBound=perfectRatio-1.0;
+                   	final double perfectRatioUpperBound=perfectRatio+1;
                    	
-                   	if(!avgRejectionRateOnElementList.isEmpty())
+                   	if(true && !avgRejectionRateOnElementList.isEmpty())
                    	{// base on last element if to increase or decrease the variance
                    		double lastRatio=100-avgRejectionRateOnElementList.get(avgRejectionRateOnElementList.size()-1);
                    		
                    		if(lastRatio<perfectRatioLowerBound)
-                   		{
+                   		{// acceptance rate low -> increase variance
                    			stdDevConstant=(ThreadLocalRandom.current().nextDouble() * 0.5) + 0.5;
                    		}
                    		else
                    		{
                        		if(lastRatio>perfectRatioUpperBound)
-                       		{
+                       		{// aceptance rate too high, decrease variance
                    			    stdDevConstant=ThreadLocalRandom.current().nextDouble()+1;
                        		}
                        		else
@@ -2948,15 +3020,18 @@ IS_ESS = function(log_weights)
                    		stdDevConstant=1.0;
                    	}
                    	
+                   	currentVar=stdDevConstant*currentVar;
+                   	final double localCurVar=currentVar;
+                   	
 
                    	//setParticleVariance
                    	Arrays.parallelSetAll(logWeightsNormalized, e->{
             			//BeastMCMC bmc=beastMClist[e];
                    		Sequential bmcc=beastMClist[e];
-                   		bmcc.m_mcmc.setParticleStdDev(stdDevConstant*currentStdDev);
+                   		bmcc.m_mcmc.setParticleStdDev(localCurVar);
                    		return logWeightsNormalized[e];
                    	});
-                   	System.out.println("Current stdev: "+ stdDevConstant);
+                   	System.out.println("Current stdev: "+ localCurVar);
                	}
 
 				List <Integer> times = new ArrayList<>();
@@ -3041,15 +3116,34 @@ IS_ESS = function(log_weights)
                    	//if(nextExponentDouble<1.0) 
                    	{
                     	double auxDoubleVarTmp;
+                    	
+                    	// check if we need to do the mcmc steps only afterwards
+                    	boolean mcmcstepsAfterwards=meanOfElementList.isEmpty();
                         // do the mcmc moves on the particles and set the exponent for annealing
-                        doMCMC_andSetExponentForAnnealing_extended(beastMClist, currentExponentDouble, nrOfMCMCrejections, nrOfMCMCMovesElemStateSpace,nrOfMCMCRejectionsElemStateSpace);
+                    	double firstMoment;
+                    	double secondMoment;
+                        
+                    	if(meanOfElementList.isEmpty())
+                    	{// put here estimated mean and variance of the prior
+	                    	firstMoment=calculateWeightedMoment(beastMClist,  logWeightsNormalized, populationsizePositionInStateArray,1);
+	                    	secondMoment=calculateWeightedMoment(beastMClist, logWeightsNormalized, populationsizePositionInStateArray,2);
+	                    	
+	                    	// variance
+	                    	auxDoubleVar=secondMoment-(firstMoment*firstMoment);
+	                    	
+	                    	meanOfElementList.add(firstMoment);
+	                    	varOfElementList.add(auxDoubleVar);
+	
+	                    	System.out.println("Mean: "+firstMoment);
+                    	}
+                    	doMCMC_andSetExponentForAnnealing_extended(beastMClist, currentExponentDouble, nrOfMCMCrejections, nrOfMCMCMovesElemStateSpace,nrOfMCMCRejectionsElemStateSpace);
                         /*
                         doMCMC_andSetExponentForAnnealing(beastMClist, currentExponentDouble, nrOfMCMCrejections);
                          
                         nrOfMCMCMovesElemStateSpace=new long[N_int];
                         long[] nrOfMCMCRejectionsElemStateSpace;
                         */
-                        auxDoubleVar=Arrays.stream(nrOfMCMCrejections).average().getAsDouble();
+                    	auxDoubleVar=Arrays.stream(nrOfMCMCrejections).average().getAsDouble();
                         avgRejectionList.add(auxDoubleVar);
                         
                         auxDoubleVar=Arrays.stream(nrOfMCMCMovesElemStateSpace).average().getAsDouble();
@@ -3071,8 +3165,8 @@ IS_ESS = function(log_weights)
                     	
                     	System.out.println("Average rej: "+auxDoubleVar);
 
-                    	double firstMoment=calculateWeightedMoment(beastMClist,  logWeightsNormalized, populationsizePositionInStateArray,1);
-                    	double secondMoment=calculateWeightedMoment(beastMClist, logWeightsNormalized, populationsizePositionInStateArray,2);
+                    	firstMoment=calculateWeightedMoment(beastMClist,  logWeightsNormalized, populationsizePositionInStateArray,1);
+                    	secondMoment=calculateWeightedMoment(beastMClist, logWeightsNormalized, populationsizePositionInStateArray,2);
                     	
                     	// variance
                     	auxDoubleVar=secondMoment-(firstMoment*firstMoment);
@@ -3085,11 +3179,9 @@ IS_ESS = function(log_weights)
                     	// init all the avgRejection elements to "not done"
                     	//final long MCMC_NotDone=-1;
                         //Arrays.parallelSetAll(avgRejection, e->MCMC_NotDone);
-                    	
-
                    	}
     				
-                   	if((nextExponentDouble==1.0))
+                   	if(false) // (nextExponentDouble==1.0))
                    	{// at the moment we resample always at the end to make it like the mcmc
         				List<Integer> stratifiedList=stratified_resample((double [])logWeightsNormalized);
 

@@ -1,6 +1,7 @@
 # IntelliJ ignores
 *.log
 *.trees
+*.state
 /.idea
 /beast2.iml
 /META-INF
